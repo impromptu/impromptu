@@ -1,0 +1,39 @@
+{
+  "name": "impromptu",
+  "description": "A sentient prompt.",
+  "version": "0.1.0",
+  "homepage": "http://impromptu.sh/",
+  "author": "Impromptu Team (http://impromptu.sh/)",
+  "contributors": [
+    "Daryl Koopersmith (http://darylkoop.com/)",
+    "Evan Solomon (http://evansolomon.me/)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/koop/impromptu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koop/impromptu/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/koop/impromptu/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "lib/impromptu",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt mocha"
+  },
+  "devDependencies": {
+    "coffee-script": "~1.6.1",
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-contrib-coffee": "~0.6.0",
+    "grunt": "~0.4.1",
+    "mocha": "~1.8.2"
+  },
+  "keywords": []
+}
