@@ -7,7 +7,7 @@ module.exports = (grunt) ->
         files: [
           expand: true     # Enable dynamic expansion.
           cwd: 'src/'      # Src matches are relative to this path.
-          src: ['**/*.js'] # Actual pattern(s) to match.
+          src: ['**/*.coffee'] # Actual pattern(s) to match.
           dest: 'lib/'     # Destination path prefix.
           ext: '.js'       # Dest filepaths will have this extension.
         ]
