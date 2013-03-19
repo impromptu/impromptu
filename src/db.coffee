@@ -12,7 +12,7 @@ class DB
   # Returns the connection to the Redis server.
   client: ->
     # If the client object isn't cached, create a new connection.
-    if not @_client
+    unless @_client
       @_client = redis.createClient DB.REDIS_PORT
 
       # If the client throws an error, attempt to spawn the Redis server.
@@ -31,8 +31,7 @@ class DB
     # if it isn't already running.
     #
     # If we don't have a cached client, attempt to connect.
-    if not @_client
-      @_client = redis.createClient DB.REDIS_PORT
+    @_client = redis.createClient DB.REDIS_PORT unless @_client
 
     # Remove the error handler that will spawn the server.
     @_client.removeListener 'error', @_spawnServerFromError
