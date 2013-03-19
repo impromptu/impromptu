@@ -5,11 +5,11 @@ module.exports = (grunt) ->
     coffee:
       default:
         files: [
-          expand: true     # Enable dynamic expansion.
-          cwd: 'src/'      # Src matches are relative to this path.
+          expand: true         # Enable dynamic expansion.
+          cwd: 'src/'          # Src matches are relative to this path.
           src: ['**/*.coffee'] # Actual pattern(s) to match.
-          dest: 'lib/'     # Destination path prefix.
-          ext: '.js'       # Dest filepaths will have this extension.
+          dest: 'lib/'         # Destination path prefix.
+          ext: '.js'           # Dest filepaths will have this extension.
         ]
 
     watch:
