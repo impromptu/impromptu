@@ -28,6 +28,9 @@
   "scripts": {
     "test": "grunt mocha"
   },
+  "dependencies": {
+    "redis": "~0.8.2"
+  },
   "devDependencies": {
     "coffee-script": "~1.6.1",
     "grunt-contrib-watch": "~0.3.1",
