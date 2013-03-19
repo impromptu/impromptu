@@ -13,8 +13,8 @@ module.exports = (grunt) ->
         ]
 
     watch:
-      lib:
-        files: ['lib/**/*.js']
+      src:
+        files: ['src/**/*.coffee']
         tasks: ['coffee', 'mocha']
 
       test:
