@@ -18,7 +18,7 @@ module.exports = (grunt) ->
         tasks: ['coffee', 'mocha']
 
       test:
-        files: ['test/**/*.js']
+        files: ['test/**/*.coffee']
         tasks: ['mocha']
 
   # These plugins provide necessary tasks.
