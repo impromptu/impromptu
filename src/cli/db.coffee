@@ -14,8 +14,10 @@ program
   .command('shutdown')
   .description('Shut down the database daemon.')
   .action ->
-    new Impromptu.DB().shutdown()
-    process.exit()
+    DB = new Impromptu.DB()
+    DB.shutdown()
+    DB.client().on 'end', ->
+      process.exit()
 
 program.name = 'tu-db'
 
