@@ -1,2 +1,49 @@
 #!/usr/bin/env node
-require('../lib/cli.js');
+
+// Heavily inspired by "component"
+// https://github.com/component/component/blob/master/bin/component
+
+var program = require('commander'),
+    join = require('path').join,
+    exists = require('fs').existsSync,
+    spawn = require('child_process').spawn;
+
+// How to use the stuff.
+program
+  .version(require('../package').version)
+  .usage('<command> [options]');
+
+// Manual help.
+program.on('--help', function(){
+  console.log('  Commands:');
+  console.log();
+  console.log('    db <subcommand>         Manage the Impromptu database.');
+  console.log();
+  process.exit();
+});
+
+// Run the stuff.
+program.parse(process.argv);
+
+// Subcommand arguments.
+var args = process.argv.slice(3);
+
+// Subcommand.
+var cmd = program.args[0];
+
+// You are lost. Here are your friends.
+if (!cmd) {
+  process.stdout.write(program.helpInformation());
+  program.emit('--help');
+  process.exit();
+}
+
+// The command we'll run.
+var bin = 'tu-' + cmd;
+
+// Check if we have a local version fo that command.
+var local = join(__dirname, bin);
+if (exists(local)) bin = local;
+
+// Spawn the command.
+var proc = spawn(bin, args, { stdio: 'inherit' });
