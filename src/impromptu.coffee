@@ -5,4 +5,4 @@ class Impromptu
 exports = module.exports = Impromptu;
 
 # Expose APIs.
-exports.DB = require './db'
+exports.db = require './db'

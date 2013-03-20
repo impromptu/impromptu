@@ -8,11 +8,11 @@ describe 'Impromptu', ->
   it 'should exist', ->
     should.exist Impromptu
 
-describe 'DB', ->
+describe 'Database', ->
   # Try to kill the server if it's running.
   before ->
     # Check if the server is running.
-    path = Impromptu.DB.REDIS_PID_FILE
+    path = Impromptu.db.REDIS_PID_FILE
     return unless fs.existsSync path
 
     # Fetch the process ID and kill it.
@@ -21,10 +21,10 @@ describe 'DB', ->
     exec "kill -9 #{pid}"
 
   it 'should exist', ->
-    should.exist Impromptu.DB
+    should.exist Impromptu.db
 
   it 'should be stopped', (done) ->
-    client = redis.createClient Impromptu.DB.REDIS_PORT
+    client = redis.createClient Impromptu.db.REDIS_PORT
 
     client.on 'error', ->
       client.quit()
@@ -38,7 +38,7 @@ describe 'DB', ->
       client.removeAllListeners()
 
   it 'should start', (done) ->
-    client = new Impromptu.DB().client()
+    client = Impromptu.db.client()
     client.on 'connect', ->
       client.quit()
       done()
@@ -54,11 +54,7 @@ describe 'DB', ->
         client.removeAllListeners
 
   it 'should stop', (done) ->
-    DB = new Impromptu.DB()
-    client = DB.client()
-    client.on 'end', ->
-      done()
-
-    DB.shutdown()
+    Impromptu.db.client().on 'end', done
+    Impromptu.db.shutdown()
 
 

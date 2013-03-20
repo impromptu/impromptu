@@ -6,17 +6,15 @@ program
   .command('start')
   .description('Start the database daemon.')
   .action ->
-    client = new Impromptu.DB().client()
-    client.on 'connect', ->
+    Impromptu.db.client().on 'connect', ->
       process.exit()
 
 program
   .command('shutdown')
   .description('Shut down the database daemon.')
   .action ->
-    DB = new Impromptu.DB()
-    DB.shutdown()
-    DB.client().on 'end', ->
+    Impromptu.db.shutdown()
+    Impromptu.db.client().on 'end', ->
       process.exit()
 
 program.name = 'tu-db'
