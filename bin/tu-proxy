@@ -1,21 +1,15 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "$0" )" && pwd )"
-PIPE="$DIR/../etc/pipe-$$"
+# The proxy is invoked by the socket server.
+SOCKET=$1
 
-# Make the pipe.
-mkfifo $PIPE 2>/dev/null
-
-# Open the socket and record its PID.
-"$DIR/tu-socket" < $PIPE &
-SOCKET_PID=$!
-echo $SOCKET_PID
-
-# Alias `tu` to pass all arguments into the pipe.
-# @TODO: Handle STDIN?
+# Alias `tu` to pass all arguments through the socket.
 tu() {
-  echo "$@" > $PIPE
+  echo "$@" | nc -U $SOCKET 2>&1
 }
+
+tu "hello world"
+
 
 # The filename for tufiles.
 TUFILE=".tu"
@@ -55,11 +49,4 @@ if [[ -n $PROJECT_TUFILE && $PROJECT_TUFILE != $USER_TUFILE && -f $PROJECT_TUFIL
   source $PROJECT_TUFILE;
 fi
 
-# Stop the socket.
-kill -2 $SOCKET_PID
-echo "kill -2 $SOCKET_PID"
-
-# Remove the pipe.
-rm $PIPE
-
-echo "Done"
+tu exit

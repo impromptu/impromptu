@@ -2,4 +2,4 @@
 
 # Helper script to clean up any orphaned pipe files.
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-rm "$DIR/../etc/pipe-"*
+rm "$DIR/../etc/"*.sock

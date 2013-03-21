@@ -1,20 +1,22 @@
 #!/usr/bin/env node
 
-process.stdin.resume();
-process.stdin.setEncoding('utf8');
+var path = require('path'),
+  net = require('net'),
+  spawn = require('child_process').spawn;
 
-process.stdin.on('data', function(chunk) {
-  chunk = chunk.trim();
-  process.stdout.write('data: "' + chunk + '"\n');
-  if (chunk == 'exit')
-    process.exit();
+var socketPath = path.resolve(__dirname + '/../etc/' + process.pid + '.sock');
+
+var server = net.createServer(function(c) { //'connection' listener
+  c.on('data', function(chunk) {
+    chunk = chunk.toString().trim();
+
+    if (chunk == 'exit')
+      process.exit();
+  });
+
+  c.end('Hello, world!\n');
 });
 
-process.stdin.on('end', function() {
-  process.stdout.write('end');
-});
-
-process.on('SIGINT', function() {
-  process.stdout.write('SIGINT');
-  process.exit();
+server.listen(socketPath, function(){
+  spawn(__dirname + '/tu-proxy', [socketPath], { stdio: 'inherit' });
 });
