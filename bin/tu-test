@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+BUFFER="$( cd "$( dirname "$0" )" && pwd )/tu-buffer"
+
+$BUFFER hello world 1
+$BUFFER hello world 2
+$BUFFER hello world 3
+$BUFFER hello world 4

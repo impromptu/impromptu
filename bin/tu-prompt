@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+PIPE="$DIR/../etc/pipe-$$"
+
+# Make the pipe.
+mkfifo $PIPE 2>/dev/null
+
+# Open the socket and record its PID.
+"$DIR/tu-socket" < $PIPE &
+SOCKET_PID=$!
+echo $SOCKET_PID
+
+# Alias `tu` to pass all arguments into the pipe.
+# @TODO: Handle STDIN?
+tu() {
+  echo "$@" > $PIPE
+}
+
+# The filename for tufiles.
+TUFILE=".tu"
+
+PWD=$(pwd)
+USER_TUFILE="$HOME/$TUFILE"
+
+# Find the project's tufile, which is the first tufile in the directory tree.
+while [ $PWD ]; do
+  PROJECT_TUFILE="$PWD/$TUFILE"
+  echo "Checking $PROJECT_TUFILE"
+
+  # Stop at the first tufile located.
+  if [ -f $PROJECT_TUFILE ]; then
+    break;
+  fi
+
+  PWD=$(dirname $PWD)
+
+  # Special handling for the root directory.
+  if [ $PWD == "/" ]; then
+    PROJECT_TUFILE="/$TUFILE";
+    if [ ! -f $PROJECT_TUFILE ]; then
+      PROJECT_TUFILE="";
+    fi
+    break;
+  fi
+done
+
+# Load the user's tufile.
+if [ -f $USER_TUFILE ]; then
+  source $USER_TUFILE;
+fi
+
+# Load the project's tufile.
+if [[ -n $PROJECT_TUFILE && $PROJECT_TUFILE != $USER_TUFILE && -f $PROJECT_TUFILE ]]; then
+  source $PROJECT_TUFILE;
+fi
+
+# Stop the socket.
+kill -2 $SOCKET_PID
+echo "kill -2 $SOCKET_PID"
+
+# Remove the pipe.
+rm $PIPE
+
+echo "Done"

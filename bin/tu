@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo $1
 CMD="tu-${1:-help}"
 shift
 
