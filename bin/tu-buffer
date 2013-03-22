@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# Should be unnecessary given `tu-prompt`
-PIPE="$( cd "$( dirname "$0" )" && pwd )/../etc/pipe-$PPID"
-echo "$@" > $PIPE

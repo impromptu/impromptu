@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-DIR="$( cd "$( dirname "$0" )" && pwd )"
-PIPE="$DIR/../etc/pipe-$PPID"
-mkfifo $PIPE 2>/dev/null
-"$DIR/tu-socket" < $PIPE &
