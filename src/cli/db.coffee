@@ -2,8 +2,7 @@ Impromptu = require '../impromptu'
 commander = require 'commander'
 CLI = require '../cli'
 
-CLI.help.command('db <cmd>')
-   .description('Manage the Impromptu database.')
+CLI.help 'db <cmd>', 'Manage the Impromptu database.'
 
 module.exports = ->
   program = new commander.Command 'tu db'

@@ -20,7 +20,7 @@ class CLI
     # Find the most specific function based on the provided commands.
     @command = CLI
     @command = @command[@args.shift()] while @args[0] && @command[@args[0]]
-    @command = null if @command == CLI
+    @command = null if @command == CLI or @command == CLI.help
 
     @argv = process.argv.slice(0, 2).concat @args
 
@@ -29,7 +29,7 @@ class CLI
     @command.apply this, @args if @command
 
     if not @command
-      CLI.help.outputHelp()
+      CLI._help.outputHelp()
 
     @done() unless @_async
 
@@ -43,8 +43,12 @@ class CLI
   write: console.log.bind console
 
 # Initialize a help command.
-help = CLI.help = new commander.Command 'tu'
-help.usage '<command>'
+_help = CLI._help = new commander.Command 'tu'
+_help.usage '<command>'
+
+CLI.help = (command, description) ->
+  _help.command(command).description(description)
+  CLI
 
 # Expose `Command`.
 exports = module.exports = CLI;
