@@ -19,7 +19,7 @@ db =
       db._client.once 'error', db._spawnServerFromError
 
       # If the client connects error-free, ensure the error handler is removed.
-      db._client.on 'connect', =>
+      db._client.on 'connect', ->
         db._client.removeListener 'error', db._spawnServerFromError
 
     db._client

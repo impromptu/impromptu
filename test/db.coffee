@@ -9,8 +9,7 @@ describe 'Impromptu', ->
     should.exist Impromptu
 
 describe 'Database', ->
-  # Try to kill the server if it's running.
-  before ->
+  kill = ->
     # Check if the server is running.
     path = Impromptu.db.REDIS_PID_FILE
     return unless fs.existsSync path
@@ -19,6 +18,12 @@ describe 'Database', ->
     pid = parseInt fs.readFileSync(path), 10
     # Make it die a painful death.
     exec "kill -9 #{pid}"
+
+  # Try to kill the server if it's running.
+  before kill
+  after ->
+    kill()
+    delete Impromptu.db._client
 
   it 'should exist', ->
     should.exist Impromptu.db
@@ -56,5 +61,3 @@ describe 'Database', ->
   it 'should stop', (done) ->
     Impromptu.db.client().on 'end', done
     Impromptu.db.shutdown()
-
-
