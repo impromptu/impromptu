@@ -1,4 +1,8 @@
 commander = require 'commander'
+Impromptu = require './impromptu'
+path = require 'path'
+
+rcommand = /^(?:\w[\w-]*(?:\s+|$))*/
 
 class CLI
   constructor: (options) ->
@@ -18,9 +22,9 @@ class CLI
       @done = connection.end.bind connection
 
     # Find the most specific function based on the provided commands.
-    @command = CLI
+    @command = CLI.commands
     @command = @command[@args.shift()] while @args[0] && @command[@args[0]]
-    @command = null if @command == CLI or @command == CLI.help
+    @command = null unless typeof @command == 'function'
 
     @argv = process.argv.slice(0, 2).concat @args
 
@@ -42,16 +46,45 @@ class CLI
   done: process.exit.bind process
   write: console.log.bind console
 
+
 # Initialize a help command.
 _help = CLI._help = new commander.Command 'tu'
 _help.usage '<command>'
+
 
 CLI.help = (command, description) ->
   _help.command(command).description(description)
   CLI
 
-# Expose `Command`.
+
+CLI.command = (name, description, fn) ->
+  CLI.help name, description
+
+  # Validate command.
+  stack = rcommand.exec name
+  return unless stack[0]
+
+  scope = CLI.commands
+  stack = stack[0].trim().split ' '
+
+  while stack.length > 1
+    scope = scope[stack.shift()] ?= {}
+
+  scope[stack.shift()] = ->
+    command = new commander.Command('tu ' + name)
+    command.usage ' '
+    fn.call this, command
+    command.parse @argv
+
+
+CLI.require = (filepath) ->
+  fn = require path.resolve(filepath)
+  fn.call Impromptu, Impromptu, CLI.command if typeof fn == 'function'
+
+
+# Expose `CLI`.
 exports = module.exports = CLI;
 
 # Expose APIs.
-exports.db = require './cli/db'
+exports.commands = {}
+CLI.require __dirname + '/cli/db'
