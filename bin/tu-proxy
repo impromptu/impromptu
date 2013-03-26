@@ -5,10 +5,17 @@ SOCKET=$1
 
 # Alias `tu` to pass all arguments through the socket.
 tu() {
-  echo "$@" | nc -U $SOCKET 2>&1
+  # Join all of the input arguments with a separator.
+  COMMAND="$1"
+  shift
+  for var; do
+    COMMAND="${COMMAND}__IMPROMPTU__${var}"
+  done
+  # Pass the stringified argument to the socket server.
+  echo -n "$COMMAND" | nc -U $SOCKET 2>&1
 }
 
-tu "hello world"
+tu hello world
 
 
 # The filename for tufiles.

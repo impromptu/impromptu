@@ -9,8 +9,10 @@ server = net.createServer (connection) ->
     if chunk == 'exit'
       process.exit()
 
-  # Automatically close the connection for now.
-  connection.end 'Hello, world!\n'
+    # Split the command back into its components.
+    chunks = chunk.split '__IMPROMPTU__'
+    # Output the command and close the connection.
+    connection.end chunks.toString()
 
 # Generate the socket path for this process.
 socketPath = path.resolve __dirname + '/../etc/' + process.pid + '.sock'
