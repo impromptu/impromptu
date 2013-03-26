@@ -1,13 +1,3 @@
-#!/usr/bin/env bash
-echo $1
-CMD="tu-${1:-help}"
-shift
-
-if [ -f $CMD ]; then
-  $CMD "$@"
-else
-  LOCAL_CMD="$( cd "$( dirname "$0" )" && pwd )/$CMD"
-  if [ -f $LOCAL_CMD ]; then
-    $LOCAL_CMD "$@"
-  fi
-fi
+#!/usr/bin/env node
+var CLI = require('../lib/cli.js');
+new CLI().run();

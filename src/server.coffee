@@ -1,7 +1,7 @@
 path = require 'path'
 net = require 'net'
 spawn = require('child_process').spawn
-Impromptu = require './impromptu'
+CLI = require './cli'
 
 # Create a new server.
 server = net.createServer (connection) ->
@@ -13,15 +13,13 @@ server = net.createServer (connection) ->
     # Split the command back into its components.
     args = input.split '__IMPROMPTU__'
 
-    # Find the most specific function based on the provided commands.
-    command = Impromptu
-    command = command[args.shift()] while args[0] && command[args[0]]
+    # Build and run the command.
+    new CLI
+      args: args
+      connection: connection
+    .run()
 
-    # Run the command.
-    command.apply this, args unless command == Impromptu
 
-    # Output the command and close the connection.
-    connection.end()
 
 # Generate the socket path for this process.
 socketPath = path.resolve __dirname + '/../etc/' + process.pid + '.sock'

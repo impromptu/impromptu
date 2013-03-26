@@ -1,23 +1,25 @@
 Impromptu = require '../impromptu'
-program = require 'commander'
-fs = require 'fs'
+commander = require 'commander'
 
-program
-  .command('start')
-  .description('Start the database daemon.')
-  .action ->
-    Impromptu.db.client().on 'connect', ->
-      process.exit()
+module.exports = ->
+  program = new commander.Command 'tu db'
 
-program
-  .command('shutdown')
-  .description('Shut down the database daemon.')
-  .action ->
-    Impromptu.db.shutdown()
-    Impromptu.db.client().on 'end', ->
-      process.exit()
+  program
+    .command('start')
+    .description('Start the database daemon.')
+    .action =>
+      done = @async()
+      Impromptu.db.client().on 'connect', ->
+        done()
 
-program.name = 'tu-db'
+  program
+    .command('shutdown')
+    .description('Shut down the database daemon.')
+    .action =>
+      done = @async()
+      Impromptu.db.shutdown()
+      Impromptu.db.client().on 'end', ->
+        done()
 
-# Make it go.
-program.parse process.argv
+  # Make it go.
+  program.parse @argv
