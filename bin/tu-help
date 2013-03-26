@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-echo ""
-echo "  Commands:"
-echo ""
-echo "    help                    List the available Impromptu subcommands."
-echo "    db <subcommand>         Manage the Impromptu database."
-echo ""

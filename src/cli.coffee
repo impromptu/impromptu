@@ -1,3 +1,5 @@
+commander = require 'commander'
+
 class CLI
   constructor: (options) ->
     # Options
@@ -27,7 +29,7 @@ class CLI
     @command.apply this, @args if @command
 
     if not @command
-      @write 'Tried to run ' + @args.toString() + '\n'
+      CLI.help.outputHelp()
 
     @done() unless @_async
 
@@ -40,6 +42,9 @@ class CLI
   done: process.exit.bind process
   write: console.log.bind console
 
+# Initialize a help command.
+help = CLI.help = new commander.Command 'tu'
+help.usage '<command>'
 
 # Expose `Command`.
 exports = module.exports = CLI;
