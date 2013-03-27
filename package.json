@@ -30,7 +30,8 @@
   },
   "dependencies": {
     "redis": "~0.8.2",
-    "commander": "~1.1.1"
+    "commander": "~1.1.1",
+    "async": "~0.2.6"
   },
   "devDependencies": {
     "coffee-script": "~1.6.1",
