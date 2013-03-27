@@ -1,8 +1,5 @@
-class Impromptu
-  constructor: ->
-
 # Expose `Impromptu`.
-exports = module.exports = Impromptu;
+exports = module.exports = {};
 
 # Expose APIs.
 exports.db = require './db'
