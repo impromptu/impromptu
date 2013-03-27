@@ -83,7 +83,7 @@ CLI.require = (filepath) ->
 
 
 # Expose `CLI`.
-exports = module.exports = CLI;
+exports = module.exports = CLI
 
 # Expose APIs.
 exports.commands = {}

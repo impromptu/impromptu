@@ -1,5 +1,5 @@
 # Expose `Impromptu`.
-exports = module.exports = {};
+exports = module.exports = {}
 
 # Expose APIs.
 exports.db = require './db'

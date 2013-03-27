@@ -20,4 +20,4 @@ prompt =
     "prompt:#{id}"
 
 # Expose `prompt`.
-exports = module.exports = prompt;
+exports = module.exports = prompt

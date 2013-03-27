@@ -63,4 +63,4 @@ db =
     spawn 'redis-server', [path.resolve __dirname, '../etc/redis.conf']
 
 # Expose `db`.
-exports = module.exports = db;
+exports = module.exports = db
