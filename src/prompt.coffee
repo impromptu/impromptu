@@ -10,8 +10,8 @@ prompt =
   set: (id, field, value, fn) ->
     @redis().hset(@key(id), field, value, fn)
 
-  del: (id, field, fn) ->
-    @redis().hdel(@key(id), field, fn)
+  del: (id, fields..., fn) ->
+    @redis().hdel(@key(id), fields..., fn)
 
   exists: (id, field, fn) ->
     @redis().hexists(@key(id), field, fn)
