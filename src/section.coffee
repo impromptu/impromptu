@@ -13,7 +13,7 @@ class Section
   redis: Impromptu.db.client
 
   get: (key, fn) ->
-    properties = ['content', 'foreground', 'background']
+    properties = ['content', 'foreground', 'background', 'priority']
     async.map properties, (property, done) =>
       @[property] key, done
     , (err, results) ->
@@ -21,7 +21,7 @@ class Section
       fn err, results
 
   set: (key, properties, fn) ->
-    async.each ['content', 'foreground', 'background'], (property, done) =>
+    async.each ['content', 'foreground', 'background', 'priority'], (property, done) =>
       @[property] key, properties[property], done if properties[property]?
     , fn
 
@@ -36,6 +36,11 @@ class Section
 
   priority: (member, score, fn) ->
     key = "#{@prompt.key}:sections"
+
+    # Allow the getter to still receive a callback.
+    if not fn and typeof score is 'function'
+      fn = score
+      score = null
 
     if score?
       @redis().zadd key, score, member, fn

@@ -34,6 +34,7 @@ describe 'Section', ->
     content: 'batch content'
     foreground: 'red'
     background: 'black'
+    priority: '4'
 
   _.each props, (value, property) ->
     it "#{property} should be clear", (done) ->
@@ -66,4 +67,5 @@ describe 'Section', ->
           content: null
           foreground: null
           background: null
+          priority: null
         done()
