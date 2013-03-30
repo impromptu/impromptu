@@ -31,18 +31,38 @@ describe 'Section', ->
 
   ['content', 'background', 'foreground'].forEach (property) ->
     it "#{property} should be clear", (done) ->
-      section[property] 'section', (err, result) ->
+      section[property] 'test-section', (err, result) ->
         should.not.exist result
         done()
 
     it "#{property} should set data", (done) ->
-      section[property] 'section', "#{property}-value", (err) ->
-        section[property] 'section', (err, result) ->
+      section[property] 'test-section', "#{property}-value", (err) ->
+        section[property] 'test-section', (err, result) ->
           result.should.equal "#{property}-value"
           done()
 
   it "should remove data", (done) ->
-    section.del 'section', (err) ->
-      section.content 'section', (err, result) ->
+    section.del 'test-section', (err) ->
+      section.content 'test-section', (err, result) ->
         should.not.exist result
+        done()
+
+  it "should handle batched data", (done) ->
+    props =
+      content: 'batch content'
+      foreground: 'red'
+      background: 'black'
+
+    section.set 'test-batch-section', props, (err) ->
+      section.get 'test-batch-section', (err, result) ->
+        result.should.eql props
+        done()
+
+  it "should remove batched data", (done) ->
+    section.del 'test-batch-section', (err) ->
+      section.get 'test-batch-section', (err, result) ->
+        result.should.eql
+          content: null
+          foreground: null
+          background: null
         done()

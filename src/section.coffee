@@ -1,5 +1,6 @@
 Impromptu = require './impromptu'
 async = require 'async'
+_ = require 'underscore'
 
 class Section
   # A section can be created with an existing prompt object,
@@ -10,6 +11,19 @@ class Section
 
   # Returns the global connection to the Redis server.
   redis: Impromptu.db.client
+
+  get: (key, fn) ->
+    properties = ['content', 'foreground', 'background']
+    async.map properties, (property, done) =>
+      @[property] key, done
+    , (err, results) ->
+      results = _.object properties, results
+      fn err, results
+
+  set: (key, properties, fn) ->
+    async.each ['content', 'foreground', 'background'], (property, done) =>
+      @[property] key, properties[property], done if properties[property]?
+    , fn
 
   content: (key, value, fn) ->
     @property 'content', key, value, fn
