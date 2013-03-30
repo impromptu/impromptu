@@ -52,7 +52,9 @@ _help.usage '<command>'
 
 CLI.help = (command, description) ->
   _help.command(command).description(description)
-  CLI
+
+  # Prevent access to the command instance returned by Commander
+  true
 
 
 CLI.command = (name, description, fn) ->
