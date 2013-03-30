@@ -31,9 +31,7 @@ class CLI
   # Run the command.
   run: ->
     @command.apply this, @args if @command
-
-    if not @command
-      CLI._help.outputHelp()
+    CLI._help.outputHelp() unless @command
 
     @done() unless @_async
 
