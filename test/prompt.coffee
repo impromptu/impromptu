@@ -1,5 +1,6 @@
 should = require 'should'
 Impromptu = require '../lib/impromptu.js'
+async = require 'async'
 _ = require 'underscore'
 
 
@@ -69,3 +70,41 @@ describe 'Section', ->
           background: null
           priority: null
         done()
+
+
+describe 'Build', ->
+  section = new Impromptu.Section 'test-build'
+  prompt = section.prompt
+
+  sections =
+    a:
+      content: 'a'
+      background: 'blue'
+      foreground: 'white'
+      priority: 20
+    b:
+      content: 'b'
+      background: 'red'
+      foreground: 'white'
+      priority: 10
+    c:
+      content: 'c'
+      background: 'red'
+      foreground: 'default'
+      priority: 30
+
+  before (done) ->
+    async.each _.keys(sections), (name, fin) ->
+      section.set name, sections[name], fin
+    , done
+
+  it 'should be in order', (done) ->
+    prompt.order (err, order) ->
+      order.should.eql ['c', 'a', 'b']
+      done()
+
+  it 'should assemble a prompt', (done) ->
+    prompt.build (err, result) ->
+      result.should.equal 'c a b'
+      done()
+
