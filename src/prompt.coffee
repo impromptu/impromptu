@@ -1,23 +1,23 @@
 Impromptu = require './impromptu'
 
-prompt =
+class Prompt
+  constructor: (id) ->
+    @key = "prompt:#{id}"
+
   # Returns the global connection to the Redis server.
   redis: Impromptu.db.client
 
-  get: (id, field, fn) ->
-    @redis().hget(@key(id), field, fn)
+  get: (field, fn) ->
+    @redis().hget(@key, field, fn)
 
-  set: (id, field, value, fn) ->
-    @redis().hset(@key(id), field, value, fn)
+  set: (field, value, fn) ->
+    @redis().hset(@key, field, value, fn)
 
-  del: (id, fields..., fn) ->
-    @redis().hdel(@key(id), fields..., fn)
+  del: (fields..., fn) ->
+    @redis().hdel(@key, fields..., fn)
 
-  exists: (id, field, fn) ->
-    @redis().hexists(@key(id), field, fn)
-
-  key: (id) ->
-    "prompt:#{id}"
+  exists: (field, fn) ->
+    @redis().hexists(@key, field, fn)
 
 # Expose `prompt`.
-exports = module.exports = prompt
+exports = module.exports = Prompt

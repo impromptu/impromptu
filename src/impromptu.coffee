@@ -3,4 +3,4 @@ exports = module.exports = {}
 
 # Expose APIs.
 exports.db = require './db'
-exports.prompt = require './prompt'
+exports.Prompt = require './prompt'
