@@ -24,9 +24,9 @@ class Section
     key = "#{@prompt.key}:sections"
 
     if score?
-      redis.zadd key, score, member, fn
+      @redis().zadd key, score, member, fn
     else
-      redis.zscore key, member, fn
+      @redis().zscore key, member, fn
 
   del: (key, fn) ->
     properties = ['content', 'foreground', 'background'].map (property) ->
