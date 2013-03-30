@@ -85,4 +85,4 @@ exports = module.exports = CLI
 
 # Expose APIs.
 exports.commands = {}
-CLI.require __dirname + '/cli/db'
+CLI.require "#{__dirname}/cli/db"
