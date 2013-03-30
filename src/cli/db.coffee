@@ -1,18 +1,18 @@
-module.exports = (Impromptu, tu) ->
-  tu 'db <cmd>', 'Manage the Impromptu database.', (program) ->
-    program
-      .command('start')
-      .description('Start the database daemon.')
-      .action =>
-        done = @async()
-        Impromptu.db.client().on 'connect', ->
-          done()
+module.exports = (Impromptu, command) ->
+  command 'db',
+    desc: 'Manage the Impromptu database.'
 
-    program
-      .command('shutdown')
-      .description('Shut down the database daemon.')
-      .action =>
-        done = @async()
-        Impromptu.db.shutdown()
-        Impromptu.db.client().on 'end', ->
-          done()
+
+  command 'db start',
+    desc: 'Start the database daemon.'
+
+    fn: (done) ->
+      Impromptu.db.client().on 'connect', done
+
+
+  command 'db shutdown',
+    desc: 'Shut down the database daemon.'
+
+    fn: (done) ->
+      Impromptu.db.shutdown()
+      Impromptu.db.client().on 'end', done

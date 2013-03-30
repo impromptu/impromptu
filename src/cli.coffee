@@ -1,18 +1,17 @@
-commander = require 'commander'
 Impromptu = require './impromptu'
 path = require 'path'
+nopt = require 'nopt'
+_ = require 'underscore'
 
 rcommand = /^(?:\w[\w-]*(?:\s+|$))*/
 
+
 class CLI
-  constructor: (options) ->
+  constructor: (options = {}) ->
     # Options
     # - args       - A set of arguments to pass to the method, defaults to argv.
     # - connection - A connection to the socket server.
     #                Automatically overrides `done` and `write` to route through the server.
-    options ?= {}
-    @_async = false
-
     @args = options.args ? process.argv.slice 2
     @originalArgs = @args.slice()
 
@@ -22,17 +21,15 @@ class CLI
       @done = connection.end.bind connection
 
     # Find the most specific function based on the provided commands.
-    @command = CLI.commands
-    @command = @command[@args.shift()] while @args[0] && @command[@args[0]]
-    @command = null unless typeof @command == 'function'
+    @command = CLI
+    @command = @command.subcommands[@args.shift()] while @args[0] && @command.subcommands[@args[0]]
+    @command = null if @command is CLI
 
     @argv = process.argv.slice(0, 2).concat @args
 
   # Run the command.
   run: ->
-    @command.apply this, @args if @command
-    CLI._help.outputHelp() unless @command
-
+    @command?.run this
     @done() unless @_async
 
   # Register the process as asynchronous.
@@ -45,36 +42,53 @@ class CLI
   write: console.log.bind console
 
 
-# Initialize a help command.
-_help = CLI._help = new commander.Command 'tu'
-_help.usage '<command>'
+class CLI.Command
+  constructor: (@name) ->
+    @alias = []
+    @options = {}
+    @subcommands = {}
+
+  parse: (args) ->
+    @desc = args.desc if args.desc
+    @fn = args.fn if args.fn
+
+    return unless args.options
+
+    for option, value of args.options
+      @options[option] = _.extend @options[option] || {}, value
+
+  run: (cli) ->
+    # Prepare options for nopt.
+    optionTypes = {}
+    for option, value of @options
+      optionTypes[option] = value.type || String
+
+    cli.args = nopt optionTypes, {}, cli.args, 0
+
+    # Link the current command to the CLI instance.
+    cli.command = this
+
+    return unless @fn
+
+    done = cli.async() if @fn.length
+    @fn.call cli, done
 
 
-CLI.help = (command, description) ->
-  _help.command(command).description(description)
-
-  # Prevent access to the command instance returned by Commander
-  true
-
-
-CLI.command = (name, description, fn) ->
-  CLI.help name, description
-
+CLI.command = (name, options) ->
   # Validate command.
   stack = rcommand.exec name
   return unless stack[0]
 
-  scope = CLI.commands
+  scope = CLI
   stack = stack[0].trim().split ' '
 
-  while stack.length > 1
-    scope = scope[stack.shift()] ?= {}
+  # Create any commands necessary to reach our desired subcommand.
+  while stack.length
+    name = stack.shift()
+    scope.subcommands[name] ?= new CLI.Command name
+    scope = scope.subcommands[name]
 
-  scope[stack.shift()] = ->
-    command = new commander.Command "tu #{name}"
-    command.usage ' '
-    fn.call this, command
-    command.parse @argv
+  scope.parse options
 
 
 CLI.require = (filepath) ->
@@ -86,5 +100,5 @@ CLI.require = (filepath) ->
 exports = module.exports = CLI
 
 # Expose APIs.
-exports.commands = {}
+exports.subcommands = {}
 CLI.require "#{__dirname}/cli/db"
