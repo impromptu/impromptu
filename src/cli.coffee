@@ -69,7 +69,7 @@ CLI.command = (name, description, fn) ->
     scope = scope[stack.shift()] ?= {}
 
   scope[stack.shift()] = ->
-    command = new commander.Command('tu ' + name)
+    command = new commander.Command "tu #{name}"
     command.usage ' '
     fn.call this, command
     command.parse @argv
