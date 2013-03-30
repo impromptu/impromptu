@@ -7,9 +7,15 @@ A sentient prompt.
 Philosophy
 ----------
 
+### On Prompts
 * Prompts should be aware of the internet, and able to show relevant information from it.
 * Prompts should show relevant information when you need it, and nothing else.
 * Prompts should use colors so that they're visually easy to parse.
+* Prompts should be prompt. Performance is paramount.
+
+### On Impromptu
+* Impromptu should be self-documenting.
+* Impromptu should be easily extensible.
 
 
 Using Impromptu (A Spec)
