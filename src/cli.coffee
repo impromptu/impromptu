@@ -39,7 +39,7 @@ class CLI
   # Returns a callback to indicate when the process is `done`.
   async: ->
     @_async = true
-    return @done
+    @done
 
   done: process.exit.bind process
   write: console.log.bind console
