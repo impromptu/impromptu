@@ -1,5 +1,6 @@
 should = require 'should'
 Impromptu = require '../lib/impromptu.js'
+_ = require 'underscore'
 
 
 describe 'Prompt', ->
@@ -29,16 +30,21 @@ describe 'Prompt', ->
 describe 'Section', ->
   section = new Impromptu.Section 'id1'
 
-  ['content', 'background', 'foreground'].forEach (property) ->
+  props =
+    content: 'batch content'
+    foreground: 'red'
+    background: 'black'
+
+  _.each props, (value, property) ->
     it "#{property} should be clear", (done) ->
       section[property] 'test-section', (err, result) ->
         should.not.exist result
         done()
 
     it "#{property} should set data", (done) ->
-      section[property] 'test-section', "#{property}-value", (err) ->
+      section[property] 'test-section', value, (err) ->
         section[property] 'test-section', (err, result) ->
-          result.should.equal "#{property}-value"
+          result.should.equal value
           done()
 
   it "should remove data", (done) ->
@@ -48,11 +54,6 @@ describe 'Section', ->
         done()
 
   it "should handle batched data", (done) ->
-    props =
-      content: 'batch content'
-      foreground: 'red'
-      background: 'black'
-
     section.set 'test-batch-section', props, (err) ->
       section.get 'test-batch-section', (err, result) ->
         result.should.eql props
