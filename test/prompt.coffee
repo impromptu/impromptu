@@ -108,3 +108,9 @@ describe 'Build', ->
       result.should.equal 'c a b'
       done()
 
+  it 'should reset the prompt', (done) ->
+    prompt.reset (err, result) ->
+      prompt.redis().hgetall prompt.key, (err, results) ->
+        should.not.exist results
+        done()
+
