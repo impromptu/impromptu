@@ -58,10 +58,21 @@ class Prompt
         async.map order, @section.get.bind(@section), done
 
       (sections, done) =>
+        lastBackground = null
         result = sections.reduce (value, section) ->
-          "#{value || ''} #{section.content}"
+          content = "#{section.content} "
+          # If two sections have the same background color, link them with a single space.
+          content = " #{content}" unless section.background is lastBackground
+
+          content = Impromptu.color content,
+            foreground: section.foreground
+            background: section.background
+
+          lastBackground = section.background
+
+          value + content
         , ''
-        done null, result.trim()
+        done null, result
     ], fn
 
 # Expose `prompt`.

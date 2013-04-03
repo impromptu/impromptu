@@ -105,7 +105,10 @@ describe 'Build', ->
 
   it 'should assemble a prompt', (done) ->
     prompt.build (err, result) ->
-      result.should.equal 'c a b'
+      c = '\x1B[41m\x1B[39m c \x1B[0m'
+      a = '\x1B[44m\x1B[37m a \x1B[0m'
+      b = '\x1B[41m\x1B[37m b \x1B[0m'
+      result.should.equal "#{c}#{a}#{b}"
       done()
 
   it 'should reset the prompt', (done) ->
