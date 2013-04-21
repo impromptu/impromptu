@@ -60,6 +60,8 @@ class Prompt
       (sections, done) =>
         lastBackground = null
         result = sections.reduce (value, section) ->
+          return value unless section.content
+
           content = "#{section.content} "
           # If two sections have the same background color, link them with a single space.
           content = " #{content}" unless section.background is lastBackground

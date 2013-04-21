@@ -111,6 +111,19 @@ describe 'Build', ->
       result.should.equal "#{c}#{a}#{b}"
       done()
 
+  it 'should ignore empty sections', (done) ->
+    async.waterfall [
+      (fin) ->
+        section.del 'a', fin
+
+      (result, fin) ->
+        prompt.build (err, result) ->
+          c = '\x1B[41m\x1B[39m c \x1B[0m'
+          b = '\x1B[41m\x1B[37mb \x1B[0m'
+          result.should.equal "#{c}#{b}"
+          fin()
+    ], done
+
   it 'should reset the prompt', (done) ->
     prompt.reset (err, result) ->
       prompt.redis().hgetall prompt.key, (err, results) ->
