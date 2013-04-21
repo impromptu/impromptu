@@ -70,5 +70,5 @@ class Section
     else
       @prompt.get key, fn
 
-# Expose `prompt`.
+# Expose `Section`.
 exports = module.exports = Section

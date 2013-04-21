@@ -77,5 +77,5 @@ class Prompt
         done null, result
     ], fn
 
-# Expose `prompt`.
+# Expose `Prompt`.
 exports = module.exports = Prompt
