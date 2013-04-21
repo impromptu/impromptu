@@ -1,3 +1,6 @@
+# Allow `.coffee` files in `require()`.
+require 'coffee-script'
+
 # Expose `Impromptu`.
 exports = module.exports = {}
 
