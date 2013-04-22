@@ -31,3 +31,9 @@ describe 'Color', ->
       background: 'world'
 
     result.should.equal 'test'
+
+  it 'should only use its own keys', () ->
+    result = Impromptu.color 'test',
+      foreground: 'constructor'
+
+    result.should.equal 'test'
