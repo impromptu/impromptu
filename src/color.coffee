@@ -1,3 +1,5 @@
+_ = require 'underscore'
+
 COLORS =
   black: 0
   red: 1
@@ -15,10 +17,10 @@ ansi = (code) ->
 exports = module.exports = (string, format) ->
   original = string
 
-  if format.foreground and COLORS[format.foreground]
+  if format.foreground and _.has COLORS, format.foreground
     string = ansi(COLORS[format.foreground] + 30) + string
 
-  if format.background and COLORS[format.background]
+  if format.background and _.has COLORS, format.background
     string = ansi(COLORS[format.background] + 40) + string
 
   string = string + ansi(0) unless string is original
