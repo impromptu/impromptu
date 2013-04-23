@@ -53,7 +53,6 @@ describe 'Prompt', ->
       background: 'blue'
       foreground: 'white'
 
-
   expect =
     a: '\x1B[44m\x1B[37m a \x1B[0m'
     b: '\x1B[42m\x1B[37m b \x1B[0m'
@@ -67,9 +66,6 @@ describe 'Prompt', ->
     for key in keys
       prompt.section key, sections[key]
     prompt
-
-  before (done) ->
-    Impromptu.db.client().on 'connect', done
 
   it 'should add sections', ->
     prompt = makePrompt ['a', 'b', 'c']
