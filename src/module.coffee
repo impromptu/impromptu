@@ -12,7 +12,14 @@ class _Method
     # Cache responses by default.
     @options.cache = true if typeof @options.cache is 'undefined'
 
-  run: (done) =>
+    # Build our own `run` instance-method to accurately reflect the fact that
+    # `run` is always asynchronous and requires an argument to declare itself
+    # as such to our API. This feels a bit hacky, but using CoffeeScript's `=>`
+    # in `_Method.prototype` creates a zero argument function when compiled.
+    @run = (done) =>
+      _Method::run.apply @, arguments
+
+  run: (done) ->
     return done null, @results if @results
 
     # If the method accepts an argument, it is asynchronous.
