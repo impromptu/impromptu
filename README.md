@@ -18,27 +18,6 @@ Philosophy
 * Impromptu should be easily extensible.
 
 
-Using Impromptu (A Spec)
-------------------------
-
-```shell
-# Reset the prompt cache
-tu prompt reset
-
-# Add a section, set some colors, set the priority.
-tu section set user $(whoami)
-tu section priority user 100
-tu section background user blue
-tu section foreground user white
-
-# Or, do it all in one command.
-tu section set pwd $(pwd) -p 50 -b blue -f black
-
-# Build the prompt
-tu prompt build
-```
-
-
 Development
 -----------
 
