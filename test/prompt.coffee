@@ -48,6 +48,12 @@ describe 'Prompt', ->
       content: [helloSync, ' | ', methods.echo, ' | ', methods.hello]
       background: 'blue'
       foreground: 'white'
+    format:
+      content: [helloSync, methods.echo, methods.hello]
+      format: ->
+        Array::slice.call(arguments).join ' | '
+      background: 'blue'
+      foreground: 'white'
 
 
   expect =
@@ -106,4 +112,10 @@ describe 'Prompt', ->
     prompt = makePrompt ['b', 'multi', 'c']
     prompt.build (err, result) ->
       result.should.equal "#{expect.b}#{expect.multi}#{expect.c}"
+      done()
+
+  it 'should handle formatted outputs', (done) ->
+    prompt = makePrompt ['format']
+    prompt.build (err, result) ->
+      result.should.equal expect.multi
       done()
