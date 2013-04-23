@@ -25,6 +25,9 @@
   "engines": {
     "node": ">= 0.8.0"
   },
+  "bin": {
+    "tu": "./bin/tu"
+  },
   "scripts": {
     "test": "grunt mocha"
   },
