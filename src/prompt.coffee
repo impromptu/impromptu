@@ -109,7 +109,7 @@ class Prompt
         else
           results = results.join ''
 
-        done null, results.toString()
+        done null, results.toString().replace(/\n/g, '')
     ], (err, results) ->
       # If `section.when` fails, just pass along blank content.
       if err instanceof WhenError
