@@ -55,7 +55,7 @@ class Prompt
     async.waterfall [
       (done) =>
         async.each @_orderedSections, (section, complete) =>
-          @_content section, (content) ->
+          @_content section, (err, content) ->
             section._formattedContent = content
             complete()
         , done
@@ -109,7 +109,7 @@ class Prompt
         else
           results = results.join ''
 
-        done results.toString()
+        done null, results.toString()
     ], (err, results) ->
       # If `section.when` fails, just pass along blank content.
       if err instanceof WhenError
