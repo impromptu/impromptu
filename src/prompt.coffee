@@ -105,7 +105,7 @@ class Prompt
 
       (results, done) ->
         if section.format
-          results = section.format results
+          results = section.format.apply @, results
         else
           results = results.join ''
 
