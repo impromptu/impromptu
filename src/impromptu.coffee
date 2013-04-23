@@ -3,10 +3,10 @@ require 'coffee-script'
 fs = require 'fs'
 _ = require 'underscore'
 
-HOME = process.env.HOME
+CONFIG_DIR = "#{process.env.HOME}/.impromptu"
 
 class Impromptu
-  paths: ["#{HOME}/.impromptu.coffee", "#{HOME}/.impromptu.js", "#{HOME}/.impromptu"]
+  paths: "#{CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
   constructor: ->
     @prompt = new Impromptu.Prompt
