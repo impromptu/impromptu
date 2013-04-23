@@ -1,7 +1,5 @@
 should = require 'should'
 Impromptu = require '../lib/impromptu.js'
-async = require 'async'
-_ = require 'underscore'
 
 
 describe 'Prompt', ->
