@@ -35,7 +35,7 @@ class Prompt
     @_orderedSections = []
 
 
-  section: (key, options) ->
+  section: (key, options) =>
     # Create the section if it doesn't already exist.
     unless @_sections[key]
       @_sections[key] = {}
