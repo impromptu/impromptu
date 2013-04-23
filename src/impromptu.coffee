@@ -1,12 +1,16 @@
 # Allow `.coffee` files in `require()`.
 require 'coffee-script'
 
+class Impromptu
+  constructor: ->
+    @prompt = new Impromptu.Prompt
+
+
 # Expose `Impromptu`.
-exports = module.exports = {}
+exports = module.exports = Impromptu
 
 # Expose APIs.
-exports.db = require './db'
-exports.color = require './color'
 exports.Prompt = require './prompt'
-exports.Section = require './section'
+exports.color = require './color'
+exports.db = require './db'
 exports.module = require './module'
