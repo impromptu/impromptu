@@ -15,7 +15,7 @@ describe 'Module', ->
         counter += 1
 
       @register 'echo', (done) ->
-        @exec "echo test", done
+        @exec 'echo test', done
 
     methods.should.have.keys 'hello', 'count', 'echo'
 
