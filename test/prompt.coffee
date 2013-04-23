@@ -5,7 +5,6 @@ _ = require 'underscore'
 
 
 describe 'Prompt', ->
-  prompt = new Impromptu.Prompt
   sections =
     a:
       content: 'a'
@@ -20,16 +19,21 @@ describe 'Prompt', ->
       background: 'red'
       foreground: 'default'
 
+  makePrompt = (keys) ->
+    prompt = new Impromptu.Prompt
+    for key in keys
+      prompt.section key, sections[key]
+    prompt
 
   before (done) ->
     Impromptu.db.client().on 'connect', done
 
   it 'should add sections', ->
-    for key, section of sections
-      prompt.section key, section
+    prompt = makePrompt ['a', 'b', 'c']
     prompt._orderedSections.length.should.equal 3
 
   it 'should assemble a prompt', (done) ->
+    prompt = makePrompt ['a', 'b', 'c']
     prompt.build (err, result) ->
       a = '\x1B[44m\x1B[37m a \x1B[0m'
       b = '\x1B[42m\x1B[37m b \x1B[0m'
