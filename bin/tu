@@ -1,3 +1,0 @@
-#!/usr/bin/env node
-var CLI = require('../lib/cli.js');
-new CLI().run();
