@@ -6,22 +6,22 @@ _ = require 'underscore'
 HOME = process.env.HOME
 
 class Impromptu
-  paths: ["#{HOME}/.tu.coffee", "#{HOME}/.tu.js", "#{HOME}/.tu"]
+  paths: ["#{HOME}/.impromptu.coffee", "#{HOME}/.impromptu.js", "#{HOME}/.impromptu"]
 
   constructor: ->
     @prompt = new Impromptu.Prompt
 
-    tuPath = _.find @paths, (path) ->
+    configPath = _.find @paths, (path) ->
       fs.existsSync path
 
-    return unless tuPath
+    return unless configPath
 
     # Load a new Impromptu module from a file.
-    tuFile = require tuPath
-    return unless typeof tuFile == 'function'
+    configFile = require configPath
+    return unless typeof configFile == 'function'
 
     # Go!
-    tuFile Impromptu, @prompt.section
+    configFile Impromptu, @prompt.section
 
 
 # Expose `Impromptu`.

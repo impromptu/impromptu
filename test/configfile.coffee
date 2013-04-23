@@ -2,16 +2,16 @@ should = require 'should'
 Impromptu = require '../lib/impromptu.js'
 path = require 'path'
 
-Impromptu::paths = [path.resolve('./test/etc/sample-tufile.coffee')]
+Impromptu::paths = [path.resolve('./test/etc/sample-configfile.coffee')]
 
-describe 'Tufile', ->
+describe 'Config File', ->
   tu = null
 
   it 'should create an instance of Impromptu', ->
     tu = new Impromptu()
     should.exist tu
 
-  it 'should load the tufile', ->
+  it 'should load the config file', ->
     tu.prompt._orderedSections.length.should.be.ok
 
   it 'should build the prompt', (done) ->
