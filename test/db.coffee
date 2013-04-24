@@ -13,7 +13,7 @@ describe 'Database', ->
   before (done) ->
     # Check if the server is running.
     path = Impromptu.db.REDIS_PID_FILE
-    return unless fs.existsSync path
+    return done() unless fs.existsSync path
 
     # Fetch the process ID and kill it.
     pid = parseInt fs.readFileSync(path), 10
