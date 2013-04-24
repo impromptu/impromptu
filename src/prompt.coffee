@@ -109,7 +109,13 @@ class Prompt
         else
           results = results.join ''
 
-        done null, results.toString().replace(/\n/g, '')
+        # Ensure the content is a string.
+        results = results.toString()
+
+        # Strip newlines unless they're explicitly requested
+        results = results.replace(/\n/g, '') unless section.allowNewlines
+
+        done null, results
     ], (err, results) ->
       # If `section.when` fails, just pass along blank content.
       if err instanceof WhenError
