@@ -10,15 +10,15 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/koop/impromptu.git"
+    "url": "git://github.com/Impromptu/impromptu.git"
   },
   "bugs": {
-    "url": "https://github.com/koop/impromptu/issues"
+    "url": "https://github.com/impromptu/impromptu/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/koop/impromptu/blob/master/LICENSE-MIT"
+      "url": "https://github.com/impromptu/impromptu/blob/master/LICENSE-MIT"
     }
   ],
   "main": "lib/impromptu",
