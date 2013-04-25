@@ -81,11 +81,12 @@ class Prompt
 
           options = section.options
 
+          # Pad both sides of the content with spaces.
           # If two sections have the same background color, link them with a single space.
-          # Otherwise, pad both sides of the content with spaces.
-          if options.postPadding
+          # If the content begins or ends in whitespace, do not pad that side.
+          if options.postPadding and /\S$/.test content
             content = "#{content} "
-          if section.background isnt lastBackground and options.prePadding
+          if section.background isnt lastBackground and options.prePadding and /^\S/.test content
             content = " #{content}"
 
           content = Impromptu.color content,
