@@ -28,6 +28,7 @@ class Impromptu
 exports = module.exports = Impromptu
 
 # Expose APIs.
+exports.CONFIG_DIR = CONFIG_DIR
 exports.Prompt = require './prompt'
 exports.color = require './color'
 exports.db = require './db'

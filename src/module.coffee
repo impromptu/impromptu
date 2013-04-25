@@ -81,7 +81,7 @@ exports = module.exports = {}
 exports.register = (fn) ->
   new _Module(fn)._registry
 
-# Load a new Impromptu module from a file.
-exports.load = (filepath) ->
-  fn = require path.resolve(filepath)
+# Require and register a new Impromptu module.
+exports.require = (module) ->
+  fn = require "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
   exports.register fn if typeof fn == 'function'
