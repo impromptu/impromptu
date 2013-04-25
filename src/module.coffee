@@ -2,6 +2,8 @@ Impromptu = require './impromptu'
 path = require 'path'
 exec = require('child_process').exec
 
+_moduleRegistry = {}
+
 class _Method
   constructor: (@module, @name, @options, @fn) ->
     # `@options` are optional.
@@ -47,6 +49,14 @@ class _Module
     @_commandCallbacks = {}
     initialize.call @, Impromptu
 
+  name: (key) ->
+    return @_name unless key
+
+    if @_name
+      delete _moduleRegistry[@_name]
+    _moduleRegistry[key] = @_registry
+    @_name = key
+
   register: (key, options, fn) ->
     method = new _Method @, key, options, fn
     @_registry[key] = method.run
@@ -76,6 +86,10 @@ class _Module
 
 # Expose `module`.
 exports = module.exports = {}
+
+# Get an existing Impromptu module.
+exports.get = (name) ->
+  _moduleRegistry[name]
 
 # Register a new Impromptu module.
 exports.register = (fn) ->
