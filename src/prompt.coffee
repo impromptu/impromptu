@@ -130,7 +130,7 @@ class Prompt
         results = if results then results.toString() else ''
 
         # Strip newlines unless they're explicitly requested
-        results = results.replace(/\n/g, '') unless section.allowNewlines
+        results = results.replace(/\n/g, '') unless section.options.newlines
 
         done null, results
     ], (err, results) ->
