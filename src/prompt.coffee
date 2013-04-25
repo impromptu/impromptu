@@ -123,7 +123,7 @@ class Prompt
 
       (results, done) ->
         if section.format
-          results = section.format.apply @, results
+          results = section.format.apply section, results
         else
           results = results.join ''
 
