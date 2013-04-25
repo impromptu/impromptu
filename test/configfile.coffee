@@ -1,5 +1,5 @@
 should = require 'should'
-Impromptu = require '../lib/impromptu.js'
+Impromptu = require '../src/impromptu'
 path = require 'path'
 
 Impromptu::paths = [path.resolve('./test/etc/sample-configfile.coffee')]
