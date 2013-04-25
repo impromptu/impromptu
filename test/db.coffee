@@ -1,5 +1,5 @@
 should = require 'should'
-Impromptu = require '../lib/impromptu.js'
+Impromptu = require '../src/impromptu'
 fs = require 'fs'
 redis = require 'redis'
 exec = require('child_process').exec
