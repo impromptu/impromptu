@@ -29,7 +29,8 @@
     "impromptu": "./bin/impromptu"
   },
   "scripts": {
-    "test": "mocha test/*.coffee --compilers coffee:coffee-script"
+    "test": "mocha test/*.coffee --compilers coffee:coffee-script",
+    "prepublish": "command -v grunt >/dev/null 2>&1 && grunt || { echo >&2 'Grunt is not installed'; }"
   },
   "dependencies": {
     "coffee-script": "~1.6.1",
