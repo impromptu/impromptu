@@ -29,7 +29,7 @@
     "impromptu": "./bin/impromptu"
   },
   "scripts": {
-    "test": "grunt mocha"
+    "test": "mocha test/*.coffee --compilers coffee:coffee-script"
   },
   "dependencies": {
     "coffee-script": "~1.6.1",
