@@ -32,4 +32,5 @@ exports.CONFIG_DIR = CONFIG_DIR
 exports.Prompt = require './prompt'
 exports.color = require './color'
 exports.db = require './db'
+exports.exec = require './exec'
 exports.module = require './module'

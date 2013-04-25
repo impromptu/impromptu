@@ -45,8 +45,6 @@ class _Method
 class _Module
   constructor: (initialize) ->
     @_registry = {}
-    @_commandCache = {}
-    @_commandCallbacks = {}
     initialize.call @, Impromptu
 
   name: (key) ->
@@ -64,24 +62,7 @@ class _Module
   get: (key, fn) ->
     @_registry[key] fn if @_registry[key]
 
-  exec: (command, fn) ->
-    # If we've already run the command, use the cached values.
-    if @_commandCache[command]
-      fn.apply @, @_commandCache[command]
-      return
-
-    # We only run a command once. If a callbacks object exists, the command is
-    # currently in the process of running.
-    if @_commandCallbacks[command]
-      @_commandCallbacks[command].push fn
-      return
-
-    # Run the command.
-    @_commandCallbacks[command] = [fn]
-    exec command, =>
-      @_commandCache[command] = arguments
-      callback.apply @, arguments for callback in @_commandCallbacks[command]
-      delete @_commandCallbacks[command]
+  exec: Impromptu.exec
 
 
 # Expose `module`.
