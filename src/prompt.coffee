@@ -35,19 +35,32 @@ class Prompt
     @_orderedSections = []
 
 
-  section: (key, options) =>
+  section: (key, properties) =>
     # Create the section if it doesn't already exist.
     unless @_sections[key]
-      @_sections[key] = {}
+      @_sections[key] =
+        background: 'default'
+        foreground: 'default'
+        options:
+          newlines: false
+          prePadding: true
+          postPadding: true
+
       @_orderedSections.push @_sections[key]
 
     section = @_sections[key]
 
     # `when` is always an array.
-    if options.when? and not _.isArray options.when
-      options.when = [options.when]
+    if properties.when? and not _.isArray properties.when
+      properties.when = [properties.when]
 
-    _.extend section, options
+    # Apply changes to the `options` object to prevent
+    # it from being overwritten below.
+    _.extend section.options, properties.options
+    delete properties.options
+
+    # Apply changes to the section properties.
+    _.extend section, properties
 
 
   # Build the prompt.
@@ -66,16 +79,20 @@ class Prompt
           content = section._formattedContent
           return value unless content
 
+          options = section.options
+
           # If two sections have the same background color, link them with a single space.
           # Otherwise, pad both sides of the content with spaces.
-          content = "#{content} "
-          content = " #{content}" unless section.background is lastBackground
+          if options.postPadding
+            content = "#{content} "
+          if section.background isnt lastBackground and options.prePadding
+            content = " #{content}"
 
           content = Impromptu.color content,
             foreground: section.foreground
             background: section.background
 
-          lastBackground = section.background
+          lastBackground = if options.postPadding then section.background else null
 
           value + content
         , ''
