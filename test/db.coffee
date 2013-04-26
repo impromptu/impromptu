@@ -8,6 +8,10 @@ exec = require('child_process').exec
 # Todo: Make these work
 return if process.env.TRAVIS is 'true'
 
+Impromptu.db.REDIS_PORT = 6421
+Impromptu.db.REDIS_CONF_FILE = '../test/etc/redis.conf'
+Impromptu.db.REDIS_PID_FILE = '/usr/local/var/run/redis-impromptu-test.pid'
+
 describe 'Impromptu', ->
   it 'should exist', ->
     should.exist Impromptu
