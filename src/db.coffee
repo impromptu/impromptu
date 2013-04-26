@@ -4,6 +4,7 @@ path = require 'path'
 spawn = require('child_process').spawn
 
 db =
+  REDIS_CONF_FILE: '../etc/redis.conf'
   REDIS_PID_FILE: '/usr/local/var/run/redis-impromptu.pid'
   REDIS_PORT: 6420
 
@@ -60,7 +61,7 @@ db =
         fs.unlinkSync db.REDIS_PID_FILE
 
     # Spawn the server using the Impromptu server settings.
-    spawn 'redis-server', [path.resolve __dirname, '../etc/redis.conf']
+    spawn 'redis-server', [path.resolve __dirname, db.REDIS_CONF_FILE]
 
 # Expose `db`.
 exports = module.exports = db
