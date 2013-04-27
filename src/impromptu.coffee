@@ -3,10 +3,10 @@ require 'coffee-script'
 fs = require 'fs'
 _ = require 'underscore'
 
-CONFIG_DIR = "#{process.env.HOME}/.impromptu"
-
 class Impromptu
-  paths: "#{CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
+  @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
+
+  paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
   constructor: ->
     @prompt = new Impromptu.Prompt
@@ -28,7 +28,6 @@ class Impromptu
 exports = module.exports = Impromptu
 
 # Expose APIs.
-exports.CONFIG_DIR = CONFIG_DIR
 exports.Prompt = require './prompt'
 exports.color = require './color'
 exports.db = require './db'
