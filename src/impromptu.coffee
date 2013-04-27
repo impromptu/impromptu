@@ -9,6 +9,7 @@ class Impromptu
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
   constructor: ->
+    @db = new Impromptu.DB
     @prompt = new Impromptu.Prompt
 
     configPath = _.find @paths, (path) ->
@@ -28,8 +29,8 @@ class Impromptu
 exports = module.exports = Impromptu
 
 # Expose APIs.
+exports.DB = require './db'
 exports.Prompt = require './prompt'
 exports.color = require './color'
-exports.db = require './db'
 exports.exec = require './exec'
 exports.module = require './module'
