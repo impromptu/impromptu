@@ -12,10 +12,6 @@ Impromptu.DB.REDIS_PORT = 6421
 Impromptu.DB.REDIS_CONF_FILE = '../test/etc/redis.conf'
 Impromptu.DB.REDIS_PID_FILE = '/usr/local/var/run/redis-impromptu-test.pid'
 
-describe 'Impromptu', ->
-  it 'should exist', ->
-    should.exist Impromptu
-
 describe 'Database', ->
   # Try to kill the server if it's running.
   before (done) ->
