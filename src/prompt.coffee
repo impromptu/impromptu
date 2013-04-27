@@ -2,15 +2,8 @@ Impromptu = require './impromptu'
 async = require 'async'
 _ = require 'underscore'
 
-
-# Since the `Error` constructor is a JS native, and can be called without the
-# `new` keyword, CoffeeScript's inheritance breaks by default. This is fixed by
-# assigning the constructor to the actual `Error` method (which doubles as its
-# constructor), thereby allowing normal inheritance to occur. Cool? Cool.
-class WhenError extends Error
-  constructor: ->
-    super
-
+# Create a custom error for when the `when` requirements fail.
+class WhenError extends Impromptu.Error
 
 # Allows any input to be treated asynchronously.
 makeAsync = (input, callback) ->
