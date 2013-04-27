@@ -2,6 +2,7 @@ should = require 'should'
 Impromptu = require '../src/impromptu'
 fs = require 'fs'
 redis = require 'redis'
+async = require 'async'
 exec = require('child_process').exec
 
 # Skip the database tests on Travis CI
@@ -62,3 +63,76 @@ describe 'Database', ->
     db = new Impromptu.DB
     db.client().on 'end', done
     db.shutdown()
+
+
+describe 'Cache', ->
+  impromptu = new Impromptu()
+  background = new Impromptu
+    background: true
+
+  before (done) ->
+    async.series [
+      (fn) ->
+        impromptu.db.client().on 'connect', fn
+      (fn) ->
+        impromptu.db.client().flushdb fn
+      (fn) ->
+        background.db.client().on 'connect', fn
+    ], done
+
+  it 'should create a method', ->
+    method = impromptu.cache
+      name: 'method'
+      update: (fn) ->
+        fn 'value'
+
+    should.exist method
+
+  it 'should be null on first miss', (done) ->
+    cached = impromptu.cache
+      name: 'missing'
+      update: (fn) ->
+        should.fail 'Update should not run.'
+        fn 'value'
+
+    cached (err, value) ->
+      should.not.exist value
+      done()
+
+  it 'should update when background is set', (done) ->
+    cached = background.cache
+      name: 'should-update'
+      update: (fn) ->
+        done()
+        fn 'value'
+
+    cached()
+
+  it 'should fetch cached values', (done) ->
+    updater = background.cache
+      name: 'should-fetch'
+      update: (fn) ->
+        fn 'value'
+
+    fetcher = impromptu.cache
+      name: 'should-fetch'
+      update: (fn) ->
+        should.fail 'Update should not run.'
+        fn 'value'
+
+    async.series [
+      (fn) ->
+        fetcher (err, fetched) ->
+          should.not.exist fetched
+          fn err
+
+      (fn) ->
+        updater (err, updated) ->
+          updated.should.equal 'value'
+          fn err
+
+      (fn) ->
+        fetcher (err, fetched) ->
+          fetched.should.equal 'value'
+          fn err
+    ], done
