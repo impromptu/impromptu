@@ -25,6 +25,17 @@ class Impromptu
     configFile Impromptu, @prompt.section
 
 
+# Create custom errors by extending `Impromptu.Error`.
+#
+# Since the `Error` constructor is a JS native, and can be called without the
+# `new` keyword, CoffeeScript's inheritance breaks by default. This is fixed by
+# assigning the constructor to the actual `Error` method (which doubles as its
+# constructor), thereby allowing normal inheritance to occur. Cool? Cool.
+class Impromptu.Error extends Error
+  constructor: (@message) ->
+    super
+
+
 # Expose `Impromptu`.
 exports = module.exports = Impromptu
 
