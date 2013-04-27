@@ -8,9 +8,9 @@ exec = require('child_process').exec
 # Todo: Make these work
 return if process.env.TRAVIS is 'true'
 
-Impromptu.db.REDIS_PORT = 6421
-Impromptu.db.REDIS_CONF_FILE = '../test/etc/redis.conf'
-Impromptu.db.REDIS_PID_FILE = '/usr/local/var/run/redis-impromptu-test.pid'
+Impromptu.DB.REDIS_PORT = 6421
+Impromptu.DB.REDIS_CONF_FILE = '../test/etc/redis.conf'
+Impromptu.DB.REDIS_PID_FILE = '/usr/local/var/run/redis-impromptu-test.pid'
 
 describe 'Impromptu', ->
   it 'should exist', ->
@@ -20,7 +20,7 @@ describe 'Database', ->
   # Try to kill the server if it's running.
   before (done) ->
     # Check if the server is running.
-    path = Impromptu.db.REDIS_PID_FILE
+    path = Impromptu.DB.REDIS_PID_FILE
     return done() unless fs.existsSync path
 
     # Fetch the process ID and kill it.
@@ -28,14 +28,11 @@ describe 'Database', ->
     # Make it die a painful death.
     exec "kill -9 #{pid}", done
 
-  after ->
-    delete Impromptu.db._client
-
   it 'should exist', ->
-    should.exist Impromptu.db
+    should.exist Impromptu.DB
 
   it 'should be stopped', (done) ->
-    client = redis.createClient Impromptu.db.REDIS_PORT
+    client = redis.createClient Impromptu.DB.REDIS_PORT
 
     client.on 'error', ->
       client.quit()
@@ -49,7 +46,8 @@ describe 'Database', ->
       client.removeAllListeners()
 
   it 'should start', (done) ->
-    client = Impromptu.db.client()
+    db = new Impromptu.DB
+    client = db.client()
     client.on 'connect', ->
       client.quit()
       done()
@@ -65,8 +63,6 @@ describe 'Database', ->
         client.removeAllListeners
 
   it 'should stop', (done) ->
-    # TODO: This is a race condition, and should be fixed.
-    done() unless Impromptu.db._client.connected
-
-    Impromptu.db.client().on 'end', done
-    Impromptu.db.shutdown()
+    db = new Impromptu.DB
+    db.client().on 'end', done
+    db.shutdown()
