@@ -1,13 +1,11 @@
 [![Build Status](https://travis-ci.org/Impromptu/impromptu.png)](https://travis-ci.org/Impromptu/impromptu)
 
-Impromptu
-=========
+# Impromptu
 
 A sentient prompt.
 
 
-Philosophy
-----------
+## Philosophy
 
 ### On Prompts
 * Prompts should be aware of the internet, and able to show relevant information from it.
@@ -20,8 +18,7 @@ Philosophy
 * Impromptu should be easily extensible.
 
 
-Development
------------
+## Development
 
 Impromptu uses [Grunt](http://gruntjs.com/).
 
@@ -39,7 +36,7 @@ Run `grunt watch` to continually recompile the build and run tests.
 Impromptu uses [Mocha](http://visionmedia.github.com/mocha/) for testing. To run the test suite alone, run `grunt mocha`.
 
 
-License
--------
+## License
+
 Copyright (c) 2013 Daryl Koopersmith & Evan Solomon
 Licensed under the MIT license.
