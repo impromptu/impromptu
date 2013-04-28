@@ -27,6 +27,7 @@
   },
   "bin": {
     "impromptu": "./bin/impromptu",
+    "impromptu-prompt": "./bin/impromptu-prompt",
     "impromptu-background": "./bin/impromptu-background"
   },
   "scripts": {
