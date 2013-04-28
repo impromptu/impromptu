@@ -41,7 +41,7 @@ class _Method
 
 
 class _Module
-  constructor: (@moduleRegistry, initialize) ->
+  constructor: (@impromptu, @moduleRegistry, initialize) ->
     @_methods = {}
     initialize.call @, Impromptu
 
@@ -68,7 +68,7 @@ class ModuleRegistry
 
   # Register a new Impromptu module.
   register: (fn) ->
-    new _Module(@, fn)._methods
+    new _Module(@impromptu, @, fn)._methods
 
   # Require and register a new Impromptu module.
   require: (module) ->
