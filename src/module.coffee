@@ -3,12 +3,7 @@ path = require 'path'
 exec = require('child_process').exec
 
 class _Method
-  constructor: (@module, @name, @options, @fn) ->
-    # `@options` are optional.
-    if typeof @options is 'function'
-      @fn = @options
-      @options = {}
-
+  constructor: (@module, @name, @options) ->
     # Cache responses by default.
     @options.cache = true if typeof @options.cache is 'undefined'
 
@@ -23,12 +18,12 @@ class _Method
     return done null, @results if @results
 
     # If the method accepts an argument, it is asynchronous.
-    if @fn.length
+    if @options.update.length
       callback = (err, results) =>
         @cache err, results, done
 
     try
-      results = @fn.call @module, callback
+      results = @options.update.call @module, callback
     catch err
     finally
       # Process the results if method is synchronous.
@@ -52,8 +47,8 @@ class _Module
     @_name = key
     @moduleRegistry.set @_name, @_methods
 
-  register: (key, options, fn) ->
-    method = new _Method @, key, options, fn
+  register: (key, options) ->
+    method = new _Method @, key, options
     @_methods[key] = method.run
 
   get: (key, fn) ->
