@@ -1,11 +1,13 @@
 # Allow `.coffee` files in `require()`.
-require 'coffee-script'
+coffee = require 'coffee-script'
+path = require 'path'
 fs = require 'fs'
 _ = require 'underscore'
 
 class Impromptu
   @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
 
+  compiledPrompt: "#{@CONFIG_DIR}/.data/prompt.js"
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
   constructor: (@options = {}) ->
@@ -18,13 +20,27 @@ class Impromptu
     @module = new Impromptu.ModuleRegistry @
     @prompt = new Impromptu.Prompt @
 
-    configPath = _.find @paths, (path) ->
-      fs.existsSync path
+    unless fs.existsSync @compiledPrompt
+      configPath = _.find @paths, (path) ->
+        fs.existsSync path
 
-    return unless configPath
+      return unless configPath
+
+      # Make the directory if needed
+      compiledPromptDir = path.dirname @compiledPrompt
+      fs.mkdir compiledPromptDir unless fs.existsSync compiledPromptDir
+
+      # If your prompt is already JS, just copy it over
+      if /\.js$/.test configPath
+        fs.createReadStream(configPath).pipe(fs.createWriteStream(@compiledPrompt))
+      else if /\.coffee$/.test configPath
+        compiledJs = coffee.compile fs.readFileSync(configPath, {encoding: 'utf-8'})
+        fs.writeFileSync @compiledPrompt, compiledJs
+      else
+        return
 
     # Load a new Impromptu module from a file.
-    configFile = require configPath
+    configFile = require @compiledPrompt
     return unless typeof configFile == 'function'
 
     # Go!
