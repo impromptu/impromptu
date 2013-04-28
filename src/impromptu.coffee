@@ -5,6 +5,7 @@ _ = require 'underscore'
 
 class Impromptu
   @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
+  @COMPILED_DIR: "#{@CONFIG_DIR}/.compiled"
 
   compiledPrompt: "#{@CONFIG_DIR}/.data/prompt.js"
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
@@ -19,34 +20,19 @@ class Impromptu
     @module = new Impromptu.ModuleRegistry @
     @prompt = new Impromptu.Prompt @
 
-    unless fs.existsSync @compiledPrompt
-      configPath = _.find @paths, (path) ->
-        fs.existsSync path
+    # Make sure we have a source prompt
+    return unless sourcePrompt = _.find @paths, (path) ->
+      fs.existsSync path
 
-      return unless configPath
-
-      # Make the directory if needed
-      compiledPromptDir = path.dirname @compiledPrompt
-      fs.mkdir compiledPromptDir unless fs.existsSync compiledPromptDir
-
-      # If your prompt is already JS, just copy it over
-      if /\.js$/.test configPath
-        fs.createReadStream(configPath).pipe(fs.createWriteStream(@compiledPrompt))
-
-      # If you're using CS, load the CoffeeScript module to compile and cache it
-      else if /\.coffee$/.test configPath
-        coffee = require 'coffee-script'
-        compiledJs = coffee.compile fs.readFileSync(configPath, {encoding: 'utf-8'})
-        fs.writeFileSync @compiledPrompt, compiledJs
-      else
-        return
+    # Regenerate the prompt if it's been changed or doesn't exist
+    @_compilePrompt sourcePrompt if @_isPromptStale sourcePrompt
 
     # Load a new Impromptu module from a file.
-    configFile = require @compiledPrompt
-    return unless typeof configFile == 'function'
+    prompt = require @compiledPrompt
+    return unless typeof prompt == 'function'
 
     # Go!
-    configFile.call @, Impromptu, @prompt.section
+    prompt.call @, Impromptu, @prompt.section
 
 
 # Create custom errors by extending `Impromptu.Error`.
