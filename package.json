@@ -32,7 +32,7 @@
   "scripts": {
     "test": "mocha test/*.coffee --compilers coffee:coffee-script",
     "postinstall": "summon redis redis-server",
-    "prepublish": "command -v grunt >/dev/null 2>&1 && grunt || { echo >&2 'Grunt is not installed'; }"
+    "prepublish": "./scripts/bootstrap"
   },
   "dependencies": {
     "coffee-script": "~1.6.1",

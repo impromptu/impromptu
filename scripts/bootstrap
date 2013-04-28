@@ -1,0 +1,58 @@
+#!/usr/bin/env node
+var exec     = require('child_process').exec;
+var spawn    = require('child_process').spawn;
+var readline = require('readline');
+
+var userInput = readline.createInterface({
+  input  : process.stdin,
+  output : process.stdout
+});
+
+// Shared function to run the default grunt task
+function runGrunt() {
+	var cmd = spawn('grunt');
+
+	cmd.stdout.on('data', function(data){
+		console.log(data.toString());
+	});
+
+	cmd.on('exit', function(code) {
+		process.exit(code);
+	});
+}
+
+// Try to install the Grunt global if you don't have it
+// Just run `grunt` straight away if you do
+exec('command -v grunt').on('exit', function(code) {
+	if (code === 0) {
+		runGrunt();
+	} else {
+		console.log("It looks like you don't have grunt-cli installed.");
+		console.log("Impromptu uses grunt-cli to build its package.\n");
+
+		userInput.question('Can we try to intall the grunt-cli global for your? (Y/n) ', function(answer) {
+			var cmd;
+
+			if (/^n/i.test(answer)) {
+				console.log('Okay, please install grunt-cli another time if you want to develop Impromptu.');
+				console.log('Run: npm install grunt-cli -g');
+			}
+
+			cmd = spawn('npm', ['install', 'grunt-cli', '-g']);
+
+			cmd.stdout.on('data', function(data) {
+				console.log(data.toString());
+			});
+
+			cmd.on('exit', function(code) {
+				if (code === 0) {
+					console.log('Sweet, that worked!');
+					runGrunt();
+				} else {
+					console.log('Uh oh, looks like there was a problem.');
+					process.exit(1);
+				}
+			});
+		});
+	}
+});
