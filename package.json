@@ -26,7 +26,8 @@
     "node": ">= 0.8.0"
   },
   "bin": {
-    "impromptu": "./bin/impromptu"
+    "impromptu": "./bin/impromptu",
+    "impromptu-background": "./bin/impromptu-background"
   },
   "scripts": {
     "test": "mocha test/*.coffee --compilers coffee:coffee-script",

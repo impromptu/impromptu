@@ -8,8 +8,11 @@ class Impromptu
 
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
-  constructor: ->
+  constructor: (@options = {}) ->
     @db = new Impromptu.DB
+    cache = new Impromptu.Cache @
+    @cache = cache.build
+    @cache.key = cache.key
     @prompt = new Impromptu.Prompt
 
     configPath = _.find @paths, (path) ->
@@ -40,6 +43,7 @@ class Impromptu.Error extends Error
 exports = module.exports = Impromptu
 
 # Expose APIs.
+exports.Cache = require './cache'
 exports.DB = require './db'
 exports.Prompt = require './prompt'
 exports.color = require './color'
