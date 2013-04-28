@@ -30,13 +30,15 @@
   },
   "scripts": {
     "test": "mocha test/*.coffee --compilers coffee:coffee-script",
+    "postinstall": "summon redis redis-server",
     "prepublish": "command -v grunt >/dev/null 2>&1 && grunt || { echo >&2 'Grunt is not installed'; }"
   },
   "dependencies": {
     "coffee-script": "~1.6.1",
     "redis": "~0.8.2",
     "async": "~0.2.6",
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "summon": "~0.1.4"
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.3.1",
