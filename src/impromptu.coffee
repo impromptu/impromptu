@@ -25,7 +25,7 @@ class Impromptu
     return unless typeof configFile == 'function'
 
     # Go!
-    configFile Impromptu, @prompt.section
+    configFile.call @, Impromptu, @prompt.section
 
 
 # Create custom errors by extending `Impromptu.Error`.
