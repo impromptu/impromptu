@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+// Build the prompt and output the results.
+var Impromptu = new require('../lib/impromptu.js');
+new Impromptu().prompt.build(function(err, results) {
+  if (results) process.stdout.write(results);
+});

@@ -1,16 +1,3 @@
-#!/usr/bin/env node
-var spawn = require('child_process').spawn;
-
-// Build the prompt and output the results.
-var Impromptu = new require('../lib/impromptu.js');
-new Impromptu().prompt.build(function(err, results) {
-  if (results) process.stdout.write(results);
-});
-
-// Spawn the background process to asynchronously update the cache.
-background = spawn(__dirname + '/impromptu-background', [], {
-  stdio: 'ignore',
-  detached: true,
-  cwd: process.cwd()
-});
-background.unref();
+#!/usr/bin/env bash
+impromptu-prompt
+impromptu-background &

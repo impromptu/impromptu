@@ -1,3 +1,4 @@
 #!/usr/bin/env node
+// Spawn the background process to asynchronously update the cache.
 var Impromptu = new require('../lib/impromptu.js');
 new Impromptu({background: true}).prompt.build();
