@@ -8,6 +8,8 @@ class DB
   @REDIS_PID_FILE: '/usr/local/var/run/redis-impromptu.pid'
   @REDIS_PORT: 6420
 
+  constructor: (@impromptu) ->
+
   # Returns the connection to the Redis server.
   client: ->
     # If the client object isn't cached, create a new connection.

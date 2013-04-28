@@ -9,7 +9,7 @@ class Impromptu
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
   constructor: (@options = {}) ->
-    @db = new Impromptu.DB
+    @db = new Impromptu.DB @
     cache = new Impromptu.Cache @
     @cache = cache.build
     @cache.key = cache.key
