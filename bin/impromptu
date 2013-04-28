@@ -8,8 +8,9 @@ new Impromptu().prompt.build(function(err, results) {
 });
 
 // Spawn the background process to asynchronously update the cache.
-spawn(__dirname + '/impromptu-background', [], {
+background = spawn(__dirname + '/impromptu-background', [], {
   stdio: 'ignore',
   detached: true,
   cwd: process.cwd()
 });
+background.unref();
