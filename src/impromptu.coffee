@@ -1,12 +1,41 @@
 # Allow `.coffee` files in `require()`.
-require 'coffee-script'
+path = require 'path'
 fs = require 'fs'
 _ = require 'underscore'
 
 class Impromptu
   @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
 
+  compiledPrompt: "#{@CONFIG_DIR}/.compiled/prompt.js"
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
+
+  _ensureCompiledDirExists: ->
+    compiledDir = path.dirname @compiledPrompt
+    fs.mkdir compiledDir unless fs.existsSync compiledDir
+
+  _isPromptStale: (sourcePrompt) ->
+    # If the compiled prompt doesn't exist, it needs to be generated
+    return true unless fs.existsSync @compiledPrompt
+
+    sourceMtime = (new Date(fs.statSync(sourcePrompt).mtime)).getTime()
+    lastCompileTime = (new Date(fs.statSync(@compiledPrompt).mtime)).getTime()
+    return sourceMtime > lastCompileTime
+
+
+  _compilePrompt: (sourcePrompt) ->
+    @_ensureCompiledDirExists()
+
+    # If your prompt is already JS, just copy it over
+    if /\.js$/.test sourcePrompt
+      fs.createReadStream(sourcePrompt).pipe(fs.createWriteStream(@compiledPrompt))
+
+    # If you're using CS, load the CoffeeScript module to compile and cache it
+    else if /\.coffee$/.test sourcePrompt
+      coffee = require 'coffee-script'
+      compiledJs = coffee.compile fs.readFileSync(sourcePrompt).toString()
+      fs.writeFileSync @compiledPrompt, compiledJs
+    else
+      return
 
   constructor: (@options = {}) ->
     @db = new Impromptu.DB @
@@ -18,17 +47,19 @@ class Impromptu
     @module = new Impromptu.ModuleRegistry @
     @prompt = new Impromptu.Prompt @
 
-    configPath = _.find @paths, (path) ->
+    # Make sure we have a source prompt
+    return unless sourcePrompt = _.find @paths, (path) ->
       fs.existsSync path
 
-    return unless configPath
+    # Regenerate the prompt if it's been changed or doesn't exist
+    @_compilePrompt sourcePrompt if @_isPromptStale sourcePrompt
 
     # Load a new Impromptu module from a file.
-    configFile = require configPath
-    return unless typeof configFile == 'function'
+    prompt = require @compiledPrompt
+    return unless typeof prompt == 'function'
 
     # Go!
-    configFile.call @, Impromptu, @prompt.section
+    prompt.call @, Impromptu, @prompt.section
 
 
 # Create custom errors by extending `Impromptu.Error`.
