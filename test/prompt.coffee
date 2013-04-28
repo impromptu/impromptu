@@ -3,11 +3,13 @@ Impromptu = require '../src/impromptu'
 
 
 describe 'Prompt', ->
+  impromptu = new Impromptu
+
   helloSync = ->
     'Hello, world!'
 
   # Note: All module methods are handled asynchronously.
-  methods = Impromptu.module.register ->
+  methods = impromptu.module.register ->
     @register 'hello', helloSync
 
     @register 'echo', (done) ->

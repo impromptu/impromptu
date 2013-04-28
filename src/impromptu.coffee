@@ -10,9 +10,12 @@ class Impromptu
 
   constructor: (@options = {}) ->
     @db = new Impromptu.DB @
+
     cache = new Impromptu.Cache @
     @cache = cache.build
     @cache.key = cache.key
+
+    @module = new Impromptu.ModuleRegistry @
     @prompt = new Impromptu.Prompt @
 
     configPath = _.find @paths, (path) ->
@@ -42,10 +45,12 @@ class Impromptu.Error extends Error
 # Expose `Impromptu`.
 exports = module.exports = Impromptu
 
+# Expose utilities.
+exports.color = require './color'
+exports.exec = require './exec'
+
 # Expose APIs.
 exports.Cache = require './cache'
 exports.DB = require './db'
+exports.ModuleRegistry = require './module'
 exports.Prompt = require './prompt'
-exports.color = require './color'
-exports.exec = require './exec'
-exports.module = require './module'
