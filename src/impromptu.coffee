@@ -1,5 +1,4 @@
 # Allow `.coffee` files in `require()`.
-coffee = require 'coffee-script'
 path = require 'path'
 fs = require 'fs'
 _ = require 'underscore'
@@ -33,7 +32,10 @@ class Impromptu
       # If your prompt is already JS, just copy it over
       if /\.js$/.test configPath
         fs.createReadStream(configPath).pipe(fs.createWriteStream(@compiledPrompt))
+
+      # If you're using CS, load the CoffeeScript module to compile and cache it
       else if /\.coffee$/.test configPath
+        coffee = require 'coffee-script'
         compiledJs = coffee.compile fs.readFileSync(configPath, {encoding: 'utf-8'})
         fs.writeFileSync @compiledPrompt, compiledJs
       else
