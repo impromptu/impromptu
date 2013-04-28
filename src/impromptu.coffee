@@ -5,10 +5,37 @@ _ = require 'underscore'
 
 class Impromptu
   @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
-  @COMPILED_DIR: "#{@CONFIG_DIR}/.compiled"
 
-  compiledPrompt: "#{@CONFIG_DIR}/.data/prompt.js"
+  compiledPrompt: "#{@CONFIG_DIR}/.compiled/prompt.js"
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
+
+  _ensureCompiledDirExists: ->
+    compiledDir = path.dirname @compiledPrompt
+    fs.mkdir compiledDir unless fs.existsSync compiledDir
+
+  _isPromptStale: (sourcePrompt) ->
+    # If the compiled prompt doesn't exist, it needs to be generated
+    return true unless fs.existsSync @compiledPrompt
+
+    sourceMtime = (new Date(fs.statSync(sourcePrompt).mtime)).getTime()
+    lastCompileTime = (new Date(fs.statSync(@compiledPrompt).mtime)).getTime()
+    return sourceMtime > lastCompileTime
+
+
+  _compilePrompt: (sourcePrompt) ->
+    @_ensureCompiledDirExists()
+
+    # If your prompt is already JS, just copy it over
+    if /\.js$/.test sourcePrompt
+      fs.createReadStream(sourcePrompt).pipe(fs.createWriteStream(@compiledPrompt))
+
+    # If you're using CS, load the CoffeeScript module to compile and cache it
+    else if /\.coffee$/.test sourcePrompt
+      coffee = require 'coffee-script'
+      compiledJs = coffee.compile fs.readFileSync(sourcePrompt).toString()
+      fs.writeFileSync @compiledPrompt, compiledJs
+    else
+      return
 
   constructor: (@options = {}) ->
     @db = new Impromptu.DB @
