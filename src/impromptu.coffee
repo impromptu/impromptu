@@ -13,7 +13,7 @@ class Impromptu
     cache = new Impromptu.Cache @
     @cache = cache.build
     @cache.key = cache.key
-    @prompt = new Impromptu.Prompt
+    @prompt = new Impromptu.Prompt @
 
     configPath = _.find @paths, (path) ->
       fs.existsSync path

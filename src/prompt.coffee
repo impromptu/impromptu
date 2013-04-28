@@ -22,7 +22,7 @@ makeAsync = (input, callback) ->
 
 
 class Prompt
-  constructor: ->
+  constructor: (@impromptu) ->
     # Create a completely empty object.
     @_sections = Object.create null
     @_orderedSections = []
