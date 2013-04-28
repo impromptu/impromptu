@@ -9,11 +9,14 @@ class Impromptu
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
   constructor: (@options = {}) ->
-    @db = new Impromptu.DB
+    @db = new Impromptu.DB @
+
     cache = new Impromptu.Cache @
     @cache = cache.build
     @cache.key = cache.key
-    @prompt = new Impromptu.Prompt
+
+    @module = new Impromptu.ModuleRegistry @
+    @prompt = new Impromptu.Prompt @
 
     configPath = _.find @paths, (path) ->
       fs.existsSync path
@@ -25,7 +28,7 @@ class Impromptu
     return unless typeof configFile == 'function'
 
     # Go!
-    configFile Impromptu, @prompt.section
+    configFile.call @, Impromptu, @prompt.section
 
 
 # Create custom errors by extending `Impromptu.Error`.
@@ -42,10 +45,12 @@ class Impromptu.Error extends Error
 # Expose `Impromptu`.
 exports = module.exports = Impromptu
 
+# Expose utilities.
+exports.color = require './color'
+exports.exec = require './exec'
+
 # Expose APIs.
 exports.Cache = require './cache'
 exports.DB = require './db'
+exports.ModuleRegistry = require './module'
 exports.Prompt = require './prompt'
-exports.color = require './color'
-exports.exec = require './exec'
-exports.module = require './module'

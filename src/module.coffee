@@ -2,8 +2,6 @@ Impromptu = require './impromptu'
 path = require 'path'
 exec = require('child_process').exec
 
-_moduleRegistry = {}
-
 class _Method
   constructor: (@module, @name, @options, @fn) ->
     # `@options` are optional.
@@ -43,40 +41,52 @@ class _Method
 
 
 class _Module
-  constructor: (initialize) ->
-    @_registry = {}
+  constructor: (@moduleRegistry, initialize) ->
+    @_methods = {}
     initialize.call @, Impromptu
 
   name: (key) ->
     return @_name unless key
 
-    if @_name
-      delete _moduleRegistry[@_name]
-    _moduleRegistry[key] = @_registry
+    @moduleRegistry.unset @_name
     @_name = key
+    @moduleRegistry.set @_name, @_methods
 
   register: (key, options, fn) ->
     method = new _Method @, key, options, fn
-    @_registry[key] = method.run
+    @_methods[key] = method.run
 
   get: (key, fn) ->
-    @_registry[key] fn if @_registry[key]
+    @_methods[key] fn if @_methods[key]
 
   exec: Impromptu.exec
 
 
-# Expose `module`.
-exports = module.exports = {}
+class ModuleRegistry
+  constructor: (@impromptu) ->
+    @_modules = {}
 
-# Get an existing Impromptu module.
-exports.get = (name) ->
-  _moduleRegistry[name]
+  # Register a new Impromptu module.
+  register: (fn) ->
+    new _Module(@, fn)._methods
 
-# Register a new Impromptu module.
-exports.register = (fn) ->
-  new _Module(fn)._registry
+  # Require and register a new Impromptu module.
+  require: (module) ->
+    fn = require "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
+    @register fn if typeof fn == 'function'
 
-# Require and register a new Impromptu module.
-exports.require = (module) ->
-  fn = require "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
-  exports.register fn if typeof fn == 'function'
+  # Get an existing Impromptu module.
+  get: (name) ->
+    @_modules[name]
+
+  # Set an existing Impromptu module.
+  set: (name, methods) ->
+    @_modules[name] = methods
+
+  # Unset an existing Impromptu module.
+  unset: (name) ->
+    delete @_modules[name]
+
+
+# Expose `ModuleRegistry`.
+exports = module.exports = ModuleRegistry
