@@ -42,6 +42,7 @@ exec('command -v grunt').on('exit', function(code) {
 			if (/^n/i.test(answer)) {
 				console.log('Okay, please install grunt-cli another time if you want to develop Impromptu.');
 				console.log('Run: npm install grunt-cli -g');
+				process.exit(0);
 			}
 
 			cmd = spawn('npm', ['install', 'grunt-cli', '-g']);
