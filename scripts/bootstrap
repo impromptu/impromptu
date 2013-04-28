@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 var exec     = require('child_process').exec;
 var spawn    = require('child_process').spawn;
 var readline = require('readline');
@@ -29,6 +30,11 @@ exec('command -v grunt').on('exit', function(code) {
 	} else {
 		console.log("It looks like you don't have grunt-cli installed.");
 		console.log("Impromptu uses grunt-cli to build its package.\n");
+
+		// Don't try to install Grunt on Travis CI
+		// Since there's no human to answer the prompt, it just hangs pointlessly
+		if (process.env.TRAVIS == 'true')
+			process.exit(0);
 
 		userInput.question('Can we try to intall the grunt-cli global for your? (Y/n) ', function(answer) {
 			var cmd;
