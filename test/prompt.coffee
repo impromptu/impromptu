@@ -32,6 +32,11 @@ describe 'Prompt', ->
       content: 'd'
       background: 'red'
       foreground: 'white'
+    disabled:
+      content: "you should not see me"
+      disabled: yes
+      background: 'green'
+      foreground: 'white'
     empty:
       content: ''
       background: 'red'
@@ -114,4 +119,10 @@ describe 'Prompt', ->
     prompt = makePrompt ['format']
     prompt.build (err, result) ->
       result.should.equal expect.multi
+      done()
+
+  it 'should hide disabled sections', (done) ->
+    prompt = makePrompt ['b', 'disabled']
+    prompt.build (err, result) ->
+      result.should.equal expect.b
       done()

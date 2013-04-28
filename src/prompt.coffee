@@ -32,6 +32,7 @@ class Prompt
     # Create the section if it doesn't already exist.
     unless @_sections[key]
       @_sections[key] =
+        disabled: false
         background: 'default'
         foreground: 'default'
         options:
@@ -55,6 +56,8 @@ class Prompt
     # Apply changes to the section properties.
     _.extend section, properties
 
+    # if the section is disabled, we override `when`
+    section.when = [false] if properties.disabled?
 
   # Build the prompt.
   build: (fn) ->
