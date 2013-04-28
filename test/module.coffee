@@ -3,11 +3,12 @@ Impromptu = require '../src/impromptu'
 
 
 describe 'Module', ->
+  impromptu = new Impromptu
   methods = null
   counter = 0
 
   it 'should register a module', ->
-    methods = Impromptu.module.register ->
+    methods = impromptu.module.register ->
       @name 'methods'
 
       @register 'hello', ->
@@ -22,7 +23,7 @@ describe 'Module', ->
     methods.should.have.keys 'hello', 'count', 'echo'
 
   it 'should store a module', ->
-    Impromptu.module.get('methods').should.equal methods
+    impromptu.module.get('methods').should.equal methods
 
   it 'should call a method', ->
     methods.hello (err, results) ->

@@ -84,7 +84,7 @@ describe 'Cache', ->
     method = impromptu.cache
       name: 'method'
       update: (fn) ->
-        fn 'value'
+        fn null, 'value'
 
     should.exist method
 
@@ -93,7 +93,7 @@ describe 'Cache', ->
       name: 'missing'
       update: (fn) ->
         should.fail 'Update should not run.'
-        fn 'value'
+        fn null, 'value'
 
     cached (err, value) ->
       should.not.exist value
@@ -104,7 +104,7 @@ describe 'Cache', ->
       name: 'should-update'
       update: (fn) ->
         done()
-        fn 'value'
+        fn null, 'value'
 
     cached()
 
@@ -112,13 +112,13 @@ describe 'Cache', ->
     updater = background.cache
       name: 'should-fetch'
       update: (fn) ->
-        fn 'value'
+        fn null, 'value'
 
     fetcher = impromptu.cache
       name: 'should-fetch'
       update: (fn) ->
         should.fail 'Update should not run.'
-        fn 'value'
+        fn null, 'value'
 
     async.series [
       (fn) ->

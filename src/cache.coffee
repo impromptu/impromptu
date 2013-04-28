@@ -70,7 +70,9 @@ class Cache
           client.set "lock-process:#{key}", process.pid
 
           # Run the provided method to generate the new value to cache.
-          options.update (value) ->
+          options.update (err, value) ->
+            return done err if err
+
             # Update the cache with the new value and locks.
             async.parallel [
               (fin) ->
