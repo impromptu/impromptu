@@ -1,10 +1,9 @@
 should = require 'should'
+environment = require './shared/environment'
 Impromptu = require '../src/impromptu'
 path = require 'path'
 exec = require('child_process').exec
 
-Impromptu::paths = [path.resolve('./test/etc/sample-configfile.coffee')]
-Impromptu::compiledPrompt = path.resolve('./test/etc/.compiled/sample-configfile.js')
 
 describe 'Config File', ->
   impromptu = new Impromptu

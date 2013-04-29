@@ -11,14 +11,17 @@ describe 'Module', ->
     methods = impromptu.module.register ->
       @name 'methods'
 
-      @register 'hello', ->
-        'Hello, world!'
+      @register 'hello',
+        update: ->
+          'Hello, world!'
 
-      @register 'count', ->
-        counter += 1
+      @register 'count',
+        update: ->
+          counter += 1
 
-      @register 'echo', (done) ->
-        @exec 'echo test', done
+      @register 'echo',
+        update: (done) ->
+          @exec 'echo test', done
 
     methods.should.have.keys 'hello', 'count', 'echo'
 
