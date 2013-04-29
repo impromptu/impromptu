@@ -47,7 +47,8 @@ class Cache extends Impromptu.Cacheable
 
   unset: (fn) ->
     key = @key()
-    @client().del key, "lock:#{key}", "lock-process:#{key}", fn
+    @client().del key, "lock:#{key}", "lock-process:#{key}", (err, results) ->
+      fn err, !!results
 
 
   get: (fn) ->
