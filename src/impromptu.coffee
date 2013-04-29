@@ -86,6 +86,7 @@ exports.exec = require './exec'
 
 # Expose APIs.
 exports.Cache = require './cache'
+exports.Cache.Local = require './cache-local'
 exports.Cache.Global = require './cache-global'
 exports.DB = require './db'
 exports.ModuleRegistry = require './module'

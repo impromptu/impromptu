@@ -63,6 +63,14 @@ describe 'Database', ->
     db.shutdown()
 
 
+describe 'Local Cache', ->
+  it 'should exist', ->
+    should.exist Impromptu.Cache.Local
+
+  describe 'Cache API', ->
+    cacheApiTests Impromptu.Cache.Local
+
+
 describe 'Global Cache', ->
   impromptu = new Impromptu()
   background = new Impromptu
