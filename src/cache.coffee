@@ -17,6 +17,8 @@ processIsRunning = (pid) ->
 
 
 class Cache extends Impromptu.Cacheable
+  @Error: CacheError
+
   key: ->
     parts = [@name]
 
@@ -65,12 +67,15 @@ class Cache extends Impromptu.Cacheable
 
       # Check if there's a process already running to update the cache.
       (exists, done) ->
-        throw new CacheError() if exists
+        if exists
+          throw new CacheError 'The key is currently locked.'
+
         client.get "lock-process:#{key}", done
 
       (pid, done) ->
         # If there's an update process, check that it's still running.
-        throw new CacheError() if pid and processIsRunning pid
+        if pid and processIsRunning pid
+          throw new CacheError 'A process is currently updating this key.'
 
         # Time to update the cache.
         # Set the process lock.
@@ -100,10 +105,10 @@ class Cache extends Impromptu.Cacheable
             # Unset the lock process; the value has been updated.
             client.del "lock-process:#{key}", done
     ], (err, results) ->
-      # If we catch a `CacheError`, the update sequence bailed; set the result
-      # to `false` and unset the error.
+      # If we catch a `CacheError`, the update sequence bailed;
+      # set the result to `false`.
       if err and err instanceof CacheError
-        return fn null, false
+        return fn err, false
 
       # Otherwise, the update was successful if there was no error.
       fn err, !!err
