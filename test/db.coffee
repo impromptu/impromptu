@@ -4,6 +4,7 @@ fs = require 'fs'
 redis = require 'redis'
 async = require 'async'
 exec = require('child_process').exec
+cacheApiTests = require './shared/cache'
 
 # Skip the database tests on Travis CI
 # Todo: Make these work
@@ -80,87 +81,44 @@ describe 'Global Cache', ->
         background.db.client().on 'connect', fn
     ], done
 
-  it 'should create an instance', ->
-    method = new Impromptu.Cache.Global impromptu, 'method',
-      update: (fn) ->
-        fn null, 'value'
+  it 'should exist', ->
+    should.exist Impromptu.Cache.Global
 
-    should.exist method
+  describe 'Cache API', ->
+    cacheApiTests Impromptu.Cache.Global
 
-  it 'should be null on first miss', (done) ->
-    cached = new Impromptu.Cache.Global impromptu, 'missing',
-      update: (fn) ->
-        should.fail 'Update should not run.'
-        fn null, 'value'
+  describe 'Run Behavior', ->
+    it 'should update when background is set', (done) ->
+      cached = new Impromptu.Cache.Global background, 'should-update',
+        update: (fn) ->
+          done()
+          fn null, 'value'
 
-    cached.run (err, value) ->
-      should.not.exist value
-      done()
+      cached.run()
 
-  it 'should update when background is set', (done) ->
-    cached = new Impromptu.Cache.Global background, 'should-update',
-      update: (fn) ->
-        done()
-        fn null, 'value'
+    it 'should fetch globally cached values', (done) ->
+      updater = new Impromptu.Cache.Global background, 'should-fetch',
+        update: (fn) ->
+          fn null, 'value'
 
-    cached.run()
+      fetcher = new Impromptu.Cache.Global impromptu, 'should-fetch',
+        update: (fn) ->
+          should.fail 'Update should not run.'
+          fn null, 'value'
 
-  it 'should fetch cached values', (done) ->
-    updater = new Impromptu.Cache.Global background, 'should-fetch',
-      update: (fn) ->
-        fn null, 'value'
+      async.series [
+        (fn) ->
+          fetcher.run (err, fetched) ->
+            should.not.exist fetched
+            fn err
 
-    fetcher = new Impromptu.Cache.Global impromptu, 'should-fetch',
-      update: (fn) ->
-        should.fail 'Update should not run.'
-        fn null, 'value'
+        (fn) ->
+          updater.run (err, updated) ->
+            updated.should.equal 'value'
+            fn err
 
-    async.series [
-      (fn) ->
-        fetcher.run (err, fetched) ->
-          should.not.exist fetched
-          fn err
-
-      (fn) ->
-        updater.run (err, updated) ->
-          updated.should.equal 'value'
-          fn err
-
-      (fn) ->
-        fetcher.run (err, fetched) ->
-          fetched.should.equal 'value'
-          fn err
-    ], done
-
-  it 'should clear cached values', (done) ->
-    updater = new Impromptu.Cache.Global background, 'should-clear',
-      update: (fn) ->
-        fn null, 'value'
-
-    async.series [
-      (fn) ->
-        updater.get (err, result) ->
-          should.not.exist result
-          fn err
-
-      (fn) ->
-        updater.set (err, result) ->
-          result.should.equal true
-          fn err
-
-      (fn) ->
-        updater.get (err, result) ->
-          result.should.equal 'value'
-          fn err
-
-      (fn) ->
-        updater.unset (err, result) ->
-          result.should.equal true
-          fn err
-
-      (fn) ->
-        updater.get (err, result) ->
-          should.not.exist result
-          fn err
-
-    ], done
+        (fn) ->
+          fetcher.run (err, fetched) ->
+            fetched.should.equal 'value'
+            fn err
+      ], done
