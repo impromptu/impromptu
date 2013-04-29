@@ -3,8 +3,12 @@ path = require 'path'
 fs = require 'fs'
 _ = require 'underscore'
 
+# Load our own package.json
+npmConfig = require '../package.json'
+
 class Impromptu
   @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
+  @VERSION: npmConfig.version
 
   compiledPrompt: "#{@CONFIG_DIR}/.compiled/prompt.js"
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
