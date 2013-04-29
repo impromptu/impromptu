@@ -1,5 +1,5 @@
 should = require 'should'
-testUtil = require './shared/test-util'
+environment = require './shared/environment'
 Impromptu = require '../src/impromptu'
 fs = require 'fs'
 redis = require 'redis'
@@ -9,7 +9,7 @@ cacheApiTests = require './shared/cache'
 
 # Skip the database tests on Travis CI
 # TODO: Make these work
-return if testUtil.isTravis()
+return if environment.isTravis()
 
 describe 'Database', ->
   # Try to kill the server if it's running.
