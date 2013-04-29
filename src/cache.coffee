@@ -1,104 +1,40 @@
 Impromptu = require './impromptu'
-async = require 'async'
-exec = require('child_process').exec
 
-class CacheError extends Impromptu.Error
-
-processIsRunning = (pid) ->
-  # Attempt to ping the process.
-  try
-    process.kill pid, 0
-
-  # If pinging the server throws an error (ESRCH), then the process isn't running.
-  catch ersch
-    return true
-
-  return false
-
-
+# An abstract class that manages how a method is cached.
 class Cache
-  constructor: (@impromptu) ->
-
-  key: (options) ->
-    parts = []
-
-    parts.push options.name if options.name
-
-    if options.directory
-      if options.directory is true
-        parts.push process.cwd()
-      else
-        parts.push options.directory
-
-    parts.join ':'
+  constructor: (@impromptu, @name, @options) ->
 
 
-  del: (options, fn) =>
-    key = @key key
-    client.del key, "lock:#{key}", "lock-process:#{key}", fn
+  # The main method.
+  #
+  # Accepts a `fn` with a signature of `err, results`, where `results` is the
+  # cached value. Optionally updates the cache.
+  #
+  # This should be bound to the instance so the method can be passed around
+  # without the instance.
+  run: (fn) => throw Impromptu.AbstractError
 
 
-  build: (options) =>
-    key = @key options
+  # Gets the cached value.
+  #
+  # Accepts a `fn` with a signature of `err, results`, where `results` is the
+  # cached value. Does not update the cache.
+  get: (fn) -> throw Impromptu.AbstractError
 
-    return unless key
 
-    (callback) =>
-      client = @impromptu.db.client()
+  # Updates the cached value.
+  #
+  # Accepts a `fn` with a signature of `err, success`, where `success` is a
+  # boolean indicating whether the cached value was updated.
+  set: (fn) -> throw Impromptu.AbstractError
 
-      # If this process isn't being run in the background,
-      # just try to fetch the cached value.
-      return client.get key, callback unless @impromptu.options.background
 
-      # Try to update the cached value.
-      async.waterfall [
-        # Check if the cached value is locked (and therefore still valid).
-        (done) ->
-          client.exists "lock:#{key}", done
+  # Clears the cached value.
+  #
+  # Accepts a `fn` with a signature of `err, success`, where `success` is a
+  # boolean indicating whether the value was removed from the cache.
+  unset: (fn) -> throw Impromptu.AbstractError
 
-        # Check if there's a process already running to update the cache.
-        (exists, done) ->
-          throw new CacheError() if exists
-          client.get "lock-process:#{key}", done
-
-        (pid, done) =>
-          # If there's an update process, check that it's still running.
-          throw new CacheError() if pid and processIsRunning pid
-
-          # Time to update the cache.
-          # Set the process lock.
-          client.set "lock-process:#{key}", process.pid
-
-          # Run the provided method to generate the new value to cache.
-          options.update (err, value) ->
-            return done err if err
-
-            # Update the cache with the new value and locks.
-            async.parallel [
-              (fin) ->
-                # Update the cached value.
-                client.set key, value.toString(), fin
-
-              (fin) ->
-                return fin() unless options.expire
-
-                # If the cached value should be stored for a certain amount of
-                # time, set the lock and expiration timer.
-                client.set "lock:#{key}", true, (err) ->
-                  fin err if err
-                  client.expire "lock:#{key}", options.expire, fin
-            ], (err) ->
-              done err if err
-
-              # Unset the lock process; the value has been updated.
-              client.del "lock-process:#{key}", done
-      ], (err, results) ->
-        if err and err not instanceof CacheError
-          throw err
-
-        # When the updating sequence completes (or bails), return the cached
-        # value to the provided callback.
-        client.get key, callback
 
 # Expose `Cache`.
 exports = module.exports = Cache

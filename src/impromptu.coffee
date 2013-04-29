@@ -44,10 +44,6 @@ class Impromptu
   constructor: (@options = {}) ->
     @db = new Impromptu.DB @
 
-    cache = new Impromptu.Cache @
-    @cache = cache.build
-    @cache.key = cache.key
-
     @module = new Impromptu.ModuleRegistry @
     @prompt = new Impromptu.Prompt @
 
@@ -76,6 +72,10 @@ class Impromptu.Error extends Error
   constructor: (@message) ->
     super
 
+class Impromptu.AbstractError extends Impromptu.Error
+  constructor: (@message) ->
+    @message = 'This method should be defined in a subclass.' unless @message
+
 
 # Expose `Impromptu`.
 exports = module.exports = Impromptu
@@ -86,6 +86,8 @@ exports.exec = require './exec'
 
 # Expose APIs.
 exports.Cache = require './cache'
+exports.Cache.Local = require './cache-local'
+exports.Cache.Global = require './cache-global'
 exports.DB = require './db'
 exports.ModuleRegistry = require './module'
 exports.Prompt = require './prompt'
