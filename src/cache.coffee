@@ -106,13 +106,8 @@ class Cache extends Impromptu.Cacheable
             # Unset the lock process; the value has been updated.
             client.del "lock-process:#{key}", done
     ], (err, results) ->
-      # If we catch a `CacheError`, the update sequence bailed;
-      # set the result to `false`.
-      if err and err instanceof CacheError
-        return fn err, false
-
-      # Otherwise, the update was successful if there was no error.
-      fn err, !!err
+      # The update was successful if there was no error.
+      fn err, results and not err
 
 
 # Expose `Cache`.
