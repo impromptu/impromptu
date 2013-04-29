@@ -85,8 +85,8 @@ exports.color = require './color'
 exports.exec = require './exec'
 
 # Expose APIs.
-exports.Cacheable = require './cacheable'
 exports.Cache = require './cache'
+exports.Cache.Global = require './cache-global'
 exports.DB = require './db'
 exports.ModuleRegistry = require './module'
 exports.Prompt = require './prompt'

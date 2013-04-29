@@ -65,7 +65,7 @@ describe 'Database', ->
     db.shutdown()
 
 
-describe 'Cache', ->
+describe 'Global Cache', ->
   impromptu = new Impromptu()
   background = new Impromptu
     background: true
@@ -81,14 +81,14 @@ describe 'Cache', ->
     ], done
 
   it 'should create an instance', ->
-    method = new Impromptu.Cache impromptu, 'method',
+    method = new Impromptu.Cache.Global impromptu, 'method',
       update: (fn) ->
         fn null, 'value'
 
     should.exist method
 
   it 'should be null on first miss', (done) ->
-    cached = new Impromptu.Cache impromptu, 'missing',
+    cached = new Impromptu.Cache.Global impromptu, 'missing',
       update: (fn) ->
         should.fail 'Update should not run.'
         fn null, 'value'
@@ -98,7 +98,7 @@ describe 'Cache', ->
       done()
 
   it 'should update when background is set', (done) ->
-    cached = new Impromptu.Cache background, 'should-update',
+    cached = new Impromptu.Cache.Global background, 'should-update',
       update: (fn) ->
         done()
         fn null, 'value'
@@ -106,11 +106,11 @@ describe 'Cache', ->
     cached.run()
 
   it 'should fetch cached values', (done) ->
-    updater = new Impromptu.Cache background, 'should-fetch',
+    updater = new Impromptu.Cache.Global background, 'should-fetch',
       update: (fn) ->
         fn null, 'value'
 
-    fetcher = new Impromptu.Cache impromptu, 'should-fetch',
+    fetcher = new Impromptu.Cache.Global impromptu, 'should-fetch',
       update: (fn) ->
         should.fail 'Update should not run.'
         fn null, 'value'
@@ -133,7 +133,7 @@ describe 'Cache', ->
     ], done
 
   it 'should clear cached values', (done) ->
-    updater = new Impromptu.Cache background, 'should-clear',
+    updater = new Impromptu.Cache.Global background, 'should-clear',
       update: (fn) ->
         fn null, 'value'
 
