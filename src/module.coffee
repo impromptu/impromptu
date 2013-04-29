@@ -4,6 +4,10 @@ exec = require('child_process').exec
 
 class _Method
   constructor: (@module, @name, @options) ->
+    # Backwards compatibility when @options is set as a function.
+    # TODO(koop): Remove compatibility once this API has solidified.
+    @options = {update: @options} if typeof @options is 'function'
+
     # Cache responses by default.
     @options.cache = true if typeof @options.cache is 'undefined'
 
