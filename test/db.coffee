@@ -80,59 +80,54 @@ describe 'Cache', ->
         background.db.client().on 'connect', fn
     ], done
 
-  it 'should create a method', ->
-    method = impromptu.cache
-      name: 'method'
+  it 'should create an instance', ->
+    method = new Impromptu.Cache impromptu, 'method',
       update: (fn) ->
         fn null, 'value'
 
     should.exist method
 
   it 'should be null on first miss', (done) ->
-    cached = impromptu.cache
-      name: 'missing'
+    cached = new Impromptu.Cache impromptu, 'missing',
       update: (fn) ->
         should.fail 'Update should not run.'
         fn null, 'value'
 
-    cached (err, value) ->
+    cached.run (err, value) ->
       should.not.exist value
       done()
 
   it 'should update when background is set', (done) ->
-    cached = background.cache
-      name: 'should-update'
+    cached = new Impromptu.Cache background, 'should-update',
       update: (fn) ->
         done()
         fn null, 'value'
 
-    cached()
+    cached.run()
 
   it 'should fetch cached values', (done) ->
-    updater = background.cache
-      name: 'should-fetch'
+    updater = new Impromptu.Cache background, 'should-fetch',
       update: (fn) ->
         fn null, 'value'
 
-    fetcher = impromptu.cache
-      name: 'should-fetch'
+    fetcher = new Impromptu.Cache impromptu, 'should-fetch',
       update: (fn) ->
         should.fail 'Update should not run.'
         fn null, 'value'
 
     async.series [
       (fn) ->
-        fetcher (err, fetched) ->
+        fetcher.run (err, fetched) ->
           should.not.exist fetched
           fn err
 
       (fn) ->
-        updater (err, updated) ->
+        updater.run (err, updated) ->
           updated.should.equal 'value'
           fn err
 
       (fn) ->
-        fetcher (err, fetched) ->
+        fetcher.run (err, fetched) ->
           fetched.should.equal 'value'
           fn err
     ], done
