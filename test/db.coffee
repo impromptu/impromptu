@@ -1,17 +1,15 @@
 should = require 'should'
+testUtil = require './shared/test-util'
 Impromptu = require '../src/impromptu'
 fs = require 'fs'
 redis = require 'redis'
 async = require 'async'
 exec = require('child_process').exec
 cacheApiTests = require './shared/cache'
-testUtil = require './shared/test-util'
 
 # Skip the database tests on Travis CI
 # TODO: Make these work
 return if testUtil.isTravis()
-
-testUtil.useTestDatabase()
 
 describe 'Database', ->
   # Try to kill the server if it's running.
