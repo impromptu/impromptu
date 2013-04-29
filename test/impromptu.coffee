@@ -6,6 +6,9 @@ describe 'Impromptu', ->
   it 'should exist', ->
     should.exist Impromptu
 
+  it 'should use semantic versions', ->
+    /^\d+\.\d+\.\d+(\D|$)/.test(Impromptu.VERSION).should.be.true
+
 describe 'Impromptu.Error', ->
   it 'should have a message', ->
     error = new Impromptu.Error 'message'
