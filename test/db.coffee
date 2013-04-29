@@ -131,3 +131,36 @@ describe 'Cache', ->
           fetched.should.equal 'value'
           fn err
     ], done
+
+  it 'should clear cached values', (done) ->
+    updater = new Impromptu.Cache background, 'should-clear',
+      update: (fn) ->
+        fn null, 'value'
+
+    async.series [
+      (fn) ->
+        updater.get (err, result) ->
+          should.not.exist result
+          fn err
+
+      (fn) ->
+        updater.set (err, result) ->
+          result.should.equal true
+          fn err
+
+      (fn) ->
+        updater.get (err, result) ->
+          result.should.equal 'value'
+          fn err
+
+      (fn) ->
+        updater.unset (err, result) ->
+          result.should.equal true
+          fn err
+
+      (fn) ->
+        updater.get (err, result) ->
+          should.not.exist result
+          fn err
+
+    ], done
