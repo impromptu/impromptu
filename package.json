@@ -29,6 +29,7 @@
     "impromptu": "./bin/impromptu",
     "impromptu-background": "./bin/impromptu-background"
   },
+  "preferGlobal": true,
   "scripts": {
     "test": "mocha test/*.coffee --compilers coffee:coffee-script",
     "postinstall": "summon redis redis-server",
