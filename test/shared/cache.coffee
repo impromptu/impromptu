@@ -9,25 +9,25 @@ class CacheTests
         fn null, 'value'
 
 
-  getShouldFail: (fn) ->
+  getShouldFail: (fn) =>
     @instance.get (err, result) ->
       should.not.exist result
       fn err
 
 
-  getShouldPass: (fn) ->
+  getShouldPass: (fn) =>
     @instance.get (err, result) ->
       result.should.equal 'value'
       fn err
 
 
-  setShouldPass: (fn) ->
+  setShouldPass: (fn) =>
     @instance.set (err, result) ->
       result.should.equal true
       fn err
 
 
-  unsetShouldPass: (fn) ->
+  unsetShouldPass: (fn) =>
     @instance.unset (err, result) ->
       result.should.equal true
       fn err
