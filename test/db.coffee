@@ -5,14 +5,13 @@ redis = require 'redis'
 async = require 'async'
 exec = require('child_process').exec
 cacheApiTests = require './shared/cache'
+testUtil = require './shared/test-util'
 
 # Skip the database tests on Travis CI
-# Todo: Make these work
-return if process.env.TRAVIS is 'true'
+# TODO: Make these work
+return if testUtil.isTravis()
 
-Impromptu.DB.REDIS_PORT = 6421
-Impromptu.DB.REDIS_CONF_FILE = '../test/etc/redis.conf'
-Impromptu.DB.REDIS_PID_FILE = '/usr/local/var/run/redis-impromptu-test.pid'
+testUtil.useTestDatabase()
 
 describe 'Database', ->
   # Try to kill the server if it's running.
