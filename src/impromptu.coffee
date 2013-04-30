@@ -21,10 +21,8 @@ class Impromptu
     # If the compiled prompt doesn't exist, it needs to be generated
     return true unless fs.existsSync @compiledPrompt
 
-    sourceMtime = (new Date(fs.statSync(sourcePrompt).mtime)).getTime()
-    lastCompileTime = (new Date(fs.statSync(@compiledPrompt).mtime)).getTime()
-    return sourceMtime > lastCompileTime
-
+    # Otherwise compare last modified times
+    fs.statSync(sourcePrompt).mtime > fs.statSync(@compiledPrompt).mtime
 
   _compilePrompt: (sourcePrompt) ->
     @_ensureCompiledDirExists()
