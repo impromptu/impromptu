@@ -1,4 +1,4 @@
-Impromptu = require './impromptu'
+Impromptu = require '../impromptu'
 
 class Instance extends Impromptu.Cache
   run: (fn) =>

@@ -1,4 +1,4 @@
-Impromptu = require './impromptu'
+Impromptu = require '../impromptu'
 
 # An abstract class that manages how a method is cached.
 class Cache
