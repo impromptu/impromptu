@@ -40,16 +40,9 @@ class _Method
 
 
 class _Module
-  constructor: (@impromptu, @moduleRegistry, initialize) ->
+  constructor: (@impromptu, initialize) ->
     @_methods = {}
     initialize.call @, Impromptu
-
-  name: (key) ->
-    return @_name unless key
-
-    @moduleRegistry.unset @_name
-    @_name = key
-    @moduleRegistry.set @_name, @_methods
 
   register: (key, options) ->
     method = new _Method @, key, options
@@ -67,24 +60,12 @@ class ModuleRegistry
 
   # Register a new Impromptu module.
   register: (fn) ->
-    new _Module(@impromptu, @, fn)._methods
+    new _Module(@impromptu, fn)._methods
 
   # Require and register a new Impromptu module.
   require: (module) ->
     fn = require "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
     @register fn if typeof fn == 'function'
-
-  # Get an existing Impromptu module.
-  get: (name) ->
-    @_modules[name]
-
-  # Set an existing Impromptu module.
-  set: (name, methods) ->
-    @_modules[name] = methods
-
-  # Unset an existing Impromptu module.
-  unset: (name) ->
-    delete @_modules[name]
 
 
 # Expose `ModuleRegistry`.

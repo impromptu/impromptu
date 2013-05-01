@@ -9,8 +9,6 @@ describe 'Module', ->
 
   it 'should register a module', ->
     methods = impromptu.module.register ->
-      @name 'methods'
-
       @register 'hello',
         update: ->
           'Hello, world!'
@@ -24,9 +22,6 @@ describe 'Module', ->
           @exec 'echo test', done
 
     methods.should.have.keys 'hello', 'count', 'echo'
-
-  it 'should store a module', ->
-    impromptu.module.get('methods').should.equal methods
 
   it 'should call a method', ->
     methods.hello (err, results) ->
