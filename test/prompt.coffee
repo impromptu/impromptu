@@ -9,7 +9,7 @@ describe 'Prompt', ->
     'Hello, world!'
 
   # Note: All module methods are handled asynchronously.
-  methods = impromptu.module.register ->
+  methods = impromptu.module.register 'prompt-tests', ->
     @register 'hello',
       update: helloSync
 

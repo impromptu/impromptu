@@ -3,7 +3,7 @@ path = require 'path'
 exec = require('child_process').exec
 
 class _Method
-  constructor: (@module, @name, @options) ->
+  constructor: (@impromptu, @module, @name, @options) ->
     # Backwards compatibility when @options is set as a function.
     # TODO(koop): Remove compatibility once this API has solidified.
     @options = {update: @options} if typeof @options is 'function'
@@ -40,12 +40,12 @@ class _Method
 
 
 class _Module
-  constructor: (@impromptu, initialize) ->
+  constructor: (@impromptu, @factory, @name, initialize) ->
     @_methods = {}
     initialize.call @, Impromptu
 
   register: (key, options) ->
-    method = new _Method @, key, options
+    method = new _Method @impromptu, @, key, options
     @_methods[key] = method.run
 
   get: (key, fn) ->
@@ -54,19 +54,19 @@ class _Module
   exec: Impromptu.exec
 
 
-class ModuleRegistry
+class ModuleFactory
   constructor: (@impromptu) ->
-    @_modules = {}
 
   # Register a new Impromptu module.
-  register: (fn) ->
-    new _Module(@impromptu, fn)._methods
+  register: (name, fn) ->
+    new _Module(@impromptu, @, name, fn)._methods
 
   # Require and register a new Impromptu module.
   require: (module) ->
-    fn = require "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
-    @register fn if typeof fn == 'function'
+    path = "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
+    fn = require path
+    @register path, fn if typeof fn == 'function'
 
 
-# Expose `ModuleRegistry`.
-exports = module.exports = ModuleRegistry
+# Expose `ModuleFactory`.
+exports = module.exports = ModuleFactory
