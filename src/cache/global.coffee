@@ -24,7 +24,7 @@ class Global extends Impromptu.Cache
     @impromptu.db.client()
 
 
-  run: (fn) =>
+  run: (fn) ->
     # If this process isn't being run in the background,
     # just try to fetch the cached value.
     return @get fn unless @impromptu.options.background

@@ -1,7 +1,7 @@
 Impromptu = require '../impromptu'
 
 class Instance extends Impromptu.Cache
-  run: (fn) =>
+  run: (fn) ->
     return get fn if @_cached
 
     @set (err, results) =>

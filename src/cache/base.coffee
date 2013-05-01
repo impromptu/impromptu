@@ -3,6 +3,13 @@ Impromptu = require '../impromptu'
 # An abstract class that manages how a method is cached.
 class Cache
   constructor: (@impromptu, @name, @options) ->
+    # Build our own `run` instance-method to accurately reflect the fact that
+    # `run` is always asynchronous and requires an argument to declare itself
+    # as such to our API. This feels a bit hacky, but using CoffeeScript's `=>`
+    # in `Cache.prototype` creates a zero argument function when compiled.
+    protoRun = @run
+    @run = (done) =>
+      protoRun.apply @, arguments
 
 
   # The main method.
@@ -10,9 +17,9 @@ class Cache
   # Accepts a `fn` with a signature of `err, results`, where `results` is the
   # cached value. Optionally updates the cache.
   #
-  # This should be bound to the instance so the method can be passed around
+  # This method is bound to the instance so the method can be passed around
   # without the instance.
-  run: (fn) => throw Impromptu.AbstractError
+  run: (fn) -> throw Impromptu.AbstractError
 
 
   # Gets the cached value.
