@@ -32,7 +32,7 @@
   "preferGlobal": true,
   "scripts": {
     "test": "mocha test/*.coffee --compilers coffee:coffee-script --reporter spec",
-    "postinstall": "summon redis redis-server",
+    "postinstall": "summon redis --testCommand=redis-server",
     "prepublish": "./scripts/bootstrap"
   },
   "dependencies": {
@@ -40,7 +40,7 @@
     "redis": "~0.8.2",
     "async": "~0.2.6",
     "underscore": "~1.4.4",
-    "summon": "~0.1.4"
+    "summon": "~0.2.0"
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.3.1",
