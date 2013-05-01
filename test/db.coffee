@@ -99,7 +99,7 @@ describe 'Global Cache', ->
           done()
           fn null, 'value'
 
-      cached.run()
+      cached.run ->
 
     it 'should fetch globally cached values', (done) ->
       updater = new Impromptu.Cache.Global background, 'should-fetch',

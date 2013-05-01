@@ -41,7 +41,9 @@ class Global extends Impromptu.Cache
 
 
   get: (fn) ->
-    @client().get @name, fn
+    fallback = @options.fallback
+    @client().get @name, (err, results = fallback) ->
+      fn err, results
 
 
   set: (fn) ->
