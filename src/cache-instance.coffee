@@ -1,6 +1,6 @@
 Impromptu = require './impromptu'
 
-class Local extends Impromptu.Cache
+class Instance extends Impromptu.Cache
   run: (fn) =>
     return get fn if @_cached
 
@@ -24,5 +24,5 @@ class Local extends Impromptu.Cache
     fn null, true
 
 
-# Expose `Local`.
-exports = module.exports = Local
+# Expose `Instance`.
+exports = module.exports = Instance
