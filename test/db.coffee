@@ -63,12 +63,12 @@ describe 'Database', ->
     db.shutdown()
 
 
-describe 'Local Cache', ->
+describe 'Instance Cache', ->
   it 'should exist', ->
-    should.exist Impromptu.Cache.Local
+    should.exist Impromptu.Cache.Instance
 
   describe 'Cache API', ->
-    cacheApiTests Impromptu.Cache.Local
+    cacheApiTests Impromptu.Cache.Instance
 
 
 describe 'Global Cache', ->
