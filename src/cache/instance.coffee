@@ -9,7 +9,7 @@ class Instance extends Impromptu.Cache
 
 
   get: (fn) ->
-    return fn null, @_cached
+    fn null, @_cached
 
 
   set: (fn) ->
