@@ -7,6 +7,8 @@ module.exports = (grunt) ->
   # Project configuration.
   grunt.initConfig
     mocha:
+      db:
+        src: ['test/db/*.coffee']
       default:
         src: ['test/*.coffee']
 
