@@ -8,18 +8,18 @@ describe 'Module', ->
   counter = 0
 
   it 'should register a module', ->
-    methods = impromptu.module.register 'module-tests', ->
-      @register 'hello',
+    methods = impromptu.module.register 'module-tests', (Impromptu, register) ->
+      register 'hello',
         update: ->
           'Hello, world!'
 
-      @register 'count',
+      register 'count',
         update: ->
           counter += 1
 
-      @register 'echo',
+      register 'echo',
         update: (done) ->
-          @exec 'echo test', done
+          Impromptu.exec 'echo test', done
 
     methods.should.have.keys 'hello', 'count', 'echo'
 
