@@ -1,4 +1,4 @@
-Impromptu = require './impromptu'
+Impromptu = require '../impromptu'
 async = require 'async'
 exec = require('child_process').exec
 
