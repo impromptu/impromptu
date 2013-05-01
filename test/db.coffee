@@ -63,6 +63,15 @@ describe 'Database', ->
     db.shutdown()
 
 
+describe 'Shim Cache', ->
+  it 'should exist', ->
+    should.exist Impromptu.Cache.Shim
+
+  describe 'Cache API', ->
+    cacheApiTests Impromptu.Cache.Shim,
+      fallback: 'value'
+
+
 describe 'Instance Cache', ->
   it 'should exist', ->
     should.exist Impromptu.Cache.Instance
@@ -99,7 +108,7 @@ describe 'Global Cache', ->
           done()
           fn null, 'value'
 
-      cached.run()
+      cached.run ->
 
     it 'should fetch globally cached values', (done) ->
       updater = new Impromptu.Cache.Global background, 'should-fetch',

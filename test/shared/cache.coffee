@@ -1,17 +1,20 @@
 should = require 'should'
 Impromptu = require '../../src/impromptu'
 async = require 'async'
+_ = require 'underscore'
 
 class CacheTests
-  constructor: (@CacheClass, @impromptu, @name) ->
-    @instance = new CacheClass @impromptu, @name,
-      update: (fn) ->
+  constructor: (@CacheClass, @options = {}, @impromptu, @name) ->
+    @options.fallback ?= 'fallback'
+    @options.update ?= (fn) ->
         fn null, 'value'
 
+    @instance = new CacheClass @impromptu, @name, @options
 
-  getShouldFail: (fn) =>
-    @instance.get (err, result) ->
-      should.not.exist result
+
+  getShouldEqualFallback: (fn) =>
+    @instance.get (err, result) =>
+      result.should.equal @options.fallback
       fn err
 
 
@@ -33,32 +36,43 @@ class CacheTests
       fn err
 
 
-exports = module.exports = (CacheClass) ->
+exports = module.exports = (CacheClass, options = {}) ->
   impromptu = new Impromptu
   counter = 0
   cache = null
 
   beforeEach ->
-    cache = new CacheTests CacheClass, impromptu, "impromptu-cache-api-test-#{counter++}"
+    cache = new CacheTests CacheClass, options, impromptu, "impromptu-cache-api-test-#{counter++}"
 
   it 'should create an instance', ->
     should.exist cache
 
-  it 'should be empty by default', (done) ->
-    cache.getShouldFail done
+  it 'should equal fallback by default', (done) ->
+    cache.getShouldEqualFallback done
 
   it 'should set a value', (done) ->
     async.series [
-      (fn) -> cache.getShouldFail fn
+      (fn) -> cache.getShouldEqualFallback fn
       (fn) -> cache.setShouldPass fn
       (fn) -> cache.getShouldPass fn
     ], done
 
+  it 'should set a value synchronously', (done) ->
+    optionsSync = _.clone options
+    optionsSync.update = -> 'value'
+    cacheSync = new CacheTests CacheClass, optionsSync, impromptu, "impromptu-cache-api-test-#{counter++}"
+
+    async.series [
+      (fn) -> cacheSync.getShouldEqualFallback fn
+      (fn) -> cacheSync.setShouldPass fn
+      (fn) -> cacheSync.getShouldPass fn
+    ], done
+
   it 'should unset a value', (done) ->
     async.series [
-      (fn) -> cache.getShouldFail fn
+      (fn) -> cache.getShouldEqualFallback fn
       (fn) -> cache.setShouldPass fn
       (fn) -> cache.getShouldPass fn
       (fn) -> cache.unsetShouldPass fn
-      (fn) -> cache.getShouldFail fn
+      (fn) -> cache.getShouldEqualFallback fn
     ], done

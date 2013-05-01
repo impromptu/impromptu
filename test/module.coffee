@@ -8,7 +8,7 @@ describe 'Module', ->
   counter = 0
 
   it 'should register a module', ->
-    methods = impromptu.module.register ->
+    methods = impromptu.module.register 'module-tests', ->
       @register 'hello',
         update: ->
           'Hello, world!'

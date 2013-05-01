@@ -2,51 +2,30 @@ Impromptu = require './impromptu'
 path = require 'path'
 exec = require('child_process').exec
 
-class _Method
-  constructor: (@module, @name, @options) ->
-    # Backwards compatibility when @options is set as a function.
-    # TODO(koop): Remove compatibility once this API has solidified.
-    @options = {update: @options} if typeof @options is 'function'
-
-    # Cache responses by default.
-    @options.cache = true if typeof @options.cache is 'undefined'
-
-    # Build our own `run` instance-method to accurately reflect the fact that
-    # `run` is always asynchronous and requires an argument to declare itself
-    # as such to our API. This feels a bit hacky, but using CoffeeScript's `=>`
-    # in `_Method.prototype` creates a zero argument function when compiled.
-    @run = (done) =>
-      _Method::run.apply @, arguments
-
-  run: (done) ->
-    return done null, @results if @results
-
-    # If the method accepts an argument, it is asynchronous.
-    if @options.update.length
-      callback = (err, results) =>
-        @cache err, results, done
-
-    try
-      results = @options.update.call @module, callback
-    catch err
-    finally
-      # Process the results if method is synchronous.
-      @cache err, results, done unless callback
-
-  cache: (err, results, done) =>
-    if @options.cache and not err
-      @results = results
-    done err, results
-
-
 class _Module
-  constructor: (@impromptu, initialize) ->
+  constructor: (@impromptu, @factory, @name, initialize) ->
     @_methods = {}
     initialize.call @, Impromptu
 
   register: (key, options) ->
-    method = new _Method @, key, options
-    @_methods[key] = method.run
+    # Backwards compatibility when @options is set as a function.
+    # TODO(koop): Remove compatibility once this API has solidified.
+    options = {update: options} if typeof options is 'function'
+
+    # Cache responses using the instance cache by default.
+    if typeof options.cache is 'undefined' or options.cache is true
+      options.cache = 'instance'
+
+    # If cache is specifically passed a falsy value, use a cache shim.
+    # This won't cache the value, it just creates a consistent API.
+    options.cache ||= 'shim'
+
+    options.context = @
+
+    Cache = @factory.cache[options.cache] || @factory.cache.instance
+    cache = new Cache @impromptu, "#{@name}:#{key}", options
+
+    @_methods[key] = cache.run
 
   get: (key, fn) ->
     @_methods[key] fn if @_methods[key]
@@ -54,19 +33,24 @@ class _Module
   exec: Impromptu.exec
 
 
-class ModuleRegistry
+class ModuleFactory
   constructor: (@impromptu) ->
-    @_modules = {}
+    # A map between caching keys and cache constructors.
+    @cache =
+      instance: Impromptu.Cache.Instance
+      global: Impromptu.Cache.Global
+      shim: Impromptu.Cache.Shim
 
   # Register a new Impromptu module.
-  register: (fn) ->
-    new _Module(@impromptu, fn)._methods
+  register: (name, fn) ->
+    new _Module(@impromptu, @, name, fn)._methods
 
   # Require and register a new Impromptu module.
   require: (module) ->
-    fn = require "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
-    @register fn if typeof fn == 'function'
+    path = "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
+    fn = require path
+    @register path, fn if typeof fn == 'function'
 
 
-# Expose `ModuleRegistry`.
-exports = module.exports = ModuleRegistry
+# Expose `ModuleFactory`.
+exports = module.exports = ModuleFactory
