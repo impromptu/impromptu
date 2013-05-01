@@ -49,9 +49,22 @@ Content is the thing that actually gets displayed in your prompt. As you've seen
 section 'time',
   content: ->
     date    = new Date
-    hours   = if date.getHours() > 12 then date.getHours() - 12 else date.getHours()
-    minutes = if date.getMinutes().toString().length is 1 then "0#{date.getMinutes()}" else date.getMinutes()
-    seconds = if date.getSeconds().toString().length is 1 then "0#{date.getSeconds()}" else date.getSeconds()
+
+    hours = if date.getHours() > 12
+      date.getHours() - 12
+    else
+      date.getHours()
+
+    minutes = if date.getMinutes().toString().length is 1
+      "0#{date.getMinutes()}"
+    else
+      date.getMinutes()
+
+    seconds = if date.getSeconds().toString().length is 1
+      "0#{date.getSeconds()}"
+    else
+      date.getSeconds()
+
     "#{hours}:#{minutes}:#{seconds}"
   foreground: 'white'
   background: 'blue'
