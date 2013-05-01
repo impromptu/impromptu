@@ -1,7 +1,17 @@
+fs = require 'fs'
+path = require 'path'
+Mocha = require 'mocha'
+
 module.exports = (grunt) ->
 
   # Project configuration.
   grunt.initConfig
+    mocha:
+      db:
+        src: ['test/db/*.coffee']
+      default:
+        src: ['test/*.coffee']
+
     coffee:
       default:
         files: [
@@ -29,16 +39,17 @@ module.exports = (grunt) ->
   grunt.registerTask 'default', ['coffee', 'mocha']
 
   # Task for running Mocha tests with coffee.
-  grunt.registerTask 'mocha', 'Run mocha unit tests.', ->
+  grunt.registerMultiTask 'mocha', 'Run mocha unit tests.', ->
     done = @async()
-    mocha =
-      cmd: 'mocha'
-      args: ['--compilers','coffee:coffee-script','--colors','--reporter','spec']
-    grunt.util.spawn mocha, (error, result) ->
-      if error
-        grunt.log.ok( result.stdout ).error( result.stderr ).writeln()
-        done new Error('Error running mocha unit tests.')
-      else
-        grunt.log.ok( result.stdout ).writeln()
-        done()
 
+    mocha = new Mocha
+      reporter: 'spec'
+
+    for files in @files
+      for file in files.src
+        mocha.addFile file
+
+    mocha.run (failures) =>
+      if failures
+        grunt.log.error(failures).writeln()
+      done()
