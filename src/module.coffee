@@ -5,13 +5,9 @@ exec = require('child_process').exec
 class _Module
   constructor: (@impromptu, @factory, @name, initialize) ->
     @_methods = {}
-    initialize.call @, Impromptu
+    initialize.call @impromptu, Impromptu, @register, @_methods
 
-  register: (key, options) ->
-    # Backwards compatibility when @options is set as a function.
-    # TODO(koop): Remove compatibility once this API has solidified.
-    options = {update: options} if typeof options is 'function'
-
+  register: (key, options) =>
     # Cache responses using the instance cache by default.
     if typeof options.cache is 'undefined' or options.cache is true
       options.cache = 'instance'
@@ -20,17 +16,13 @@ class _Module
     # This won't cache the value, it just creates a consistent API.
     options.cache ||= 'shim'
 
-    options.context = @
+    # Set the impromptu instance as the context by default.
+    options.context ?= @impromptu
 
     Cache = @factory.cache[options.cache] || @factory.cache.instance
     cache = new Cache @impromptu, "#{@name}:#{key}", options
 
     @_methods[key] = cache.run
-
-  get: (key, fn) ->
-    @_methods[key] fn if @_methods[key]
-
-  exec: Impromptu.exec
 
 
 class ModuleFactory

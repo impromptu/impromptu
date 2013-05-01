@@ -1,16 +1,16 @@
 module.exports = (Impromptu, section) ->
-  methods = @module.register 'sample-configfile', ->
-    @register 'cwd',
+  methods = @module.register 'sample-configfile', (Impromptu, register) ->
+    register 'cwd',
       update: (done) ->
-        @exec 'printf "~/path/to/impromptu"', done
+        Impromptu.exec 'printf "~/path/to/impromptu"', done
 
-    @register 'user',
+    register 'user',
       update: (done) ->
-        @exec 'printf "user"', done
+        Impromptu.exec 'printf "user"', done
 
-    @register 'host',
+    register 'host',
       update: (done) ->
-        @exec 'printf "host"', done
+        Impromptu.exec 'printf "host"', done
 
 
   section 'user',

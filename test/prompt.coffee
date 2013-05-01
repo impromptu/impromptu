@@ -9,13 +9,13 @@ describe 'Prompt', ->
     'Hello, world!'
 
   # Note: All module methods are handled asynchronously.
-  methods = impromptu.module.register 'prompt-tests', ->
-    @register 'hello',
+  methods = impromptu.module.register 'prompt-tests', (Impromptu, register) ->
+    register 'hello',
       update: helloSync
 
-    @register 'echo',
+    register 'echo',
       update: (done) ->
-        @exec "printf test", done
+        Impromptu.exec "printf test", done
 
   sections =
     a:
