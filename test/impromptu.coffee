@@ -7,7 +7,9 @@ describe 'Impromptu', ->
     should.exist Impromptu
 
   it 'should use semantic versions', ->
-    /^\d+\.\d+\.\d+(\D|$)/.test(Impromptu.VERSION).should.be.true
+    # https://github.com/coolaj86/semver-utils/blob/v1.0.1/semver-utils.js
+    regex = /^((\d+)\.(\d+)\.(\d+))(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?$/
+    regex.test(Impromptu.VERSION).should.be.true
 
 describe 'Impromptu.Error', ->
   it 'should have a message', ->
