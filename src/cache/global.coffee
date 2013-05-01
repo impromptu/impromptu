@@ -50,6 +50,7 @@ class Global extends Impromptu.Cache
     client = @client()
     name = @name
     options = @options
+    update = @_update
 
     # Try to update the cached value.
     async.waterfall [
@@ -74,7 +75,7 @@ class Global extends Impromptu.Cache
         client.set "lock-process:#{name}", process.pid
 
         # Run the provided method to generate the new value to cache.
-        options.update.call options.context, (err, value) ->
+        update (err, value) ->
           return done err if err
 
           # Update the cache with the new value and locks.

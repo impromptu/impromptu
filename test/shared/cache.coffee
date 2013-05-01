@@ -1,6 +1,7 @@
 should = require 'should'
 Impromptu = require '../../src/impromptu'
 async = require 'async'
+_ = require 'underscore'
 
 class CacheTests
   constructor: (@CacheClass, @options = {}, @impromptu, @name) ->
@@ -35,7 +36,7 @@ class CacheTests
       fn err
 
 
-exports = module.exports = (CacheClass, options) ->
+exports = module.exports = (CacheClass, options = {}) ->
   impromptu = new Impromptu
   counter = 0
   cache = null
@@ -54,6 +55,17 @@ exports = module.exports = (CacheClass, options) ->
       (fn) -> cache.getShouldEqualFallback fn
       (fn) -> cache.setShouldPass fn
       (fn) -> cache.getShouldPass fn
+    ], done
+
+  it 'should set a value synchronously', (done) ->
+    optionsSync = _.clone options
+    optionsSync.update = -> 'value'
+    cacheSync = new CacheTests CacheClass, optionsSync, impromptu, "impromptu-cache-api-test-#{counter++}"
+
+    async.series [
+      (fn) -> cacheSync.getShouldEqualFallback fn
+      (fn) -> cacheSync.setShouldPass fn
+      (fn) -> cacheSync.getShouldPass fn
     ], done
 
   it 'should unset a value', (done) ->

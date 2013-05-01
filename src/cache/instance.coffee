@@ -13,7 +13,7 @@ class Instance extends Impromptu.Cache
 
 
   set: (fn) ->
-    @options.update.call @options.context, (err, value) =>
+    @_update (err, value) =>
       unless err
         @_cached = value
       fn err, !err

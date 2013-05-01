@@ -43,5 +43,18 @@ class Cache
   unset: (fn) -> throw Impromptu.AbstractError
 
 
+  # Private. A low-level method to properly call the cache's update method.
+  _update: (done) =>
+    # If the method accepts an argument, it is asynchronous.
+    return @options.update.call @options.context, done if @options.update.length
+
+    try
+      results = @options.update.call @options.context
+    catch err
+    finally
+      # Process the results if method is synchronous.
+      done err, results
+
+
 # Expose `Cache`.
 exports = module.exports = Cache

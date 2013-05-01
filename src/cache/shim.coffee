@@ -8,7 +8,7 @@ class Shim extends Impromptu.Cache
 
 
   get: (fn) ->
-    @options.update.call @options.context, fn
+    @_update fn
 
 
   set: (fn) ->
