@@ -5,7 +5,7 @@ exec = require('child_process').exec
 class _Module
   constructor: (@impromptu, @factory, @name, initialize) ->
     @_methods = {}
-    initialize.call @, Impromptu
+    initialize.call @, Impromptu, @_methods
 
   register: (key, options) ->
     # Cache responses using the instance cache by default.
