@@ -8,10 +8,6 @@ class _Module
     initialize.call @, Impromptu
 
   register: (key, options) ->
-    # Backwards compatibility when @options is set as a function.
-    # TODO(koop): Remove compatibility once this API has solidified.
-    options = {update: options} if typeof options is 'function'
-
     # Cache responses using the instance cache by default.
     if typeof options.cache is 'undefined' or options.cache is true
       options.cache = 'instance'
