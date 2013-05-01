@@ -1,19 +1,19 @@
 Impromptu = require '../impromptu'
 
 class Instance extends Impromptu.Cache
-  run: (fn) =>
-    return get fn if @_cached
+  run: (fn) ->
+    return @get fn if @_cached
 
     @set (err, results) =>
       if err then fn err else @get fn
 
 
   get: (fn) ->
-    return fn null, @_cached
+    fn null, @_cached ? @options.fallback
 
 
   set: (fn) ->
-    @options.update.call @options.context, (err, value) =>
+    @_update (err, value) =>
       unless err
         @_cached = value
       fn err, !err

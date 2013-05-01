@@ -1,5 +1,5 @@
 module.exports = (Impromptu, section) ->
-  methods = @module.register ->
+  methods = @module.register 'sample-configfile', ->
     @register 'cwd',
       update: (done) ->
         @exec 'printf "~/path/to/impromptu"', done

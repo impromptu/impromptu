@@ -24,7 +24,7 @@ class Global extends Impromptu.Cache
     @impromptu.db.client()
 
 
-  run: (fn) =>
+  run: (fn) ->
     # If this process isn't being run in the background,
     # just try to fetch the cached value.
     return @get fn unless @impromptu.options.background
@@ -41,13 +41,16 @@ class Global extends Impromptu.Cache
 
 
   get: (fn) ->
-    @client().get @name, fn
+    fallback = @options.fallback
+    @client().get @name, (err, results = fallback) ->
+      fn err, results
 
 
   set: (fn) ->
     client = @client()
     name = @name
     options = @options
+    update = @_update
 
     # Try to update the cached value.
     async.waterfall [
@@ -72,7 +75,7 @@ class Global extends Impromptu.Cache
         client.set "lock-process:#{name}", process.pid
 
         # Run the provided method to generate the new value to cache.
-        options.update.call options.context, (err, value) ->
+        update (err, value) ->
           return done err if err
 
           # Update the cache with the new value and locks.

@@ -42,7 +42,7 @@ class Impromptu
   constructor: (@options = {}) ->
     @db = new Impromptu.DB @
 
-    @module = new Impromptu.ModuleRegistry @
+    @module = new Impromptu.ModuleFactory @
     @prompt = new Impromptu.Prompt @
 
     # Make sure we have a source prompt
@@ -84,8 +84,9 @@ exports.exec = require './exec'
 
 # Expose APIs.
 exports.Cache = require './cache/base'
+exports.Cache.Shim = require './cache/shim'
 exports.Cache.Instance = require './cache/instance'
 exports.Cache.Global = require './cache/global'
 exports.DB = require './db'
-exports.ModuleRegistry = require './module'
+exports.ModuleFactory = require './module'
 exports.Prompt = require './prompt'
