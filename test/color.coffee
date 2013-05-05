@@ -1,5 +1,5 @@
 should = require 'should'
-Impromptu = require '../src/impromptu'
+Impromptu = require '../lib/impromptu'
 
 
 describe 'Color', ->
