@@ -11,9 +11,9 @@ processIsRunning = (pid) ->
 
   # If pinging the server throws an error (ESRCH), then the process isn't running.
   catch ersch
-    return true
+    return false
 
-  return false
+  return true
 
 
 class Global extends Impromptu.Cache
