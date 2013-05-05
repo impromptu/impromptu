@@ -1,5 +1,6 @@
 should = require 'should'
-Impromptu = require '../src/impromptu'
+environment = require './shared/environment'
+Impromptu = require '../lib/impromptu'
 
 
 describe 'Repository', ->
