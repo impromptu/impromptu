@@ -1,4 +1,5 @@
 should = require 'should'
+environment = require './shared/environment'
 Impromptu = require '../lib/impromptu'
 
 
