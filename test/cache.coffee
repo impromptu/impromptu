@@ -49,8 +49,17 @@ describe 'Global Cache', ->
 
 
 describe 'Directory Cache', ->
+  impromptu = new Impromptu()
+
   it 'should exist', ->
     should.exist Impromptu.Cache.Directory
+
+  it 'should have the directory in the name', ->
+    cache = new Impromptu.Cache.Directory impromptu, 'name',
+      update: (fn) ->
+        fn null, 'value'
+
+    cache.name.should.equal "name:#{process.env.PWD}"
 
   describe 'Cache API', ->
     cacheTest.base Impromptu.Cache.Directory
