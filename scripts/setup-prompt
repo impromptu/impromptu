@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+// Don't try to setup a prompt on the CI server
+if (process.env.TRAVIS === 'true')
+  process.exit(0);
+
 var fs       = require('fs');
 var exec     = require('child_process').exec;
 var spawn    = require('child_process').spawn;
