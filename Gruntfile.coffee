@@ -36,7 +36,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-watch'
 
   # Default task.
-  grunt.registerTask 'default', ['coffee', 'mocha']
+  grunt.registerTask 'default', ['coffee', 'mocha:default']
 
   # Task for running Mocha tests with coffee.
   grunt.registerMultiTask 'mocha', 'Run mocha unit tests.', ->
