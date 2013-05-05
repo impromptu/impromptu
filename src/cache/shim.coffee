@@ -13,11 +13,11 @@ class Shim extends Impromptu.Cache
 
   set: (fn) ->
     @get (err, value) ->
-      fn err, !err
+      fn err, !err if fn
 
 
   unset: (fn) ->
-    fn null, true
+    fn null, true if fn
 
 
 # Expose `Shim`.
