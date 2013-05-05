@@ -14,7 +14,7 @@ class Repository extends Impromptu.Cache.Global
       return fn err if err
 
       # Remove any trailing empty parts.
-      while not results[results.length - 1]
+      while results.length and not results[results.length - 1]
         results.pop()
 
       # Update the name.

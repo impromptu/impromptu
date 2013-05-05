@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 var Impromptu = new require('../lib/impromptu.js');
-new Impromptu({background: true}).prompt.build();
+new Impromptu({background: true}).prompt.build(function(err, results) {
+  process.exit();
+});
