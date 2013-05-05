@@ -80,6 +80,7 @@ class Impromptu.AbstractError extends Impromptu.Error
 exports = module.exports = Impromptu
 
 # Expose utilities.
+exports.cli = require './cli'
 exports.color = require './color'
 exports.exec = require './exec'
 
