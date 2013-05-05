@@ -82,3 +82,11 @@ describe 'Global Cache', ->
             fetched.should.equal 'value'
             fn err
       ], done
+
+
+describe 'Directory Cache', ->
+  it 'should exist', ->
+    should.exist Impromptu.Cache.Directory
+
+  describe 'Cache API', ->
+    cacheApiTests Impromptu.Cache.Directory
