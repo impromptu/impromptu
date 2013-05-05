@@ -2,7 +2,7 @@ should = require 'should'
 environment = require './shared/environment'
 Impromptu = require '../lib/impromptu'
 async = require 'async'
-cacheApiTests = require './shared/cache'
+cacheTest = require './shared/cache'
 
 # Skip the database tests on Travis CI
 # TODO: Make these work
@@ -14,7 +14,7 @@ describe 'Shim Cache', ->
     should.exist Impromptu.Cache.Shim
 
   describe 'Cache API', ->
-    cacheApiTests Impromptu.Cache.Shim,
+    cacheTest.base Impromptu.Cache.Shim,
       fallback: 'value'
 
 
@@ -23,13 +23,11 @@ describe 'Instance Cache', ->
     should.exist Impromptu.Cache.Instance
 
   describe 'Cache API', ->
-    cacheApiTests Impromptu.Cache.Instance
+    cacheTest.base Impromptu.Cache.Instance
 
 
 describe 'Global Cache', ->
   impromptu = new Impromptu()
-  background = new Impromptu
-    background: true
 
   before (done) ->
     async.series [
@@ -37,48 +35,59 @@ describe 'Global Cache', ->
         impromptu.db.client().on 'connect', fn
       (fn) ->
         impromptu.db.client().flushdb fn
-      (fn) ->
-        background.db.client().on 'connect', fn
     ], done
 
   it 'should exist', ->
     should.exist Impromptu.Cache.Global
 
   describe 'Cache API', ->
-    cacheApiTests Impromptu.Cache.Global
+    cacheTest.base Impromptu.Cache.Global
 
   describe 'Run Behavior', ->
-    it 'should update when background is set', (done) ->
-      cached = new Impromptu.Cache.Global background, 'should-update',
-        update: (fn) ->
-          done()
-          fn null, 'value'
+    cacheTest.global Impromptu.Cache.Global
 
-      cached.run ->
 
-    it 'should fetch globally cached values', (done) ->
-      updater = new Impromptu.Cache.Global background, 'should-fetch',
-        update: (fn) ->
-          fn null, 'value'
+describe 'Directory Cache', ->
+  impromptu = new Impromptu()
 
-      fetcher = new Impromptu.Cache.Global impromptu, 'should-fetch',
-        update: (fn) ->
-          should.fail 'Update should not run.'
-          fn null, 'value'
+  it 'should exist', ->
+    should.exist Impromptu.Cache.Directory
 
-      async.series [
-        (fn) ->
-          fetcher.run (err, fetched) ->
-            should.not.exist fetched
-            fn err
+  it 'should have the directory in the name', ->
+    name = cacheTest.name()
+    cache = new Impromptu.Cache.Directory impromptu, name,
+      update: (fn) ->
+        fn null, 'value'
 
-        (fn) ->
-          updater.run (err, updated) ->
-            updated.should.equal 'value'
-            fn err
+    cache.name.should.equal "#{name}:#{process.env.PWD}"
 
-        (fn) ->
-          fetcher.run (err, fetched) ->
-            fetched.should.equal 'value'
-            fn err
-      ], done
+  describe 'Cache API', ->
+    cacheTest.base Impromptu.Cache.Directory
+
+  describe 'Run Behavior', ->
+    cacheTest.global Impromptu.Cache.Directory
+
+
+describe 'Repository Cache', ->
+  impromptu = new Impromptu()
+
+  it 'should exist', ->
+    should.exist Impromptu.Cache.Repository
+
+  it 'should have the repository root in the name', (done) ->
+    name = cacheTest.name()
+    cache = new Impromptu.Cache.Repository impromptu, name,
+      update: (fn) ->
+        fn null, 'value'
+
+    Impromptu.Cache.Global::prepared = (done) ->
+      cache.name.should.equal "#{name}:#{process.env.PWD}"
+      done()
+
+    cache.prepare 'prepared', done
+
+  describe 'Cache API', ->
+    cacheTest.base Impromptu.Cache.Repository
+
+  describe 'Run Behavior', ->
+    cacheTest.global Impromptu.Cache.Repository
