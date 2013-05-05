@@ -26,21 +26,18 @@
     "node": ">= 0.8.0"
   },
   "bin": {
-    "impromptu": "./bin/impromptu",
+    "impromptu-prompt": "./bin/impromptu-prompt",
     "impromptu-background": "./bin/impromptu-background"
   },
-  "preferGlobal": true,
   "scripts": {
     "test": "grunt test",
-    "postinstall": "summon redis --testCommand=redis-server && ./scripts/setup-prompt",
     "prepublish": "./scripts/bootstrap"
   },
   "dependencies": {
     "coffee-script": "~1.6.2",
     "redis": "~0.8.2",
     "async": "~0.2.6",
-    "underscore": "~1.4.4",
-    "summon": "~0.2.0"
+    "underscore": "~1.4.4"
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.3.1",
