@@ -30,6 +30,8 @@ class ModuleFactory
     # A map between caching keys and cache constructors.
     @cache =
       instance: Impromptu.Cache.Instance
+      directory: Impromptu.Cache.Directory
+      repository: Impromptu.Cache.Repository
       global: Impromptu.Cache.Global
       shim: Impromptu.Cache.Shim
 
