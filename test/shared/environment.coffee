@@ -1,4 +1,4 @@
-Impromptu = require '../../src/impromptu'
+Impromptu = require '../../lib/impromptu'
 path = require 'path'
 
 # Update the test paths for the sample prompt file.

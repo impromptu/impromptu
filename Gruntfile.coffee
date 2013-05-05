@@ -1,6 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 Mocha = require 'mocha'
+exec = require('child_process').exec
 
 module.exports = (grunt) ->
 
@@ -25,18 +26,29 @@ module.exports = (grunt) ->
     watch:
       src:
         files: ['src/**/*.coffee']
-        tasks: ['coffee', 'mocha']
+        tasks: ['coffee', 'test']
 
       test:
         files: ['test/**/*.coffee']
-        tasks: ['mocha']
+        tasks: ['test']
 
   # These plugins provide necessary tasks.
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-watch'
 
   # Default task.
-  grunt.registerTask 'default', ['coffee', 'mocha']
+  grunt.registerTask 'default', ['coffee', 'test']
+
+  grunt.registerTask 'test', 'mocha:default'
+
+  grunt.registerTask 'nuke', "Nuke stuff. Don't run this unless you know what you're doing.", ->
+    steps = [
+      'rm -rf ~/.impromptu'
+      'brew uninstall redis cmake'
+      'git clean -fdx'
+    ]
+
+    exec steps.join ' && '
 
   # Task for running Mocha tests with coffee.
   grunt.registerMultiTask 'mocha', 'Run mocha unit tests.', ->
