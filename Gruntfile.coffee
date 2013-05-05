@@ -1,6 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 Mocha = require 'mocha'
+exec = require('child_process').exec
 
 module.exports = (grunt) ->
 
@@ -37,6 +38,15 @@ module.exports = (grunt) ->
 
   # Default task.
   grunt.registerTask 'default', ['coffee', 'mocha:default']
+
+  grunt.registerTask 'nuke', "Nuke stuff. Don't run this unless you know what you're doing.", ->
+    steps = [
+      'rm -rf ~/.impromptu'
+      'brew uninstall redis cmake'
+      'git clean -fdx'
+    ]
+
+    exec steps.join ' && '
 
   # Task for running Mocha tests with coffee.
   grunt.registerMultiTask 'mocha', 'Run mocha unit tests.', ->
