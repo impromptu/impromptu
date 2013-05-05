@@ -26,11 +26,11 @@ module.exports = (grunt) ->
     watch:
       src:
         files: ['src/**/*.coffee']
-        tasks: ['coffee', 'mocha']
+        tasks: ['coffee', 'mocha:default']
 
       test:
         files: ['test/**/*.coffee']
-        tasks: ['mocha']
+        tasks: ['mocha:default']
 
   # These plugins provide necessary tasks.
   grunt.loadNpmTasks 'grunt-contrib-coffee'
