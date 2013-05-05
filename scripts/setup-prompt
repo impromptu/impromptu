@@ -67,15 +67,8 @@ function handleQuestionResponse(response) {
   cloneMyImpromptu();
 }
 
-if (fs.existsSync(PROMPT_DIR)) {
-  console.log("You have a ~/.impromptu directory, but no prompt file.");
-  userInput.question("Can we move your ~/.impromptu and setup a new prompt for you? (Y/n) ", function(answer) {
-    if (/^n/i.test(answer))
-      fs.rename(PROMPT_DIR, PROMPT_DIR + '-backup');
+if (fs.existsSync(PROMPT_DIR))
+  process.exit(0);
 
-    handleQuestionResponse(answer);
-  });
-} else {
-  console.log("You don't have a ~/.impromptu directory.");
-  userInput.question("Would you like help setting one up? (Y/n) ", handleQuestionResponse);
-}
+console.log("You don't have a ~/.impromptu directory.");
+userInput.question("Would you like help setting one up? (Y/n) ", handleQuestionResponse);
