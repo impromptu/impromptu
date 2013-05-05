@@ -40,6 +40,7 @@ class Impromptu
       return
 
   constructor: (@options = {}) ->
+    @repository = new Impromptu.RepositoryFactory @
     @db = new Impromptu.DB @
 
     @module = new Impromptu.ModuleFactory @
@@ -90,3 +91,4 @@ exports.Cache.Global = require './cache/global'
 exports.DB = require './db'
 exports.ModuleFactory = require './module'
 exports.Prompt = require './prompt'
+exports.RepositoryFactory = require './repository'
