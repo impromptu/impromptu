@@ -1,6 +1,6 @@
 should = require 'should'
 environment = require '../shared/environment'
-Impromptu = require '../../src/impromptu'
+Impromptu = require '../../lib/impromptu'
 fs = require 'fs'
 redis = require 'redis'
 exec = require('child_process').exec

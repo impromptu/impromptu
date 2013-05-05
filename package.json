@@ -31,8 +31,8 @@
   },
   "preferGlobal": true,
   "scripts": {
-    "test": "mocha test/*.coffee --compilers coffee:coffee-script --reporter spec",
-    "postinstall": "summon redis --testCommand=redis-server",
+    "test": "grunt test",
+    "postinstall": "summon redis --testCommand=redis-server && ./scripts/setup-prompt",
     "prepublish": "./scripts/bootstrap"
   },
   "dependencies": {
