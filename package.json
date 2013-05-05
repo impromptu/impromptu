@@ -40,7 +40,8 @@
     "redis": "~0.8.2",
     "async": "~0.2.6",
     "underscore": "~1.4.4",
-    "summon": "~0.2.0"
+    "summon": "~0.2.0",
+    "resolve": "~0.3.1"
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.3.1",
