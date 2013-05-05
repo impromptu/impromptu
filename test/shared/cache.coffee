@@ -80,6 +80,18 @@ test.base = (CacheClass, options = {}) ->
       (fn) -> cache.getShouldEqualFallback fn
     ], done
 
+  it 'should call get without a callback', ->
+    cache.instance.get()
+
+  it 'should call set without a callback', ->
+    cache.instance.set()
+
+  it 'should call unset without a callback', ->
+    cache.instance.unset()
+
+  it 'should call run without a callback', ->
+    cache.instance.run()
+
 
 test.global = (CacheClass, options = {}) ->
   impromptu = new Impromptu()

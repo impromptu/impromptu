@@ -45,6 +45,8 @@ class Cache
 
   # Private. A low-level method to properly call the cache's update method.
   _update: (done) =>
+    done ||= (err, results) ->
+
     # If the method accepts an argument, it is asynchronous.
     return @options.update.call @options.context, done if @options.update.length
 
