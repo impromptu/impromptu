@@ -61,19 +61,20 @@ class Global extends Impromptu.Cache
       # Check if there's a process already running to update the cache.
       (exists, done) ->
         if exists
-          throw new CacheError 'The cache is currently locked.'
+          return done new CacheError 'The cache is currently locked.'
 
         client.get "lock-process:#{name}", done
 
       (pid, done) ->
         # If there's an update process, check that it's still running.
         if pid and processIsRunning pid
-          throw new CacheError 'A process is currently updating the cache.'
+          return done new CacheError 'A process is currently updating the cache.'
 
         # Time to update the cache.
         # Set the process lock.
-        client.set "lock-process:#{name}", process.pid
+        client.set "lock-process:#{name}", process.pid, done
 
+      (locked, done) ->
         # Run the provided method to generate the new value to cache.
         update (err, value) ->
           return done err if err
