@@ -35,15 +35,17 @@ class CacheTests
       result.should.equal true
       fn err
 
-test = {}
+test =
+  counter: 0
+  name: ->
+    "impromptu-cache-test-#{test.counter++}"
 
 test.base = (CacheClass, options = {}) ->
   impromptu = new Impromptu
-  counter = 0
   cache = null
 
   beforeEach ->
-    cache = new CacheTests CacheClass, options, impromptu, "impromptu-cache-api-test-#{counter++}"
+    cache = new CacheTests CacheClass, options, impromptu, test.name()
 
   it 'should create an instance', ->
     should.exist cache
@@ -61,7 +63,7 @@ test.base = (CacheClass, options = {}) ->
   it 'should set a value synchronously', (done) ->
     optionsSync = _.clone options
     optionsSync.update = -> 'value'
-    cacheSync = new CacheTests CacheClass, optionsSync, impromptu, "impromptu-cache-api-test-#{counter++}"
+    cacheSync = new CacheTests CacheClass, optionsSync, impromptu, test.name()
 
     async.series [
       (fn) -> cacheSync.getShouldEqualFallback fn
@@ -85,7 +87,7 @@ test.global = (CacheClass, options = {}) ->
     background: true
 
   it 'should update when background is set', (done) ->
-    cached = new CacheClass background, 'should-update',
+    cached = new CacheClass background, test.name(),
       update: (fn) ->
         done()
         fn null, 'value'
@@ -93,11 +95,12 @@ test.global = (CacheClass, options = {}) ->
     cached.run ->
 
   it 'should fetch cached values', (done) ->
-    updater = new CacheClass background, 'should-fetch',
+    name = test.name()
+    updater = new CacheClass background, name,
       update: (fn) ->
         fn null, 'value'
 
-    fetcher = new CacheClass impromptu, 'should-fetch',
+    fetcher = new CacheClass impromptu, name,
       update: (fn) ->
         should.fail 'Update should not run.'
         fn null, 'value'
