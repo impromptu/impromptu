@@ -47,7 +47,6 @@ describe 'Global Cache', ->
     cacheTest.global Impromptu.Cache.Global
 
 
-
 describe 'Directory Cache', ->
   impromptu = new Impromptu()
 
@@ -55,14 +54,40 @@ describe 'Directory Cache', ->
     should.exist Impromptu.Cache.Directory
 
   it 'should have the directory in the name', ->
-    cache = new Impromptu.Cache.Directory impromptu, 'name',
+    name = cacheTest.name()
+    cache = new Impromptu.Cache.Directory impromptu, name,
       update: (fn) ->
         fn null, 'value'
 
-    cache.name.should.equal "name:#{process.env.PWD}"
+    cache.name.should.equal "#{name}:#{process.env.PWD}"
 
   describe 'Cache API', ->
     cacheTest.base Impromptu.Cache.Directory
 
   describe 'Run Behavior', ->
     cacheTest.global Impromptu.Cache.Directory
+
+
+describe 'Repository Cache', ->
+  impromptu = new Impromptu()
+
+  it 'should exist', ->
+    should.exist Impromptu.Cache.Repository
+
+  it 'should have the repository root in the name', (done) ->
+    name = cacheTest.name()
+    cache = new Impromptu.Cache.Repository impromptu, name,
+      update: (fn) ->
+        fn null, 'value'
+
+    Impromptu.Cache.Global::prepared = (done) ->
+      cache.name.should.equal "#{name}:#{process.env.PWD}"
+      done()
+
+    cache.prepare 'prepared', done
+
+  describe 'Cache API', ->
+    cacheTest.base Impromptu.Cache.Repository
+
+  describe 'Run Behavior', ->
+    cacheTest.global Impromptu.Cache.Repository

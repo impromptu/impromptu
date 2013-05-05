@@ -31,6 +31,7 @@ class ModuleFactory
     @cache =
       instance: Impromptu.Cache.Instance
       directory: Impromptu.Cache.Directory
+      repository: Impromptu.Cache.Repository
       global: Impromptu.Cache.Global
       shim: Impromptu.Cache.Shim
 
