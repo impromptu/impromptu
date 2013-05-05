@@ -22,6 +22,24 @@ function runGrunt() {
 	});
 }
 
+function installGruntCli() {
+	var cmd = spawn('npm', ['install', 'grunt-cli', '-g']);
+
+	cmd.stdout.on('data', function(data) {
+		console.log(data.toString());
+	});
+
+	cmd.on('exit', function(code) {
+		if (code === 0) {
+			console.log('Sweet, that worked!');
+			runGrunt();
+		} else {
+			console.log('Uh oh, looks like there was a problem.');
+			process.exit(1);
+		}
+	});
+}
+
 // Try to install the Grunt global if you don't have it
 // Just run `grunt` straight away if you do
 exec('command -v grunt').on('exit', function(code) {
@@ -31,35 +49,22 @@ exec('command -v grunt').on('exit', function(code) {
 		console.log("It looks like you don't have grunt-cli installed.");
 		console.log("Impromptu uses grunt-cli to build its package.\n");
 
-		// Don't try to install Grunt on Travis CI
+		// Don't ask to install Grunt on Travis CI
 		// Since there's no human to answer the prompt, it just hangs pointlessly
-		if (process.env.TRAVIS == 'true')
-			process.exit(0);
+		if (process.env.TRAVIS == 'true') {
+			installGruntCli();
+		} else {
+			userInput.question('Can we try to intall the grunt-cli global for your? (Y/n) ', function(answer) {
 
-		userInput.question('Can we try to intall the grunt-cli global for your? (Y/n) ', function(answer) {
-			var cmd;
-
-			if (/^n/i.test(answer)) {
-				console.log('Okay, please install grunt-cli another time if you want to develop Impromptu.');
-				console.log('Run: npm install grunt-cli -g');
-				process.exit(0);
-			}
-
-			cmd = spawn('npm', ['install', 'grunt-cli', '-g']);
-
-			cmd.stdout.on('data', function(data) {
-				console.log(data.toString());
-			});
-
-			cmd.on('exit', function(code) {
-				if (code === 0) {
-					console.log('Sweet, that worked!');
-					runGrunt();
-				} else {
-					console.log('Uh oh, looks like there was a problem.');
-					process.exit(1);
+				if (/^n/i.test(answer)) {
+					console.log('Okay, please install grunt-cli another time if you want to develop Impromptu.');
+					console.log('Run: npm install grunt-cli -g');
+					process.exit(0);
 				}
+
+				installGruntCli();
+
 			});
-		});
+		}
 	}
 });
