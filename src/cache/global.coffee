@@ -32,18 +32,21 @@ class Global extends Impromptu.Cache
     # If this process is running in the background, try to update
     # the cached value, then fetch the cached value.
     @set (err, results) =>
-      if err then fn err else @get fn
+      if err
+        fn err if fn
+      else
+        @get fn
 
 
   unset: (fn) ->
     @client().del @name, "lock:#{@name}", "lock-process:#{@name}", (err, results) ->
-      fn err, !!results
+      fn err, !!results if fn
 
 
   get: (fn) ->
     fallback = @options.fallback
     @client().get @name, (err, results = fallback) ->
-      fn err, results
+      fn err, results if fn
 
 
   set: (fn) ->
@@ -100,7 +103,7 @@ class Global extends Impromptu.Cache
             client.del "lock-process:#{name}", done
     ], (err, results) ->
       # The update was successful if there was no error.
-      fn err, results and not err
+      fn err, results and not err if fn
 
 
 # Expose `Global`.

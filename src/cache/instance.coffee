@@ -5,23 +5,26 @@ class Instance extends Impromptu.Cache
     return @get fn if @_cached
 
     @set (err, results) =>
-      if err then fn err else @get fn
+      if err
+        fn err if fn
+      else
+        @get fn
 
 
   get: (fn) ->
-    fn null, @_cached ? @options.fallback
+    fn null, @_cached ? @options.fallback if fn
 
 
   set: (fn) ->
     @_update (err, value) =>
       unless err
         @_cached = value
-      fn err, !err
+      fn err, !err if fn
 
 
   unset: (fn) ->
     @_cached = null
-    fn null, true
+    fn null, true if fn
 
 
 # Expose `Instance`.
