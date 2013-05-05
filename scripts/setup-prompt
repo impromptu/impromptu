@@ -42,7 +42,7 @@ function npmInstallMyImpromptu() {
 function cloneMyImpromptu() {
 
   console.log('Cloning...');
-  var commandArg = 'clone git@github.com:Impromptu/my-impromptu.git ' + PROMPT_DIR;
+  var commandArg = 'clone git://github.com/Impromptu/my-impromptu.git ' + PROMPT_DIR;
   var clone = spawn('git', commandArg.split(' '));
   clone.stdout.on('data', printCommandOutput);
   clone.stderr.on('data', printCommandOutput);
