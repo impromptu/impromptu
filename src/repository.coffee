@@ -84,7 +84,7 @@ class RepositoryFactory
           # We've found the primary repository.
           if exists[repository.type]
             @_primary = repository
-            fn null, @_primary
+            return fn null, @_primary
 
 
   # Finds the root of the primary repository.
