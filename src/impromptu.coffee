@@ -40,6 +40,7 @@ class Impromptu
       return
 
   constructor: (@options = {}) ->
+    @color = new Impromptu.Color @
     @repository = new Impromptu.RepositoryFactory @
     @db = new Impromptu.DB @
 
@@ -81,10 +82,10 @@ exports = module.exports = Impromptu
 
 # Expose utilities.
 exports.cli = require './cli'
-exports.color = require './color'
 exports.exec = require './exec'
 
 # Expose APIs.
+exports.Color = require './color'
 exports.Cache = require './cache/base'
 exports.Cache.Shim = require './cache/shim'
 exports.Cache.Instance = require './cache/instance'

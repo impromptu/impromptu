@@ -67,7 +67,7 @@ describe 'Prompt', ->
     multi: '\x1B[44m\x1B[37m Hello, world! | test | Hello, world! \x1B[0m'
 
   makePrompt = (keys) ->
-    prompt = new Impromptu.Prompt
+    prompt = new Impromptu.Prompt impromptu
     for key in keys
       prompt.section key, sections[key]
     prompt

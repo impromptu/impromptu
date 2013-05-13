@@ -68,7 +68,7 @@ class Prompt
 
       (done) =>
         lastBackground = null
-        result = @_orderedSections.reduce (value, section) ->
+        result = @_orderedSections.reduce (value, section) =>
           content = section._formattedContent
           return value unless content
 
@@ -82,7 +82,7 @@ class Prompt
           if section.background isnt lastBackground and options.prePadding and /^\S/.test content
             content = " #{content}"
 
-          content = Impromptu.color content,
+          content = @impromptu.color.format content,
             foreground: section.foreground
             background: section.background
 
