@@ -11,17 +11,25 @@ COLORS =
   white: 7
   default: 9
 
-ansi = (code) ->
-  "\x1B[#{code}m"
+class Color
+  constructor: (@impromptu) ->
 
-exports = module.exports = (string, format) ->
-  original = string
+  format: (string, options) ->
+    original = string
 
-  if format.foreground and _.has COLORS, format.foreground
-    string = ansi(COLORS[format.foreground] + 30) + string
+    if options.foreground and _.has COLORS, options.foreground
+      string = @ansi(COLORS[options.foreground] + 30) + string
 
-  if format.background and _.has COLORS, format.background
-    string = ansi(COLORS[format.background] + 40) + string
+    if options.background and _.has COLORS, options.background
+      string = @ansi(COLORS[options.background] + 40) + string
 
-  string = string + ansi(0) unless string is original
-  string
+    string = string + @ansi(0) unless string is original
+    string
+
+  ansi: (code) ->
+    if @impromptu.options.prompt
+      "\\[\\033[#{code}m\\]"
+    else
+      "\x1B[#{code}m"
+
+exports = module.exports = Color
