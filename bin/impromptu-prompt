@@ -24,6 +24,10 @@
 # So we set both commands: `PROMPT_COMMAND` for bash and `precmd` for zsh,
 # and tell impromptu to escape the color codes for that specific shell.
 
+if [[ "$1" == "-v" || "$1" == "--version" ]]; then
+  $IMPROMPTU_BIN/impromptu-cli $1
+fi
+
 export PROMPT_COMMAND='PS1="$($IMPROMPTU_BIN/impromptu-cli bash)"'
 
 precmd () {
