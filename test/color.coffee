@@ -42,26 +42,51 @@ describe 'Color', ->
     result.should.equal 'test'
 
 
-  describe 'For Prompt', ->
-    impromptuForPrompt = new Impromptu
-      prompt: true
+  describe 'For Bash Prompt', ->
+    impromptuBash = new Impromptu
+      prompt: 'bash'
 
     it 'should format the foreground', ->
-      result = impromptuForPrompt.color.format 'test',
+      result = impromptuBash.color.format 'test',
         foreground: 'red'
 
       result.should.equal '\\[\\033[31m\\]test\\[\\033[0m\\]'
 
 
     it 'should format the background', ->
-      result = impromptuForPrompt.color.format 'test',
+      result = impromptuBash.color.format 'test',
         background: 'red'
 
       result.should.equal '\\[\\033[41m\\]test\\[\\033[0m\\]'
 
     it 'should format multiple attributes', ->
-      result = impromptuForPrompt.color.format 'test',
+      result = impromptuBash.color.format 'test',
         foreground: 'white'
         background: 'blue'
 
-      result.should.equal '\\[\\033[44m\\]\\[\\033[37m\\ ]test\\[\\033[0m\\]'
+      result.should.equal '\\[\\033[44m\\]\\[\\033[37m\\]test\\[\\033[0m\\]'
+
+
+  describe 'For Zsh Prompt', ->
+    impromptuZsh = new Impromptu
+      prompt: 'zsh'
+
+    it 'should format the foreground', ->
+      result = impromptuZsh.color.format 'test',
+        foreground: 'red'
+
+      result.should.equal '%{\x1B[31m%}test%{\x1B[0m%}'
+
+
+    it 'should format the background', ->
+      result = impromptuZsh.color.format 'test',
+        background: 'red'
+
+      result.should.equal '%{\x1B[41m%}test%{\x1B[0m%}'
+
+    it 'should format multiple attributes', ->
+      result = impromptuZsh.color.format 'test',
+        foreground: 'white'
+        background: 'blue'
+
+      result.should.equal '%{\x1B[44m%}%{\x1B[37m%}test%{\x1B[0m%}'
