@@ -27,9 +27,9 @@ class Color
     string
 
   ansi: (code) ->
-    if @impromptu.options.prompt
-      "\\[\\033[#{code}m\\]"
-    else
-      "\x1B[#{code}m"
+    switch @impromptu.options.prompt
+      when 'bash' then "\\[\\033[#{code}m\\]"
+      when 'zsh' then "%{\x1B[#{code}m%}"
+      else "\x1B[#{code}m"
 
 exports = module.exports = Color
