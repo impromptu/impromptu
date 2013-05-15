@@ -45,7 +45,7 @@ server = http.createServer (request, response) ->
         prompt.refresh()
 
     child.send
-      type: 'options'
+      type: 'env'
       data: body
 
 server.listen 1624

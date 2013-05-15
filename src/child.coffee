@@ -2,27 +2,27 @@ Impromptu = require '../lib/impromptu'
 impromptu = new Impromptu()
 
 process.on 'message', (message) ->
-  if message.type is 'options'
-    options =
-      env: {}
+  if message.type is 'env'
+    env = {}
 
     if message.data
-      for line in message.data.split '__IMPROMPTU__'
-        continue unless line
-        index = line.indexOf '='
-        key = line.substr 0, index
-        value = line.substr index + 1
-        options.env[key] = value
+      data = message.data.split /(?:^|\n)([a-z0-9_]+)=/i
+      # Remove the first blank match.
+      data.shift()
 
-    if options.env.IMPROMPTU_SHELL
-      impromptu.options.prompt = options.env.IMPROMPTU_SHELL
+      # Record the environment.
+      for key, index in data by 2
+        env[key] = data[index+1]
+
+    if env.IMPROMPTU_SHELL
+      impromptu.options.prompt = env.IMPROMPTU_SHELL
 
     # Overload the environment.
-    process.env = options.env
+    process.env = env
 
     # Update the current working directory.
     try
-      process.chdir options.env.PWD
+      process.chdir env.PWD
     catch err
 
     impromptu.load()
