@@ -1,4 +1,5 @@
 http = require 'http'
+fork = require('child_process').fork
 Impromptu = require '../lib/impromptu'
 
 server = http.createServer (request, response) ->
@@ -17,18 +18,17 @@ server = http.createServer (request, response) ->
       response.writeHead(413, {'Content-Type': 'text/plain'}).end()
       request.connection.destroy()
 
-
   request.on 'end', ->
-    options = JSON.parse body
-    response.writeHead 200, "OK", {'Content-Type': 'text/plain'}
+    child = fork "#{__dirname}/../lib/child.js"
 
-    impromptu = new Impromptu()
-    if options.shell
-      impromptu.options.prompt = options.shell
+    child.on 'message', (message) ->
+      if message.type is 'prompt'
+        response.writeHead 200, "OK", {'Content-Type': 'text/plain'}
+        response.write message.data
+        response.end()
 
-    impromptu.load()
-    impromptu.prompt.build (err, results) ->
-      response.write results if results
-      response.end()
+    child.send
+      type: 'options'
+      data: body
 
 server.listen 1624
