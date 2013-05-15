@@ -1,2 +1,16 @@
 #!/usr/bin/env bash
-curl --silent -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "{\"shell\":\"$1\"}" http://localhost:1624
+
+# Fetch all of the environment variables.
+# This also accounts for any variables with newlines, and ensures each variable exists.
+ENV_VARS=$(printenv | grep "^\([[:alnum:]]\|[[:punct:]]\)\+=" | sed 's/=.*$//g')
+REQUEST=""
+echo $ENV_VARS | while read var; do
+  REQUEST+="$var=$(printenv $var)__IMPROMPTU__"
+done
+
+# Set the current shell.
+if [ -n "$1" ]; then
+  REQUEST+="IMPROMPTU_SHELL=$1__IMPROMPTU__"
+fi
+
+curl --silent -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "$REQUEST" http://localhost:1624/
