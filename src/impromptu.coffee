@@ -10,7 +10,7 @@ class Impromptu
   @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
   @VERSION: npmConfig.version
 
-  compiledPrompt: "#{@CONFIG_DIR}/.compiled/prompt.js"
+  compiledPromptPath: "#{@CONFIG_DIR}/.compiled/prompt.js"
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
   constructor: (@options = {}) ->
@@ -21,45 +21,47 @@ class Impromptu
     @module = new Impromptu.ModuleFactory @
     @prompt = new Impromptu.Prompt @
 
-    # Make sure we have a source prompt
+    # Ensure the prompt is compiled.
+    @_compilePrompt()
+
+  run: ->
+    # Ensure the prompt is compiled.
+    # Double-check that nothing has changed since Impromptu was instantiated.
+    return unless @_compilePrompt()
+
+    # Load the prompt file.
+    prompt = require @compiledPromptPath
+    prompt.call? @, Impromptu, @prompt.section
+
+  # Returns true if the compiled prompt file exists.
+  _compilePrompt: ->
+    # Make sure we have a source prompt.
+    # If we don't find a prompt file, bail.
     return unless sourcePrompt = _.find @paths, (path) ->
       fs.existsSync path
 
-    # Regenerate the prompt if it's been changed or doesn't exist
-    @_compilePrompt sourcePrompt if @_isPromptStale sourcePrompt
+    # Check whether the compiled prompt exists and is up to date.
+    if fs.existsSync @compiledPromptPath
+      sourceMtime   = fs.statSync(sourcePrompt).mtime
+      compiledMtime = fs.statSync(@compiledPromptPath).mtime
 
-    # Load a new Impromptu module from a file.
-    prompt = require @compiledPrompt
-    return unless typeof prompt == 'function'
+      return true if sourceMtime < compiledMtime
 
-    # Go!
-    prompt.call @, Impromptu, @prompt.section
-
-  _ensureCompiledDirExists: ->
-    compiledDir = path.dirname @compiledPrompt
+    # Ensure the compiled prompt directory exists.
+    compiledDir = path.dirname @compiledPromptPath
     fs.mkdir compiledDir unless fs.existsSync compiledDir
 
-  _isPromptStale: (sourcePrompt) ->
-    # If the compiled prompt doesn't exist, it needs to be generated
-    return true unless fs.existsSync @compiledPrompt
-
-    # Otherwise compare last modified times
-    fs.statSync(sourcePrompt).mtime > fs.statSync(@compiledPrompt).mtime
-
-  _compilePrompt: (sourcePrompt) ->
-    @_ensureCompiledDirExists()
-
-    # If your prompt is already JS, just copy it over
+    # If your prompt is already JS, just copy it over.
     if /\.js$/.test sourcePrompt
-      fs.createReadStream(sourcePrompt).pipe(fs.createWriteStream(@compiledPrompt))
+      fs.createReadStream(sourcePrompt).pipe(fs.createWriteStream(@compiledPromptPath))
+      return true
 
-    # If you're using CS, load the CoffeeScript module to compile and cache it
+    # If you're using CS, load the CoffeeScript module to compile and cache it.
     else if /\.coffee$/.test sourcePrompt
       coffee = require 'coffee-script'
       compiledJs = coffee.compile fs.readFileSync(sourcePrompt).toString()
-      fs.writeFileSync @compiledPrompt, compiledJs
-    else
-      return
+      fs.writeFileSync @compiledPromptPath, compiledJs
+      return true
 
 
 # Create custom errors by extending `Impromptu.Error`.
