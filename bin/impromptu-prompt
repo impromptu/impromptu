@@ -28,8 +28,8 @@ if [[ "$1" == "-v" || "$1" == "--version" ]]; then
   $IMPROMPTU_BIN/impromptu-cli $1
 fi
 
-export PROMPT_COMMAND='PS1="$($IMPROMPTU_BIN/impromptu-cli bash)"'
+export PROMPT_COMMAND='PS1="$(source $IMPROMPTU_BIN/impromptu-client bash)"'
 
 precmd () {
-  export PS1="$($IMPROMPTU_BIN/impromptu-cli zsh)"
+  export PS1="$(source $IMPROMPTU_BIN/impromptu-client zsh)"
 }
