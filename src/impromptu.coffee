@@ -24,14 +24,15 @@ class Impromptu
     # Ensure the prompt is compiled.
     @_compilePrompt()
 
-  run: ->
+  load: ->
     # Ensure the prompt is compiled.
     # Double-check that nothing has changed since Impromptu was instantiated.
-    return unless @_compilePrompt()
+    return @ unless @_compilePrompt()
 
     # Load the prompt file.
     prompt = require @compiledPromptPath
     prompt.call? @, Impromptu, @prompt.section
+    return @
 
   # Returns true if the compiled prompt file exists.
   _compilePrompt: ->

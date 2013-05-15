@@ -20,7 +20,7 @@ describe 'Config File', ->
     should.exist tu
 
   it 'should load the config file', ->
-    impromptu.run()
+    impromptu.load()
     impromptu.prompt._orderedSections.length.should.be.ok
 
   it 'should build the prompt', (done) ->
