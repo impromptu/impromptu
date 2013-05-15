@@ -28,6 +28,14 @@ if [[ "$1" == "-v" || "$1" == "--version" ]]; then
   $IMPROMPTU_BIN/impromptu-cli $1
 fi
 
+# Start the server if it's not running.
+ps aux | grep impromptu-server | grep -v grep >/dev/null 2>&1
+if [ $? != 0 ]; then
+  ($IMPROMPTU_BIN/impromptu-server &)
+  echo "Starting Impromptu server..."
+  sleep 1
+fi
+
 export PROMPT_COMMAND='PS1="$(source $IMPROMPTU_BIN/impromptu-client bash)"'
 
 precmd () {
