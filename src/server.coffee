@@ -2,6 +2,22 @@ http = require 'http'
 fork = require('child_process').fork
 Impromptu = require '../lib/impromptu'
 
+prompt =
+  BUFFER_SIZE: 2
+  buffer: []
+
+  spawn: ->
+    fork "#{__dirname}/../lib/child.js"
+
+  refresh: ->
+    while @buffer.length < @BUFFER_SIZE
+      @buffer.push @spawn()
+
+  get: ->
+    if @buffer.length then @buffer.shift() else @spawn()
+
+prompt.refresh()
+
 server = http.createServer (request, response) ->
   if request.method isnt 'POST'
     response.writeHead(405, {'Content-Type': 'text/plain'}).end()
@@ -19,13 +35,14 @@ server = http.createServer (request, response) ->
       request.connection.destroy()
 
   request.on 'end', ->
-    child = fork "#{__dirname}/../lib/child.js"
+    child = prompt.get()
 
     child.on 'message', (message) ->
       if message.type is 'prompt'
         response.writeHead 200, "OK", {'Content-Type': 'text/plain'}
         response.write message.data
         response.end()
+        prompt.refresh()
 
     child.send
       type: 'options'
