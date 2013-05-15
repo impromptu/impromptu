@@ -17,6 +17,14 @@ process.on 'message', (message) ->
     if options.env.IMPROMPTU_SHELL
       impromptu.options.prompt = options.env.IMPROMPTU_SHELL
 
+    # Overload the environment.
+    process.env = options.env
+
+    # Update the current working directory.
+    try
+      process.chdir options.env.PWD
+    catch err
+
     impromptu.load()
     impromptu.prompt.build (err, results) ->
       process.send
