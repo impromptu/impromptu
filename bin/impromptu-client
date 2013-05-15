@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+curl --silent -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "{\"shell\":\"$1\"}" http://localhost:1624
