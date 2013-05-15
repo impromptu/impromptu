@@ -13,6 +13,28 @@ class Impromptu
   compiledPrompt: "#{@CONFIG_DIR}/.compiled/prompt.js"
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
 
+  constructor: (@options = {}) ->
+    @color = new Impromptu.Color @
+    @repository = new Impromptu.RepositoryFactory @
+    @db = new Impromptu.DB @
+
+    @module = new Impromptu.ModuleFactory @
+    @prompt = new Impromptu.Prompt @
+
+    # Make sure we have a source prompt
+    return unless sourcePrompt = _.find @paths, (path) ->
+      fs.existsSync path
+
+    # Regenerate the prompt if it's been changed or doesn't exist
+    @_compilePrompt sourcePrompt if @_isPromptStale sourcePrompt
+
+    # Load a new Impromptu module from a file.
+    prompt = require @compiledPrompt
+    return unless typeof prompt == 'function'
+
+    # Go!
+    prompt.call @, Impromptu, @prompt.section
+
   _ensureCompiledDirExists: ->
     compiledDir = path.dirname @compiledPrompt
     fs.mkdir compiledDir unless fs.existsSync compiledDir
@@ -38,28 +60,6 @@ class Impromptu
       fs.writeFileSync @compiledPrompt, compiledJs
     else
       return
-
-  constructor: (@options = {}) ->
-    @color = new Impromptu.Color @
-    @repository = new Impromptu.RepositoryFactory @
-    @db = new Impromptu.DB @
-
-    @module = new Impromptu.ModuleFactory @
-    @prompt = new Impromptu.Prompt @
-
-    # Make sure we have a source prompt
-    return unless sourcePrompt = _.find @paths, (path) ->
-      fs.existsSync path
-
-    # Regenerate the prompt if it's been changed or doesn't exist
-    @_compilePrompt sourcePrompt if @_isPromptStale sourcePrompt
-
-    # Load a new Impromptu module from a file.
-    prompt = require @compiledPrompt
-    return unless typeof prompt == 'function'
-
-    # Go!
-    prompt.call @, Impromptu, @prompt.section
 
 
 # Create custom errors by extending `Impromptu.Error`.
