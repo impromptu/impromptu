@@ -30,3 +30,5 @@ process.on 'message', (message) ->
       process.send
         type: 'prompt'
         data: results || ''
+
+      process.exit()
