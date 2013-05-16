@@ -9,4 +9,17 @@ if [ -n "$1" ]; then
 IMPROMPTU_SHELL=$1"
 fi
 
-curl --silent -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "$REQUEST" http://localhost:1624/
+generate_prompt() {
+  curl --max-time 1 --silent \
+  -H "Accept: application/json" -H "Content-type: application/json" \
+  -X POST -d "$REQUEST" http://localhost:1624/
+}
+
+generate_prompt
+
+if [ $? != 0 ]; then
+  echo "Impromptu server isn't running, attempting to restart..."
+  $IMPROMPTU_BIN/impromptu-prompt
+
+  generate_prompt
+fi
