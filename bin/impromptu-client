@@ -23,3 +23,7 @@ if [ $? != 0 ]; then
 
   generate_prompt
 fi
+
+if [ "$(type -t update_terminal_cwd 2>/dev/null)" ]; then
+  update_terminal_cwd
+fi
