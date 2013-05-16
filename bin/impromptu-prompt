@@ -31,7 +31,7 @@ fi
 # Start the server if it's not running.
 ps aux | grep impromptu-server | grep -v grep >/dev/null 2>&1
 if [ $? != 0 ]; then
-  ($IMPROMPTU_BIN/impromptu-server &)
+  (nohup $IMPROMPTU_BIN/impromptu-server >& /dev/null &)
   echo "Starting Impromptu server..."
   sleep 1
 fi
