@@ -31,7 +31,11 @@ class Impromptu
 
     # Load the prompt file.
     prompt = require @compiledPromptPath
-    prompt.call? @, Impromptu, @prompt.section
+    try
+      prompt.call? @, Impromptu, @prompt.section
+    catch err
+      @_error 'javascript', 'Your prompt file triggered a JavaScript error.', err
+
     return @
 
   # Returns true if the compiled prompt file exists.
@@ -60,9 +64,18 @@ class Impromptu
     # If you're using CS, load the CoffeeScript module to compile and cache it.
     else if /\.coffee$/.test sourcePrompt
       coffee = require 'coffee-script'
-      compiledJs = coffee.compile fs.readFileSync(sourcePrompt).toString()
-      fs.writeFileSync @compiledPromptPath, compiledJs
-      return true
+      try
+        compiledJs = coffee.compile fs.readFileSync(sourcePrompt).toString()
+        fs.writeFileSync @compiledPromptPath, compiledJs
+        return true
+      catch err
+        @_error 'coffeescript', 'Your prompt file is not valid CoffeeScript.', err
+
+  _error: (name, content, err) ->
+    @prompt.section "error:message:#{name}",
+      content: content
+      background: 'red'
+      foreground: 'white'
 
 
 # Create custom errors by extending `Impromptu.Error`.
