@@ -7,8 +7,8 @@ _ = require 'underscore'
 npmConfig = require '../package.json'
 
 class Impromptu
-  @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
   @VERSION: npmConfig.version
+  @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
 
   compiledPromptPath: "#{@CONFIG_DIR}/.compiled/prompt.js"
   paths: "#{@CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
@@ -63,6 +63,10 @@ class Impromptu
 
     # If you're using CS, load the CoffeeScript module to compile and cache it.
     else if /\.coffee$/.test sourcePrompt
+      # Clear any pre-existing CoffeeScript compiler errors;
+      # we only care about whether the most recent compilation succeeded.
+      @_clearError 'coffeescript'
+
       coffee = require 'coffee-script'
       try
         compiledJs = coffee.compile fs.readFileSync(sourcePrompt).toString()
@@ -70,12 +74,40 @@ class Impromptu
         return true
       catch err
         @_error 'coffeescript', 'Your prompt file is not valid CoffeeScript.', err
+        return
 
   _error: (name, content, err) ->
+    logPath = "#{Impromptu.CONFIG_DIR}/impromptu-debug.log"
+
     @prompt.section "error:message:#{name}",
       content: content
       background: 'red'
       foreground: 'white'
+
+    @prompt.section "error:instructions:#{name}",
+      content: "\nDetails can be found in #{logPath}\n"
+      options:
+        newlines: true
+
+    fs.appendFileSync logPath,
+      """
+      ----------------------------------------
+      #{new Date()}
+      ----------------------------------------
+      #{content}
+
+      #{err.stack}
+
+
+
+      """
+
+  _clearError: (name) ->
+    @prompt.section "error:message:#{name}",
+      content: ''
+
+    @prompt.section "error:instructions:#{name}",
+      content: ''
 
 
 # Create custom errors by extending `Impromptu.Error`.
