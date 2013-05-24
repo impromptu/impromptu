@@ -2,6 +2,8 @@ http = require 'http'
 fork = require('child_process').fork
 Impromptu = require '../lib/impromptu'
 
+port = process.argv[2] || 1624
+
 prompt =
   BUFFER_SIZE: 2
   buffer: []
@@ -48,4 +50,4 @@ server = http.createServer (request, response) ->
       type: 'env'
       data: body
 
-server.listen 1624
+server.listen port

@@ -28,10 +28,27 @@ if [[ "$1" == "-v" || "$1" == "--version" ]]; then
   $IMPROMPTU_BIN/impromptu-cli $1
 fi
 
-# Start the server if it's not running.
-ps aux | grep impromptu-server | grep -v grep >/dev/null 2>&1
-if [ $? != 0 ]; then
-  (nohup $IMPROMPTU_BIN/impromptu-server >& /dev/null &)
+if [[ -z "$IMPROMPTU_PORT" ]]; then
+  IMPROMPTU_PORT="1624"
+fi
+
+compiled_dir="$IMPROMPTU_DIR/.compiled"
+pid_file="$compiled_dir/impromptu-server.pid"
+
+# Start the server if it's not running
+# .
+# Check if the pid file exists and check if the process is still running.
+if [[ ! -f $pid_file || $(kill -0 $(cat $pid_file) 2> /dev/null; echo $?) -ne 0 ]]; then
+  # Ensure the `.compiled` directory exists.
+  [ -d $compiled_dir ] || mkdir $compiled_dir
+
+  # Start the impromptu server.
+  # Ensure the server is detached from this process and save the PID.
+  (
+    nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_PORT >& /dev/null &
+    echo "$!" > $pid_file
+  )
+
   echo "Starting Impromptu server..."
   sleep 1
 fi
