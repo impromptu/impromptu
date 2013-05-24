@@ -1,9 +1,8 @@
 Impromptu = require '../../lib/impromptu'
 path = require 'path'
 
-# Update the test paths for the sample prompt file.
-Impromptu::paths = [path.resolve('./test/etc/sample-configfile.coffee')]
-Impromptu::compiledPromptPath = path.resolve('./test/etc/.compiled/sample-configfile.js')
+# Update the config path for the sample prompt file.
+Impromptu.CONFIG_DIR = path.resolve('./test/etc/')
 
 # Set the redis testing constants.
 Impromptu.DB.REDIS_PORT = 6421
