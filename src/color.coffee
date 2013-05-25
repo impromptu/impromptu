@@ -27,7 +27,7 @@ class Color
     string
 
   ansi: (code) ->
-    switch @impromptu.options.prompt
+    switch @impromptu.options.shell
       when 'bash' then "\\[\\033[#{code}m\\]"
       when 'zsh' then "%{\x1B[#{code}m%}"
       else "\x1B[#{code}m"
