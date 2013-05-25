@@ -44,7 +44,7 @@ describe 'Color', ->
 
   describe 'For Bash Prompt', ->
     impromptuBash = new Impromptu
-      prompt: 'bash'
+      shell: 'bash'
 
     it 'should format the foreground', ->
       result = impromptuBash.color.format 'test',
@@ -69,7 +69,7 @@ describe 'Color', ->
 
   describe 'For Zsh Prompt', ->
     impromptuZsh = new Impromptu
-      prompt: 'zsh'
+      shell: 'zsh'
 
     it 'should format the foreground', ->
       result = impromptuZsh.color.format 'test',

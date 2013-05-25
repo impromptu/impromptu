@@ -15,7 +15,7 @@ process.on 'message', (message) ->
         env[key] = data[index+1]
 
     if env.IMPROMPTU_SHELL
-      impromptu.options.prompt = env.IMPROMPTU_SHELL
+      impromptu.options.shell = env.IMPROMPTU_SHELL
 
     # Overload the environment.
     process.env = env
