@@ -34,11 +34,17 @@ fi
 
 compiled_dir="$IMPROMPTU_DIR/.compiled"
 pid_file="$compiled_dir/impromptu-server.pid"
+impromptu_command="impromptu-client"
+
+ping_process() {
+  kill -0 $(cat $pid_file) 2> /dev/null
+  echo $?
+}
 
 # Start the server if it's not running
 # .
 # Check if the pid file exists and check if the process is still running.
-if [[ ! -f $pid_file || $(kill -0 $(cat $pid_file) 2> /dev/null; echo $?) -ne 0 ]]; then
+if [[ ! -f $pid_file || $(ping_process) -ne 0 ]]; then
   # Ensure the `.compiled` directory exists.
   [ -d $compiled_dir ] || mkdir $compiled_dir
 
@@ -51,10 +57,18 @@ if [[ ! -f $pid_file || $(kill -0 $(cat $pid_file) 2> /dev/null; echo $?) -ne 0 
 
   echo "Starting Impromptu server..."
   sleep 1
+
+  if [ $(ping_process) -ne 0 ]; then
+    echo "Could not start Impromptu server."
+    echo "Port $IMPROMPTU_PORT may already be in use."
+    echo "Using Impromptu CLI instead."
+
+    impromptu_command="impromptu-cli"
+  fi
 fi
 
-export PROMPT_COMMAND='PS1="$(source $IMPROMPTU_BIN/impromptu-client bash)"'
+export PROMPT_COMMAND='PS1="$(source $IMPROMPTU_BIN/$impromptu_command bash)"'
 
 precmd () {
-  export PS1="$(source $IMPROMPTU_BIN/impromptu-client zsh)"
+  export PS1="$(source $IMPROMPTU_BIN/$impromptu_command zsh)"
 }
