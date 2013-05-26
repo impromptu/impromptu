@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
+# We need to keep this before running any other commands.
+LAST_EXIT_CODE=$?
+
 # Record the shell's environment.
-REQUEST="$(printenv)"
+REQUEST="$(printenv)
+IMPROMPTU_LAST_EXIT_CODE=$LAST_EXIT_CODE
+IMPROMPTU_JOBS_COUNT=`jobs|wc -l|sed 's/ //g'`"
 
 # Set the current shell.
 if [ -n "$1" ]; then
