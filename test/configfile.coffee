@@ -25,5 +25,5 @@ describe 'Config File', ->
 
   it 'should build the prompt', (done) ->
     impromptu.prompt.build (err, prompt) ->
-      prompt.should.equal '\u001b[42m\u001b[37m user@host \u001b[0m\u001b[44m\u001b[37m ~/path/to/impromptu \u001b[0m'
+      prompt.should.equal '\x1b[42m\x1b[37m user@host \x1b[0m\x1b[44m\x1b[37m ~/path/to/impromptu \x1b[0m'
       done()
