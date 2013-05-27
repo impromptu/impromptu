@@ -9,7 +9,7 @@ describe 'Config File', ->
   impromptu = new Impromptu
 
   after (done) ->
-    tempDir = path.dirname Impromptu::compiledPrompt
+    tempDir = path.dirname impromptu.path.compiled
     exec "rm -rf #{tempDir}", ->
       done()
 
