@@ -41,7 +41,7 @@ class ModuleFactory
 
   # Require and register a new Impromptu module.
   require: (module) ->
-    path = "#{Impromptu.CONFIG_DIR}/node_modules/#{module}"
+    path = "#{@impromptu.path.config}/node_modules/#{module}"
     fn = require path
     @register path, fn if typeof fn == 'function'
 
