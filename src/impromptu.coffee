@@ -8,7 +8,7 @@ npmConfig = require '../package.json'
 
 class Impromptu
   @VERSION: npmConfig.version
-  @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
+  @CONFIG_DIR: process.env.IMPROMPTU_DIR || "#{process.env.HOME}/.impromptu"
 
   constructor: (@options = {}) ->
     @path =
