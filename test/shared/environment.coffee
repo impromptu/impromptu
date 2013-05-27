@@ -2,7 +2,7 @@ Impromptu = require '../../lib/impromptu'
 path = require 'path'
 
 # Update the config path for the sample prompt file.
-Impromptu.CONFIG_DIR = path.resolve('./test/etc/')
+Impromptu.CONFIG_DIR = path.resolve('./test/prompts/sample/')
 
 # Set the redis testing constants.
 Impromptu.DB.REDIS_PORT = 6421
