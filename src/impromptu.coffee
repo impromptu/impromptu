@@ -8,13 +8,17 @@ npmConfig = require '../package.json'
 
 class Impromptu
   @VERSION: npmConfig.version
-  @CONFIG_DIR: "#{process.env.HOME}/.impromptu"
+  @DEFAULT_CONFIG_DIR: process.env.IMPROMPTU_DIR || "#{process.env.HOME}/.impromptu"
 
   constructor: (@options = {}) ->
+    config = @options.config || Impromptu.DEFAULT_CONFIG_DIR
+    delete @options.config
+
     @path =
-      sources: "#{Impromptu.CONFIG_DIR}/prompt.#{ext}" for ext in ['coffee', 'js']
-      compiled: "#{Impromptu.CONFIG_DIR}/.compiled/prompt.js"
-      log: "#{Impromptu.CONFIG_DIR}/impromptu-debug.log"
+      config: config
+      sources: "#{config}/prompt.#{ext}" for ext in ['coffee', 'js']
+      compiled: "#{config}/.compiled/prompt.js"
+      log: "#{config}/impromptu-debug.log"
 
     @color = new Impromptu.Color @
     @repository = new Impromptu.RepositoryFactory @
