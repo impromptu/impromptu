@@ -19,6 +19,7 @@ node_modules
 # Ignore our output directories
 lib
 test/prompts/*/.compiled
+test/prompts/*/impromptu-debug.log
 
 # Ignore socket files
 *.sock
