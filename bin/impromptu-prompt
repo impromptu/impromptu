@@ -24,12 +24,12 @@
 # So we set both commands: `PROMPT_COMMAND` for bash and `precmd` for zsh,
 # and tell impromptu to escape the color codes for that specific shell.
 
-if [[ "$1" == "-v" || "$1" == "--version" ]]; then
-  $IMPROMPTU_BIN/impromptu-cli $1
-fi
-
 if [[ -z "$IMPROMPTU_PORT" ]]; then
   IMPROMPTU_PORT="1624"
+fi
+
+if [[ "$1" == "-v" || "$1" == "--version" ]]; then
+  $IMPROMPTU_BIN/impromptu-cli $1
 fi
 
 compiled_dir="$IMPROMPTU_DIR/.compiled"
