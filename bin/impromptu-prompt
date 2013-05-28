@@ -24,6 +24,10 @@
 # So we set both commands: `PROMPT_COMMAND` for bash and `precmd` for zsh,
 # and tell impromptu to escape the color codes for that specific shell.
 
+if [[ -z "$IMPROMPTU_DIR" || ! -d "$IMPROMPTU_DIR" ]]; then
+  export IMPROMPTU_DIR="$HOME/.impromptu"
+fi
+
 if [[ -z "$IMPROMPTU_PORT" ]]; then
   IMPROMPTU_PORT="1624"
 fi
