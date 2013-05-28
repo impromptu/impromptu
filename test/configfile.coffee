@@ -18,7 +18,7 @@ describe 'Prompt Files', ->
 
     it 'should report a compiler error', (done) ->
       tests.shouldBuildPrompt (err, prompt) ->
-        prompt.should.include "\x1b[41m\x1b[37m Your prompt file is not valid CoffeeScript. \x1b[0m"
+        prompt.should.include "Your prompt file is not valid CoffeeScript."
         done err
 
   describe 'JavaScript Loading Error', ->
@@ -26,5 +26,5 @@ describe 'Prompt Files', ->
 
     it 'should report a compiler error', (done) ->
       tests.shouldBuildPrompt (err, prompt) ->
-        prompt.should.include "\x1b[41m\x1b[37m Your prompt file triggered a JavaScript error. \x1b[0m"
+        prompt.should.include "Your prompt file triggered a JavaScript error."
         done err
