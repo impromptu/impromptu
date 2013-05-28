@@ -1,17 +1,13 @@
 should = require 'should'
 environment = require './shared/environment'
 Impromptu = require '../lib/impromptu'
-path = require 'path'
-exec = require('child_process').exec
 
 
 describe 'Config File', ->
   impromptu = new Impromptu
 
   after (done) ->
-    tempDir = path.dirname impromptu.path.compiled
-    exec "rm -rf #{tempDir}", ->
-      done()
+    environment.cleanPromptDir impromptu, done
 
   tu = null
 

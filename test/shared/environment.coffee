@@ -1,5 +1,6 @@
 Impromptu = require '../../lib/impromptu'
 path = require 'path'
+exec = require('child_process').exec
 
 TEST_PROMPT_ROOT = path.resolve './test/prompts'
 
@@ -16,3 +17,8 @@ exports = module.exports =
 
   isTravis: ->
     process.env.TRAVIS is 'true'
+
+  cleanPromptDir: (impromptu, done) ->
+    # Remove the `.compiled` directory and the debug log.
+    compiledDir = path.dirname impromptu.path.compiled
+    exec "rm -rf #{compiledDir} #{impromptu.path.log}", done
