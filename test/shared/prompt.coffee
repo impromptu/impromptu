@@ -6,26 +6,30 @@ path = require 'path'
 
 class PromptTests
   constructor: (@name) ->
-    config = "#{environment.TEST_PROMPT_ROOT}/#{@name}"
 
+  shouldInitializeImpromptu: ->
     @impromptu = new Impromptu
-      config: config
+      config: "#{environment.TEST_PROMPT_ROOT}/#{@name}"
 
-    @expected = require "#{config}/expected"
+    should.exist @impromptu
 
   shouldLoadThePromptFile: ->
+    @shouldInitializeImpromptu()
     @impromptu.load()
     @impromptu.prompt._orderedSections.length.should.be.ok
 
-  shouldEqualTheExpectedPrompt: (fn) ->
+  shouldBuildPrompt: (fn) ->
+    @shouldLoadThePromptFile()
     @impromptu.prompt.build (err, prompt) =>
-      prompt.should.equal @expected.prompt
-      fn err
+      should.exist prompt
+      fn err, prompt
 
-  cleanPromptDir: (done) ->
+  clean: (fn) ->
+    @shouldInitializeImpromptu() unless @impromptu
     # Remove the `.compiled` directory and the debug log.
     compiledDir = path.dirname @impromptu.path.compiled
-    exec "rm -rf #{compiledDir} #{@impromptu.path.log}", done
+    exec "rm -rf #{compiledDir} #{@impromptu.path.log}", fn
+    delete @impromptu
 
 module.exports = (name) ->
   tests = new PromptTests name
@@ -33,11 +37,10 @@ module.exports = (name) ->
   it 'should load the prompt file', ->
     tests.shouldLoadThePromptFile()
 
-  if tests.expected.prompt
-    it 'should equal the expected prompt', (done) ->
-      tests.shouldEqualTheExpectedPrompt done
+  it 'should build a prompt', (done) ->
+    tests.shouldBuildPrompt done
 
-  after (done) ->
-    tests.cleanPromptDir done
+  afterEach (done) ->
+    tests.clean done
 
   tests
