@@ -3,7 +3,14 @@
 Impromptu
 =========
 
-A sentient prompt.
+A better prompt.
+
+Installation
+------------
+Impromptu requires [Node.js](http://nodejs.org/) and [Redis](http://redis.io/). The install script currently requires [Git](http://git-scm.com/). Impromptu supports bash and zsh by default.
+
+1. `npm install -g use-impromptu`
+2. Add `source impromptu` to the end of your shell’s configuration file. You might want to run something like `echo 'source impromptu' >> ~/.bash_profile` on a default OS X install.
 
 
 Philosophy
