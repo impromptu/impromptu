@@ -24,7 +24,7 @@ describe 'Prompt Files', ->
   describe 'JavaScript Loading Error', ->
     tests = promptTests 'load-error'
 
-    it 'should report a compiler error', (done) ->
+    it 'should report a runtime error', (done) ->
       tests.shouldBuildPrompt (err, prompt) ->
         prompt.should.include "Your prompt file triggered a JavaScript error."
         done err
