@@ -22,7 +22,8 @@ prompt.refresh()
 
 server = http.createServer (request, response) ->
   if request.method isnt 'POST'
-    response.writeHead(405, {'Content-Type': 'text/plain'}).end()
+    response.writeHead 405, {'Content-Type': 'text/plain'}
+    response.end()
     return
 
   # Build the body.
@@ -33,7 +34,8 @@ server = http.createServer (request, response) ->
     # Make sure the server isn't being flooded.
     if body.length > 1e6
       body = ''
-      response.writeHead(413, {'Content-Type': 'text/plain'}).end()
+      response.writeHead 413, {'Content-Type': 'text/plain'}
+      response.end()
       request.connection.destroy()
 
   request.on 'end', ->
