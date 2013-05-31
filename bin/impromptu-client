@@ -24,13 +24,17 @@ generate_prompt() {
   -X POST -d "$REQUEST" "http://localhost:$IMPROMPTU_PORT/"
 }
 
-generate_prompt
+# Record the result of the generated prompt.
+generated_prompt=$(generate_prompt)
 
-if [ $? != 0 ]; then
+# If the prompt errored or returned nothing, the server is no longer running.
+if [[ $? != 0 || -z $generated_prompt ]]; then
   echo "Impromptu server isn't running, attempting to restart..."
-  $IMPROMPTU_BIN/impromptu-prompt
+  source $IMPROMPTU_BIN/impromptu-prompt
 
   generate_prompt
+elif [[ -n $generated_prompt ]]; then
+  echo -n "$generated_prompt"
 fi
 
 if [ "$(type -t update_terminal_cwd 2>/dev/null)" ]; then
