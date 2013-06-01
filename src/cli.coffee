@@ -8,6 +8,17 @@ module.exports = ->
     console.log Impromptu.VERSION
     process.exit()
 
+  # Help text
+  if process.argv[2] is '--help' or process.argv[2] is '-h'
+    console.log """
+      Impromptu version #{Impromptu.VERSION}
+
+      To generate your prompt using Impromptu, add 'source impromptu' to the end of your shell's configuration file.
+
+      You might want to run something like `echo 'source impromptu' >> ~/.bash_profile` on a default OS X install.
+    """
+    process.exit()
+
   # Spawn the background process to asynchronously update the cache.
   backgroundPath = path.resolve "#{__dirname}/../bin/impromptu-background"
   background = spawn backgroundPath, [],
