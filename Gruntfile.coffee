@@ -44,7 +44,7 @@ module.exports = (grunt) ->
   grunt.registerTask 'nuke', "Nuke stuff. Don't run this unless you know what you're doing.", ->
     steps = [
       'rm -rf ~/.impromptu'
-      'brew uninstall redis cmake'
+      'brew uninstall redis'
       'git clean -fdx'
     ]
 
