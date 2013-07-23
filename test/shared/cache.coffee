@@ -125,6 +125,39 @@ test.global = (CacheClass, options = {}) ->
 
     cached.run ->
 
+  it 'should validate cached values before updating', (done) ->
+    x = 'invalid'
+
+    cached = new CacheClass impromptu, test.name(),
+      blocking: true
+      validate: (err, value, fn) ->
+        fn value is 'valid'
+      update: (fn) ->
+        fn null, x
+
+    async.series [
+      (fn) ->
+        # Test initial invalid value assignment.
+        cached.run (err, fetched) ->
+          fetched.should.equal 'invalid'
+          fn err
+
+      (fn) ->
+        # Test that invalid value doesn't prevent update.
+        x = 'valid'
+        cached.run (err, fetched) ->
+          fetched.should.equal 'valid'
+          fn err
+
+      (fn) ->
+        # Test that valid value prevents update.
+        x = 'invalid'
+        cached.run (err, fetched) ->
+          fetched.should.equal 'valid'
+          fn err
+    ], done
+
+
   it 'should fetch cached values', (done) ->
     name = test.name()
     updater = new CacheClass background, name,

@@ -3,12 +3,7 @@ Impromptu = require '../impromptu'
 class Instance extends Impromptu.Cache
   run: (fn) ->
     return @get fn if @_cached
-
-    @set (err, results) =>
-      if err
-        fn err if fn
-      else
-        @get fn
+    @_setThenGet fn
 
 
   get: (fn) ->

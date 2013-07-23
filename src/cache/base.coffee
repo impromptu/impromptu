@@ -58,5 +58,14 @@ class Cache
       done err, results
 
 
+  # Private. A helper method to update the cached value, then fetch the cached value.
+  _setThenGet: (done) =>
+    @set (err, results) =>
+      if err
+        done err if done
+      else
+        @get done
+
+
 # Expose `Cache`.
 exports = module.exports = Cache
