@@ -116,7 +116,7 @@ test.global = (CacheClass, options = {}) ->
 
     cached.run ->
 
-  it 'should update when blocking is set', (done) ->
+  it 'should update when forced', (done) ->
     cached = new CacheClass impromptu, test.name(),
       blocking: true
       update: (fn) ->
@@ -129,15 +129,14 @@ test.global = (CacheClass, options = {}) ->
     x = 'invalid'
 
     cached = new CacheClass impromptu, test.name(),
-      blocking: true
-      validate: (err, value, fn) ->
-        fn value is 'valid'
+      force: (err, value, force) ->
+        force value isnt 'valid'
       update: (fn) ->
         fn null, x
 
     async.series [
       (fn) ->
-        # Test initial invalid value assignment.
+        # Test a forced update.
         cached.run (err, fetched) ->
           fetched.should.equal 'invalid'
           fn err

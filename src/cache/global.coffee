@@ -27,18 +27,18 @@ class Global extends Impromptu.Cache
   run: (fn) ->
     # If this process isn't being run in the background and isn't a blocking
     # process, just try to fetch the cached value.
-    return @get fn unless @impromptu.options.background or @options.blocking
+    return @get fn unless @impromptu.options.background or @options.force
 
     # Run the update process if a validator isn't provided.
-    return @_setThenGet fn unless @options.validate
+    return @_setThenGet fn unless @options.force
 
-    # Check if the current value is still valid. If it is, don't update.
+    # Check if we should force an update based on the current value.
     @get (err, results) =>
-      @options.validate.call @options.context, err, results, (valid) =>
-        if valid
-          fn err, results
-        else
+      @options.force.call @options.context, err, results, (force) =>
+        if force
           @_setThenGet fn
+        else
+          fn err, results
 
 
   unset: (fn) ->
