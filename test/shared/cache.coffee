@@ -98,8 +98,27 @@ test.global = (CacheClass, options = {}) ->
   background = new Impromptu
     background: true
 
+  it 'should fetch a null value by default', (done) ->
+    cached = new CacheClass impromptu, test.name(),
+      update: (fn) ->
+        should.fail 'Update should not run.'
+        fn null, 'value'
+
+    cached.run (err, fetched) ->
+      should.not.exist fetched
+      done err
+
   it 'should update when background is set', (done) ->
     cached = new CacheClass background, test.name(),
+      update: (fn) ->
+        done()
+        fn null, 'value'
+
+    cached.run ->
+
+  it 'should update when blocking is set', (done) ->
+    cached = new CacheClass impromptu, test.name(),
+      blocking: true
       update: (fn) ->
         done()
         fn null, 'value'

@@ -27,7 +27,7 @@ class Global extends Impromptu.Cache
   run: (fn) ->
     # If this process isn't being run in the background,
     # just try to fetch the cached value.
-    return @get fn unless @impromptu.options.background
+    return @get fn unless @impromptu.options.background or @options.blocking
 
     # If this process is running in the background, try to update
     # the cached value, then fetch the cached value.
