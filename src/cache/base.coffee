@@ -9,16 +9,22 @@ class Cache
     # in `Cache.prototype` creates a zero argument function when compiled.
     protoRun = @run
     @run = (done) =>
-      protoRun.apply @, arguments
+      if @options.run
+        # If a `run` option is defined, use that instead.
+        @options.run.apply @, arguments
+      else
+        # Otherwise, use the default `run` method.
+        protoRun.apply @, arguments
 
 
-  # The main method.
+  # The main method: `run` acts as a deterministic way to fetch and potentially
+  # update the cache.
   #
   # Accepts a `fn` with a signature of `err, results`, where `results` is the
-  # cached value. Optionally updates the cache.
+  # cached value.
   #
   # This method is bound to the instance so the method can be passed around
-  # without the instance.
+  # without the instance. Can be overloaded using `options.run`.
   run: (fn) -> throw Impromptu.AbstractError
 
 
