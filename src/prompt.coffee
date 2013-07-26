@@ -62,7 +62,7 @@ class Prompt
       (done) =>
         async.each @_orderedSections, (section, complete) =>
           @_content section, (err, content) ->
-            section._formattedContent = content
+            section._formattedContent = content unless err
             complete()
         , done
 
