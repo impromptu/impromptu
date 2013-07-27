@@ -25,6 +25,7 @@ module.exports = ->
     stdio: 'ignore'
     detached: true
     cwd: process.cwd()
+    env: process.env
 
   background.unref()
 
