@@ -2,14 +2,14 @@ Impromptu = require '../lib/impromptu'
 impromptu = new Impromptu()
 
 parseEnv = (printenvOutput) ->
-    env = {}
-    if printenvOutput
-      pairs = printenvOutput.split /(?:^|\n)([a-z0-9_]+)=/i
-      # Remove the first blank match.
-      pairs.shift()
-      for key, index in pairs by 2
-        env[key] = pairs[index+1]
-    env
+  env = {}
+  if printenvOutput
+    pairs = printenvOutput.split /(?:^|\n)([a-z0-9_]+)=/i
+    # Remove the first blank match.
+    pairs.shift()
+    for key, index in pairs by 2
+      env[key] = pairs[index+1]
+  env
 
 process.on 'message', (message) ->
   if message.type is 'env'
