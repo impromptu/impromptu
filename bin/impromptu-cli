@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('../lib/impromptu').cli();
+require('../lib/impromptu').cli.run();

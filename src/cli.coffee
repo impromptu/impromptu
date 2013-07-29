@@ -2,7 +2,9 @@ Impromptu = require './impromptu'
 spawn = require('child_process').spawn
 path = require 'path'
 
-module.exports = ->
+cli = {}
+
+cli.run = ->
   # Show the version if that's all you asked for.
   if process.argv[2] is '--version' or process.argv[2] is '-v'
     console.log Impromptu.VERSION
@@ -19,6 +21,20 @@ module.exports = ->
     """
     process.exit()
 
+  cli.spawnBackground()
+
+  # Build the prompt.
+  new Impromptu({shell: process.argv[2]}).load().prompt.build (err, results) ->
+    process.stdout.write results if results
+    process.exit()
+
+
+cli.runBackground = ->
+  new Impromptu({background: true}).load().prompt.build (err, results) ->
+    process.exit()
+
+
+cli.spawnBackground = ->
   # Spawn the background process to asynchronously update the cache.
   backgroundPath = path.resolve "#{__dirname}/../bin/impromptu-background"
   background = spawn backgroundPath, [],
@@ -29,7 +45,4 @@ module.exports = ->
 
   background.unref()
 
-  # Build the prompt.
-  new Impromptu({shell: process.argv[2]}).load().prompt.build (err, results) ->
-    process.stdout.write results if results
-    process.exit()
+module.exports = cli
