@@ -26,6 +26,10 @@ process.on 'message', (message) ->
       process.chdir env.PWD
     catch err
 
+    # Spawn the background update process.
+    Impromptu.cli.spawnBackground()
+
+    # Load and build the prompt.
     impromptu.load()
     impromptu.prompt.build (err, results) ->
       process.send
