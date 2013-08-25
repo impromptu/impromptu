@@ -55,7 +55,7 @@ module.exports = (grunt) ->
     done = @async()
 
     mocha = new Mocha
-      reporter: 'spec'
+      reporter: 'nyan'
 
     for files in @files
       for file in files.src
