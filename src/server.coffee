@@ -1,4 +1,4 @@
-http = require 'http'
+net = require 'net'
 fork = require('child_process').fork
 Impromptu = require '../lib/impromptu'
 path = require 'path'
@@ -23,20 +23,14 @@ prompt =
 
 prompt.refresh()
 
-server = http.createServer (request, response) ->
-  if request.method isnt 'POST'
-    response.writeHead 405, {'Content-Type': 'text/plain'}
-    response.end()
-    return
-
+server = net.createServer {allowHalfOpen: true}, (socket) ->
   # Verify that the client is running on the same version as the server.
   npmConfigPath = path.resolve "#{__dirname}/../package.json"
   npmConfig = JSON.parse fs.readFileSync(npmConfigPath)
 
   # If there's a version mismatch, stop running the server.
   if Impromptu.VERSION isnt npmConfig.version
-    response.writeHead 503, {'Content-Type': 'text/plain'}
-    response.end()
+    socket.end()
 
     # Remove the server's pid file.
     fs.unlinkSync impromptu.path.serverPid
@@ -46,24 +40,21 @@ server = http.createServer (request, response) ->
 
   # Build the body.
   body = ''
-  request.on 'data', (data) ->
+  socket.on 'data', (data) ->
     body += data
 
     # Make sure the server isn't being flooded.
     if body.length > 1e6
       body = ''
-      response.writeHead 413, {'Content-Type': 'text/plain'}
-      response.end()
-      request.connection.destroy()
+      socket.end()
+      socket.destroy()
 
-  request.on 'end', ->
+  socket.on 'end', ->
     child = prompt.get()
 
     child.on 'message', (message) ->
       if message.type is 'prompt'
-        response.writeHead 200, "OK", {'Content-Type': 'text/plain'}
-        response.write message.data
-        response.end()
+        socket.end message.data
         prompt.refresh()
 
     child.send
