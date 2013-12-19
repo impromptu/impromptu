@@ -28,8 +28,8 @@ IMPROMPTU_SHELL=$1"
 fi
 
 generate_prompt() {
-  if [ ".sock" == "${IMPROMPTU_PORT:(-5)}" ]; then
-    echo -n "$REQUEST" | nc -w 1 -U "$IMPROMPTU_PORT"
+  if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
+    echo -n "$REQUEST" | nc -w 1 -U "$IMPROMPTU_UNIX_DOMAIN_SOCKET"
   else
     echo -n "$REQUEST" | nc -w 1 localhost "$IMPROMPTU_PORT"
   fi

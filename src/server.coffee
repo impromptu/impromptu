@@ -4,7 +4,7 @@ Impromptu = require '../lib/impromptu'
 path = require 'path'
 fs = require 'fs'
 
-port = process.argv[2] || 1624
+pathOrPort = process.argv[2] || 1624
 impromptu = new Impromptu()
 
 prompt =
@@ -61,4 +61,4 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
       type: 'env'
       data: body
 
-server.listen port
+server.listen pathOrPort
