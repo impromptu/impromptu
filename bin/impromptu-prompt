@@ -60,10 +60,12 @@ if [[ ! -f $pid_file || $(ping_process) -ne 0 ]]; then
   # Start the impromptu server.
   # Ensure the server is detached from this process and save the PID.
   (
-    if [ ".sock" == "${IMPROMPTU_PORT:(-5)}" ]; then
-      rm "$IMPROMPTU_PORT" &> /dev/null
+    if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
+      rm "$IMPROMPTU_UNIX_DOMAIN_SOCKET" &> /dev/null
+      nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_UNIX_DOMAIN_SOCKET >& /dev/null &
+    else
+      nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_PORT >& /dev/null &
     fi
-    nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_PORT >& /dev/null &
     echo "$!" > $pid_file
   )
 
