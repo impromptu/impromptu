@@ -18,6 +18,9 @@ process.on 'message', (message) ->
     if env.IMPROMPTU_SHELL
       impromptu.options.shell = env.IMPROMPTU_SHELL
 
+    if env.IMPROMPTU_LOG_LEVEL
+      impromptu.log.setVerbosity env.IMPROMPTU_LOG_LEVEL
+
     # Overload the environment.
     process.env = env
 

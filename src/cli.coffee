@@ -30,6 +30,9 @@ module.exports = ->
   background.unref()
 
   # Build the prompt.
-  new Impromptu({shell: process.argv[2]}).load().prompt.build (err, results) ->
+  new Impromptu({
+    shell: process.argv[2]
+    verbosity: process.env.IMPROMPTU_LOG_LEVEL
+  }).load().prompt.build (err, results) ->
     process.stdout.write results if results
     process.exit()

@@ -14,6 +14,9 @@ class Impromptu
     config = @options.config || Impromptu.DEFAULT_CONFIG_DIR
     delete @options.config
 
+    verbosity = @options.verbosity
+    delete @options.verbosity
+
     @path =
       config: config
       sources: "#{config}/prompt.#{ext}" for ext in ['coffee', 'js']
@@ -21,6 +24,7 @@ class Impromptu
       log: "#{config}/impromptu-debug.log"
       serverPid: "#{config}/.compiled/impromptu-server.pid"
 
+    @log = new Impromptu.Log @, verbosity
     @color = new Impromptu.Color @
     @repository = new Impromptu.RepositoryFactory @
     @db = new Impromptu.DB @
@@ -94,17 +98,10 @@ class Impromptu
       options:
         newlines: true
 
-    fs.appendFileSync @path.log,
-      """
-      ----------------------------------------
-      #{new Date()}
-      ----------------------------------------
-      #{content}
+    @log.warning """#{content}
 
       #{err.stack}
-
-
-
+      ----------------------------------------
       """
 
   _clearError: (name) ->
@@ -146,6 +143,7 @@ exports.Cache.Global = require './cache/global'
 exports.Cache.Directory = require './cache/directory'
 exports.Cache.Repository = require './cache/repository'
 exports.DB = require './db'
+exports.Log = require './log'
 exports.ModuleFactory = require './module'
 exports.Prompt = require './prompt'
 exports.RepositoryFactory = require './repository'

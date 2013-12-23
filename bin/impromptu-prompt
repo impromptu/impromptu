@@ -73,8 +73,8 @@ if [[ ! -f $pid_file || $(ping_process) -ne 0 ]]; then
   sleep 1
 
   if [ $(ping_process) -ne 0 ]; then
+    # The port/socket may already be in use.
     echo "Could not start Impromptu server."
-    echo "Port $IMPROMPTU_PORT may already be in use."
   fi
 fi
 

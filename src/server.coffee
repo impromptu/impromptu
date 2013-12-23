@@ -5,7 +5,8 @@ path = require 'path'
 fs = require 'fs'
 
 pathOrPort = process.argv[2] || 1624
-impromptu = new Impromptu()
+impromptu = new Impromptu
+  verbosity: process.env.IMPROMPTU_LOG_LEVEL
 
 prompt =
   BUFFER_SIZE: 2
