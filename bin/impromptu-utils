@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 # We need to keep this before running any other commands.
-IMPROMPTU_LAST_EXIT_CODE=$?
+# We check for its existence since the utils may be included multiple times.
+if [[ -z "$IMPROMPTU_LAST_EXIT_CODE" ]]; then
+  IMPROMPTU_LAST_EXIT_CODE=$?
+fi
 
 impromptu_ensure_constants() {
   if [[ -z "$IMPROMPTU_DIR" || ! -d "$IMPROMPTU_DIR" ]]; then
