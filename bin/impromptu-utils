@@ -19,7 +19,7 @@ impromptu_ensure_constants() {
 # Ensures an Impromptu socket server is running.
 impromptu_ensure_server() {
   compiled_dir="$IMPROMPTU_DIR/.compiled"
-  pid_file="$compiled_dir/impromptu-server.pid"
+  pid_file="$compiled_dir/impromptu-node-server.pid"
 
   ping_process() {
     kill -0 $(cat $pid_file) 2> /dev/null
@@ -39,9 +39,9 @@ impromptu_ensure_server() {
   (
     if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
       rm "$IMPROMPTU_UNIX_DOMAIN_SOCKET" &> /dev/null
-      nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_UNIX_DOMAIN_SOCKET >& /dev/null &
+      nohup "$IMPROMPTU_BIN/impromptu-node-server" $IMPROMPTU_UNIX_DOMAIN_SOCKET >& /dev/null &
     else
-      nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_PORT >& /dev/null &
+      nohup "$IMPROMPTU_BIN/impromptu-node-server" $IMPROMPTU_PORT >& /dev/null &
     fi
     echo "$!" > $pid_file
   )

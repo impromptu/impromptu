@@ -22,7 +22,7 @@ class Impromptu
       sources: "#{config}/prompt.#{ext}" for ext in ['coffee', 'js']
       compiled: "#{config}/.compiled/prompt.js"
       log: "#{config}/impromptu-debug.log"
-      serverPid: "#{config}/.compiled/impromptu-server.pid"
+      serverPid: "#{config}/.compiled/impromptu-node-server.pid"
 
     @log = new Impromptu.Log @, verbosity
     @color = new Impromptu.Color @

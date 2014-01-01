@@ -26,8 +26,7 @@
     "node": ">= 0.8.0"
   },
   "bin": {
-    "impromptu-prompt": "./bin/impromptu-prompt",
-    "impromptu-background": "./bin/impromptu-background"
+    "impromptu-cli": "./bin/impromptu-cli"
   },
   "scripts": {
     "test": "grunt test",
