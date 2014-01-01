@@ -8,21 +8,21 @@ pathOrPort = process.argv[2] || 1624
 impromptu = new Impromptu
   verbosity: process.env.IMPROMPTU_LOG_LEVEL
 
-prompt =
-  BUFFER_SIZE: 2
-  buffer: []
+childFactory =
+  MAX_LENGTH: 2
+  _queue: []
 
-  spawn: ->
+  _spawn: ->
     fork "#{__dirname}/../lib/child.js"
 
   refresh: ->
-    while @buffer.length < @BUFFER_SIZE
-      @buffer.push @spawn()
+    while @_queue.length < @MAX_LENGTH
+      @_queue.push @_spawn()
 
   get: ->
-    if @buffer.length then @buffer.shift() else @spawn()
+    if @_queue.length then @_queue.shift() else @_spawn()
 
-prompt.refresh()
+childFactory.refresh()
 
 server = net.createServer {allowHalfOpen: true}, (socket) ->
   # Verify that the client is running on the same version as the server.
@@ -51,12 +51,15 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
       socket.destroy()
 
   socket.on 'end', ->
-    child = prompt.get()
+    child = childFactory.get()
 
     child.on 'message', (message) ->
       if message.type is 'prompt'
         socket.end message.data
-        prompt.refresh()
+        # TODO: Call this when the child has exited (or disconnect from the
+        # child at this point, and create a different system to handle any orphaned
+        # or long-running background refreshes).
+        childFactory.refresh()
 
     child.send
       type: 'env'
