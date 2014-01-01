@@ -95,11 +95,11 @@ test.base = (CacheClass, options = {}) ->
 
 test.global = (CacheClass, options = {}) ->
   impromptu = new Impromptu()
-  background = new Impromptu
-    background: true
+  refreshable = new Impromptu
+    refresh: true
 
-  it 'should update when background is set', (done) ->
-    cached = new CacheClass background, test.name(),
+  it 'should update when refresh is set', (done) ->
+    cached = new CacheClass refreshable, test.name(),
       update: (fn) ->
         done()
         fn null, 'value'
@@ -108,7 +108,7 @@ test.global = (CacheClass, options = {}) ->
 
   it 'should fetch cached values', (done) ->
     name = test.name()
-    updater = new CacheClass background, name,
+    updater = new CacheClass refreshable, name,
       update: (fn) ->
         fn null, 'value'
 
