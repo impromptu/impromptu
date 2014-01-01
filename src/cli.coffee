@@ -20,7 +20,7 @@ module.exports = ->
     process.exit()
 
   # Spawn the background process to asynchronously update the cache.
-  backgroundPath = path.resolve "#{__dirname}/../bin/impromptu-background"
+  backgroundPath = path.resolve "#{__dirname}/../bin/impromptu-refresh"
   background = spawn backgroundPath, [],
     stdio: 'ignore'
     detached: true
