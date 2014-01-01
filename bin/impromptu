@@ -7,18 +7,26 @@ impromptu_ensure_constants
 if [[ -n "$1" ]]; then
   if [[ "$1" == "-v" || "$1" == "--version" ]]; then
     $IMPROMPTU_BIN/impromptu-node-cli $1
-    exit
   fi
 
   if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     $IMPROMPTU_BIN/impromptu-node-cli $1
-    exit
   fi
 
-  if [[ "$1" == "--socketless" ]]; then
+  if [[ "$1" == "--no-server" ]]; then
     impromptu_set_prompt_command impromptu-node-cli
-    exit
   fi
+
+  if [[ "$1" == "prompt" ]]; then
+    if [[ -n "$2" && "$2" == "--no-server" ]]; then
+      $IMPROMPTU_BIN/impromptu-node-cli
+    else
+      impromptu_ensure_server
+      source $IMPROMPTU_BIN/impromptu-client
+    fi
+  fi
+
+  exit
 fi
 
 impromptu_ensure_server
