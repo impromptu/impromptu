@@ -25,8 +25,7 @@ class Global extends Impromptu.Cache
 
 
   run: (fn) ->
-    # Only try to update the cached value when we're in a background process.
-    if @impromptu.options.background
+    if @impromptu.options.refresh
       @_setThenGet fn
     else
       @get fn

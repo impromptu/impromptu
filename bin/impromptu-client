@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# We need to keep this before running any other commands.
-LAST_EXIT_CODE=$?
+source $IMPROMPTU_BIN/impromptu-utils
 
 # `update_terminal_cwd` is an OS X specific command that ensures Terminal.app
 # maintains the correct directory when a new tab is opened (if that setting is
@@ -12,26 +11,24 @@ if [ "$(type -t update_terminal_cwd 2>/dev/null)" ]; then
   update_terminal_cwd
 fi
 
-if [[ -z "$IMPROMPTU_PORT" ]]; then
-  IMPROMPTU_PORT="1624"
-fi
+impromptu_ensure_constants
 
 # Record the shell's environment.
-REQUEST="$(printenv)
-IMPROMPTU_LAST_EXIT_CODE=$LAST_EXIT_CODE
+request_env="$(printenv)
+IMPROMPTU_LAST_EXIT_CODE=$IMPROMPTU_LAST_EXIT_CODE
 IMPROMPTU_JOBS_COUNT=`jobs|wc -l|sed 's/ //g'`"
 
 # Set the current shell.
 if [ -n "$1" ]; then
-  REQUEST+="
+  request_env+="
 IMPROMPTU_SHELL=$1"
 fi
 
 generate_prompt() {
   if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
-    echo -n "$REQUEST" | nc -w 1 -U "$IMPROMPTU_UNIX_DOMAIN_SOCKET"
+    echo -n "$request_env" | nc -w 1 -U "$IMPROMPTU_UNIX_DOMAIN_SOCKET"
   else
-    echo -n "$REQUEST" | nc -w 1 localhost "$IMPROMPTU_PORT"
+    echo -n "$request_env" | nc -w 1 localhost "$IMPROMPTU_PORT"
   fi
 }
 

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+source $IMPROMPTU_BIN/impromptu-utils
+impromptu_ensure_constants
+
+# Check for version or help flags.
+if [[ -n "$1" ]]; then
+  if [[ "$1" == "-v" || "$1" == "--version" ]]; then
+    $IMPROMPTU_BIN/impromptu-node-cli $1
+    exit
+  fi
+
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    $IMPROMPTU_BIN/impromptu-node-cli $1
+    exit
+  fi
+
+  if [[ "$1" == "--socketless" ]]; then
+    impromptu_set_prompt_command impromptu-node-cli
+    exit
+  fi
+fi
+
+impromptu_ensure_server
+impromptu_set_prompt_command impromptu-client
