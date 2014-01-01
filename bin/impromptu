@@ -21,7 +21,6 @@ if [[ -n "$1" ]]; then
     if [[ -n "$2" && "$2" == "--no-server" ]]; then
       $IMPROMPTU_BIN/impromptu-node-cli
     else
-      impromptu_ensure_server
       source $IMPROMPTU_BIN/impromptu-client
     fi
   fi

@@ -37,17 +37,16 @@ generated_prompt=$(generate_prompt)
 
 # If the prompt errored or returned nothing, the server is no longer running.
 if [[ $? != 0 || -z $generated_prompt ]]; then
-  if [[ -z $IMPROMPTU_RESTART_ATTEMPTED ]]; then
-    echo "Attempting to start Impromptu server..."
-    IMPROMPTU_RESTART_ATTEMPTED="true"
-    source $IMPROMPTU_BIN/impromptu
-  else
+  echo "Attempting to start Impromptu server..."
+  impromptu_ensure_server
+
+  if [[ "$?" -ne 0 ]]; then
     echo "The Impromptu server failed to start. Falling back to the CLI..."
     echo "Use the --no-server flag to use the CLI by default."
     $IMPROMPTU_BIN/impromptu-node-cli
+  else
+    generate_prompt
   fi
-
-  generate_prompt
 elif [[ -n $generated_prompt ]]; then
   echo -n "$generated_prompt"
 fi

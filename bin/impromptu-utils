@@ -16,42 +16,47 @@ impromptu_ensure_constants() {
   fi
 }
 
-# Ensures the Impromptu socket server is running.
+# Ensures an Impromptu socket server is running.
 impromptu_ensure_server() {
   compiled_dir="$IMPROMPTU_DIR/.compiled"
   pid_file="$compiled_dir/impromptu-server.pid"
 
   ping_process() {
     kill -0 $(cat $pid_file) 2> /dev/null
-    echo $?
   }
 
-  # Start the server if it's not running.
   # Check if the pid file exists and check if the process is still running.
-  if [[ ! -f $pid_file || $(ping_process) -ne 0 ]]; then
-    # Ensure the `.compiled` directory exists.
-    [ -d $compiled_dir ] || mkdir $compiled_dir
-
-    # Start the impromptu server.
-    # Ensure the server is detached from this process and save the PID.
-    (
-      if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
-        rm "$IMPROMPTU_UNIX_DOMAIN_SOCKET" &> /dev/null
-        nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_UNIX_DOMAIN_SOCKET >& /dev/null &
-      else
-        nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_PORT >& /dev/null &
-      fi
-      echo "$!" > $pid_file
-    )
-
-    echo "Starting Impromptu server..."
-    sleep 1
-
-    if [ $(ping_process) -ne 0 ]; then
-      # The port/socket may already be in use.
-      echo "Could not start Impromptu server."
-    fi
+  ping_process
+  if [[ "$?" -eq 0 && -f $pid_file ]]; then
+    return 0
   fi
+
+  # A server isn't running; try to start one.
+  # Ensure the `.compiled` directory exists.
+  [ -d $compiled_dir ] || mkdir $compiled_dir
+
+  # Ensure the server is detached from this process and save the PID.
+  (
+    if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
+      rm "$IMPROMPTU_UNIX_DOMAIN_SOCKET" &> /dev/null
+      nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_UNIX_DOMAIN_SOCKET >& /dev/null &
+    else
+      nohup "$IMPROMPTU_BIN/impromptu-server" $IMPROMPTU_PORT >& /dev/null &
+    fi
+    echo "$!" > $pid_file
+  )
+
+  echo "Starting Impromptu server..."
+  sleep 1
+
+  ping_process
+  if [ "$?" -eq 0 ]; then
+    return 0
+  fi
+
+  # The port/socket may already be in use.
+  echo "Could not start Impromptu server."
+  return 1
 }
 
 # Okay, I get it. This file might look a little confusing.
