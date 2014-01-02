@@ -21,13 +21,13 @@ impromptu_ensure_server() {
   compiled_dir="$IMPROMPTU_DIR/.compiled"
   pid_file="$compiled_dir/impromptu-node-server.pid"
 
+  # Checks if the pid file exists and checks if the process is still running.
   ping_process() {
-    kill -0 $(cat $pid_file) 2> /dev/null
+    [ -f $pid_file ] && kill -0 $(cat $pid_file) 2> /dev/null
   }
 
-  # Check if the pid file exists and check if the process is still running.
   ping_process
-  if [[ "$?" -eq 0 && -f $pid_file ]]; then
+  if [[ "$?" -eq 0 ]]; then
     return 0
   fi
 
@@ -52,11 +52,11 @@ impromptu_ensure_server() {
   ping_process
   if [ "$?" -eq 0 ]; then
     return 0
+  else
+    # The port/socket may already be in use.
+    echo "Could not start Impromptu server."
+    return 1
   fi
-
-  # The port/socket may already be in use.
-  echo "Could not start Impromptu server."
-  return 1
 }
 
 # Opens a connection to the Impromptu socket server.
