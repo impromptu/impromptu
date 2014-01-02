@@ -63,8 +63,6 @@ impromptu_ensure_server() {
     (
       # Ensure the server is detached from this process.
       nohup "$IMPROMPTU_BIN/impromptu-node-server" $server_path_or_port >& /dev/null &
-      # Save the PID of the server.
-      echo "$!" > "$compiled_dir/impromptu-node-server.pid"
     )
 
     echo "Starting Impromptu server..."
