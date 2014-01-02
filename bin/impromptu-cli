@@ -28,7 +28,16 @@ if [[ -n "$1" ]]; then
   if [[ "$1" == "server" ]]; then
     if [[ -n "$2" ]]; then
       if [[ "$2" == "start" ]]; then
-        impromptu_ensure_server
+        impromptu_ping_server
+        if [[ "$?" -eq 0 ]]; then
+          echo "The Impromptu server is already running."
+        else
+          if [[ -n "$3" && "$3" == "--foreground" ]]; then
+            impromptu_ensure_server --foreground
+          else
+            impromptu_ensure_server
+          fi
+        fi
       elif [[ "$2" == "shutdown" ]]; then
         echo -n "shutdown" | impromptu_server_connection
       fi

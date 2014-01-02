@@ -16,46 +16,68 @@ impromptu_ensure_constants() {
   fi
 }
 
+# Pings the Impromptu socket server.
+impromptu_ping_server() {
+  pid_file="$IMPROMPTU_DIR/.compiled/impromptu-node-server.pid"
+  # Checks if the pid file exists and checks if the process is still running.
+  [ -f $pid_file ] && kill -0 $(cat $pid_file) 2> /dev/null
+}
+
 # Ensures an Impromptu socket server is running.
 impromptu_ensure_server() {
-  compiled_dir="$IMPROMPTU_DIR/.compiled"
-  pid_file="$compiled_dir/impromptu-node-server.pid"
-
-  # Checks if the pid file exists and checks if the process is still running.
-  ping_process() {
-    [ -f $pid_file ] && kill -0 $(cat $pid_file) 2> /dev/null
-  }
-
-  ping_process
+  impromptu_ping_server
   if [[ "$?" -eq 0 ]]; then
     return 0
   fi
 
   # A server isn't running; try to start one.
   # Ensure the `.compiled` directory exists.
+  compiled_dir="$IMPROMPTU_DIR/.compiled"
   [ -d $compiled_dir ] || mkdir $compiled_dir
 
-  # Ensure the server is detached from this process and save the PID.
-  (
-    if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
+  # Check if we're using a Unix domain socket or a port.
+  if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
+    # Check if the socket already exists.
+    if [[ -S $IMPROMPTU_UNIX_DOMAIN_SOCKET ]]; then
+      # Overwrite the socket.
       rm "$IMPROMPTU_UNIX_DOMAIN_SOCKET" &> /dev/null
-      nohup "$IMPROMPTU_BIN/impromptu-node-server" $IMPROMPTU_UNIX_DOMAIN_SOCKET >& /dev/null &
-    else
-      nohup "$IMPROMPTU_BIN/impromptu-node-server" $IMPROMPTU_PORT >& /dev/null &
+
+    # Check if the path to the socket is a different file.
+    elif [[ -e $IMPROMPTU_UNIX_DOMAIN_SOCKET ]]; then
+      echo "A file exists at the location of the Impromptu Unix domain socket."
+      echo "Please specify a different path."
+      return 1
     fi
-    echo "$!" > $pid_file
-  )
 
-  echo "Starting Impromptu server..."
-  sleep 1
-
-  ping_process
-  if [ "$?" -eq 0 ]; then
-    return 0
+    server_path_or_port=$IMPROMPTU_UNIX_DOMAIN_SOCKET
   else
-    # The port/socket may already be in use.
-    echo "Could not start Impromptu server."
-    return 1
+    server_path_or_port=$IMPROMPTU_PORT
+  fi
+
+  # Start the server process in the foreground.
+  if [[ -n "$1" && "$1" == "--foreground" ]]; then
+    "$IMPROMPTU_BIN/impromptu-node-server" $server_path_or_port
+
+  # Start the server as a daemon in a subshell.
+  else
+    (
+      # Ensure the server is detached from this process.
+      nohup "$IMPROMPTU_BIN/impromptu-node-server" $server_path_or_port >& /dev/null &
+      # Save the PID of the server.
+      echo "$!" > "$compiled_dir/impromptu-node-server.pid"
+    )
+
+    echo "Starting Impromptu server..."
+    sleep 1
+
+    impromptu_ping_server
+    if [ "$?" -eq 0 ]; then
+      return 0
+    else
+      # The port/socket may already be in use.
+      echo "Could not start Impromptu server."
+      return 1
+    fi
   fi
 }
 

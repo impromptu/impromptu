@@ -28,15 +28,19 @@ impromptu.db.client()
 # Build the queue of child processes.
 childFactory.refresh()
 
+# Safely shut down the server.
 shutdown = (socket) ->
   socket.end()
 
-  # Shut down the Redis server.
-  impromptu.db.shutdown()
+  server.close ->
+    # Shut down the Redis server.
+    impromptu.db.shutdown()
 
-  # Remove the Impromptu server's pid file.
-  fs.unlinkSync impromptu.path.serverPid
-  process.exit()
+    # Remove the Impromptu server's pid file.
+    fs.unlinkSync impromptu.path.serverPid
+
+    # TODO: If the server is using a Unix domain socket, remove the socket file here.
+    process.exit()
 
 server = net.createServer {allowHalfOpen: true}, (socket) ->
   # Verify that the client is running on the same version as the server.
