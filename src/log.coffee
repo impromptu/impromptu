@@ -25,27 +25,92 @@ class Log
     @_verbosity = Log.Levels.NOTICE
     @setVerbosity verbosity
 
+    @defaultDestinations =
+      file: true
+      server: false
+      stdout: false
+
   setVerbosity: (level) ->
     @_verbosity = Log.Levels.WARNING if level is 'warning'
     @_verbosity = Log.Levels.NOTICE if level is 'notice'
     @_verbosity = Log.Levels.DEBUG if level is 'debug'
 
-  write: (level, message) ->
-    return if level > @_verbosity
-
-    delimiter = if Log.Delimiters[level] then "#{Log.Delimiters[level]} " else ''
-
-    fs.appendFileSync @impromptu.path.log,
-      "[#{process.pid}] #{new Date().toISOString()} #{delimiter}#{message}"
+  output: (message) ->
+    @write message,
+      level: null
+      format: false
+      destinations:
+        file: false
+        server: false
+        stdout: true
 
   warning: (message) ->
-    @write Log.Levels.WARNING, message
+    @write message,
+      level: Log.Levels.WARNING
+      format: true
+      destinations: @defaultDestinations
 
   notice: (message) ->
-    @write Log.Levels.NOTICE, message
+    @write message,
+      level: Log.Levels.NOTICE
+      format: true
+      destinations: @defaultDestinations
 
   debug: (message) ->
-    @write Log.Levels.DEBUG, message
+    @write message,
+      level: Log.Levels.DEBUG
+      format: true
+      destinations: @defaultDestinations
+
+  # Low-level method to write output and logs.
+  # Accepts a message and an options object.
+  #
+  # options.level - Integer. Specifies the log level of the message.
+  #                 Optional. Messages without a specified level will always be written.
+  #
+  # options.format - Boolean. Whether the message should be formatted.
+  #
+  # options.destinations - Whether the message should be written to various destiations.
+  #                        An object with three boolean keys: 'file', 'server', and 'stdout'.
+  #                        Optional, defaults to `this.defaultDestinations`.
+  write: (message, options) ->
+    return if options.level and options.level > @_verbosity
+    destinations = options.destinations or @defaultDestinations
+
+    if options.format
+      message = @format message, options.level
+
+    if destinations.stdout
+      @_writeToStdoutRaw message
+
+    if destinations.server
+      @_writeToServerRaw message
+
+    if destinations.file
+      @_writeToFileRaw message
+
+  format: (message, level) ->
+    delimiter = if Log.Delimiters[level] then "#{Log.Delimiters[level]} " else ''
+    "[#{process.pid}] #{new Date().toISOString()} #{delimiter}#{message}"
+
+  _writeToFileRaw: (message) ->
+    fs.appendFileSync @impromptu.path.log, message
+
+  _writeToStdoutRaw: (message) ->
+    if @impromptu.options.processType is 'child'
+      process.send
+        type: 'log:stdout'
+        data: message
+    else
+      console.log message
+
+  _writeToServerRaw: (message) ->
+    if @impromptu.options.processType is 'child'
+      process.send
+        type: 'log:server'
+        data: message
+    else if @impromptu.options.processType is 'server'
+      console.log message
 
 # Expose `Log`.
 exports = module.exports = Log

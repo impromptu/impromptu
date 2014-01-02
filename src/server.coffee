@@ -4,8 +4,9 @@ Impromptu = require '../lib/impromptu'
 path = require 'path'
 fs = require 'fs'
 
-pathOrPort = process.argv[2] || 1624
+pathOrPort = process.argv[2]
 impromptu = new Impromptu
+  processType: 'server'
   verbosity: process.env.IMPROMPTU_LOG_LEVEL
 
 childFactory =
@@ -94,6 +95,12 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
         # child at this point, and create a different system to handle any orphaned
         # or long-running background refreshes).
         childFactory.refresh()
+
+      else if message.type is 'log:stdout'
+        socket.write "#{message.data}\n"
+
+      else if message.type is 'log:server'
+        console.log message.data
 
     child.send
       type: 'env'

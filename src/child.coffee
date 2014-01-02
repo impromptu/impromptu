@@ -1,5 +1,6 @@
 Impromptu = require '../lib/impromptu'
-impromptu = new Impromptu()
+impromptu = new Impromptu
+  processType: 'child'
 
 parseEnv = (printenvOutput) ->
   env = {}
