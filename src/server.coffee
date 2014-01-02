@@ -22,7 +22,21 @@ childFactory =
   get: ->
     if @_queue.length then @_queue.shift() else @_spawn()
 
+# Ensure the Redis server is running.
+impromptu.db.client()
+
+# Build the queue of child processes.
 childFactory.refresh()
+
+shutdown = (socket) ->
+  socket.end()
+
+  # Shut down the Redis server.
+  impromptu.db.shutdown()
+
+  # Remove the Impromptu server's pid file.
+  fs.unlinkSync impromptu.path.serverPid
+  process.exit()
 
 server = net.createServer {allowHalfOpen: true}, (socket) ->
   # Verify that the client is running on the same version as the server.
@@ -31,15 +45,14 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
 
   # If there's a version mismatch, stop running the server.
   if Impromptu.VERSION isnt npmConfig.version
-    socket.end()
-
-    # Remove the server's pid file.
-    fs.unlinkSync impromptu.path.serverPid
-    process.exit()
+    shutdown socket
     return
 
-
   # Build the body.
+  # The body can be:
+  # * A newline delimited representation of the shell environment (as formatted
+  #   by printenv: each line is equal to "KEY=value").
+  # * The string 'shutdown'.
   body = ''
   socket.on 'data', (data) ->
     body += data
@@ -51,6 +64,10 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
       socket.destroy()
 
   socket.on 'end', ->
+    if body is 'shutdown'
+      shutdown socket
+      return
+
     child = childFactory.get()
 
     child.on 'message', (message) ->

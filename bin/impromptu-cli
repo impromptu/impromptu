@@ -25,6 +25,16 @@ if [[ -n "$1" ]]; then
     fi
   fi
 
+  if [[ "$1" == "server" ]]; then
+    if [[ -n "$2" ]]; then
+      if [[ "$2" == "start" ]]; then
+        impromptu_ensure_server
+      elif [[ "$2" == "shutdown" ]]; then
+        echo -n "shutdown" | impromptu_server_connection
+      fi
+    fi
+  fi
+
   exit
 fi
 
