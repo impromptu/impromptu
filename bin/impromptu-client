@@ -13,23 +13,13 @@ fi
 
 impromptu_ensure_constants
 
-# Record the shell's environment.
-request_env="$(printenv)
-IMPROMPTU_LAST_EXIT_CODE=$IMPROMPTU_LAST_EXIT_CODE
-IMPROMPTU_JOBS_COUNT=`jobs|wc -l|sed 's/ //g'`"
-
 # Set the current shell.
 if [ -n "$1" ]; then
-  request_env+="
-IMPROMPTU_SHELL=$1"
+  IMPROMPTU_SHELL="$1"
 fi
 
 generate_prompt() {
-  if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
-    echo -n "$request_env" | nc -w 1 -U "$IMPROMPTU_UNIX_DOMAIN_SOCKET"
-  else
-    echo -n "$request_env" | nc -w 1 localhost "$IMPROMPTU_PORT"
-  fi
+  impromptu_env | impromptu_server_connection
 }
 
 # Record the result of the generated prompt.

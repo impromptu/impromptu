@@ -59,6 +59,31 @@ impromptu_ensure_server() {
   return 1
 }
 
+# Opens a connection to the Impromptu socket server.
+impromptu_server_connection() {
+  if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
+    nc -w 1 -U "$IMPROMPTU_UNIX_DOMAIN_SOCKET"
+  else
+    nc -w 1 localhost "$IMPROMPTU_PORT"
+  fi
+}
+
+# Prints the impromptu environment (including relevant local variables).
+impromptu_env() {
+  # Record the shell's environment.
+  request_env="$(printenv)
+IMPROMPTU_LAST_EXIT_CODE=$IMPROMPTU_LAST_EXIT_CODE
+IMPROMPTU_JOBS_COUNT=$(jobs|wc -l|sed 's/ //g')"
+
+  # Set the current shell.
+  if [ -n "$IMPROMPTU_SHELL" ]; then
+    request_env+="
+IMPROMPTU_SHELL=$1"
+  fi
+
+  echo -n "$request_env"
+}
+
 # Okay, I get it. This method might look a little confusing.
 # But I promise it makes sense.
 #
