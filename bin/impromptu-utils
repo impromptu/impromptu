@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-# We need to keep this before running any other commands.
-# We check for its existence since the utils may be included multiple times.
-if [[ -z "$IMPROMPTU_LAST_EXIT_CODE" ]]; then
-  IMPROMPTU_LAST_EXIT_CODE=$?
-fi
+# Prevent the utils from being included multiple times.
+[ -n "$IMPROMPTU_UTILS_LOADED" ] && return
+IMPROMPTU_UTILS_LOADED="true"
 
 impromptu_ensure_constants() {
   if [[ -z "$IMPROMPTU_DIR" || ! -d "$IMPROMPTU_DIR" ]]; then
@@ -129,9 +127,11 @@ IMPROMPTU_SHELL=$1"
 # and tell Impromptu to escape the color codes for that specific shell.
 impromptu_set_prompt_command() {
   command="$1"
-  export PROMPT_COMMAND='PS1="$(source $IMPROMPTU_BIN/'"$command"' bash)"'
+  export PROMPT_COMMAND='export IMPROMPTU_LAST_EXIT_CODE=$?;
+PS1="$(source $IMPROMPTU_BIN/'"$command"' bash)"'
 
   precmd() {
+    export IMPROMPTU_LAST_EXIT_CODE=$?
     export PS1="$(source $IMPROMPTU_BIN/$command zsh)"
   }
 }
