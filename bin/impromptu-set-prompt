@@ -32,10 +32,9 @@ fi
 #
 # So we set both commands: `PROMPT_COMMAND` for bash and `precmd` for zsh,
 # and tell Impromptu to escape the color codes for that specific shell.
-export PROMPT_COMMAND='export IMPROMPTU_LAST_EXIT_CODE=$?;
-PS1="$(impromptu print '"$print_flag"' bash)"'
+export PROMPT_COMMAND='source $IMPROMPTU_BIN/impromptu-utils;
+impromptu_prompt_command "'$print_flag'" bash'
 
 precmd() {
-  export IMPROMPTU_LAST_EXIT_CODE=$?
-  export PS1="$(source impromptu print $print_flag zsh)"
+  impromptu_prompt_command $print_flag zsh
 }

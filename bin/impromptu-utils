@@ -101,3 +101,11 @@ IMPROMPTU_SHELL=$1"
 
   echo -n "$request_env"
 }
+
+# The method used for bash's "PROMPT_COMMAND" and zsh's "precmd".
+# All arguments are passed on to `impromptu print`.
+impromptu_prompt_command () {
+  # Record the last exit code before any methods are executed.
+  export IMPROMPTU_LAST_EXIT_CODE=$?
+  export PS1="$(impromptu print $@)"
+}
