@@ -3,8 +3,39 @@
 source $IMPROMPTU_BIN/impromptu-utils
 
 if [[ -n "$1" && "$1" == "--no-server" ]]; then
-  impromptu_set_prompt_command impromptu-node-cli
+  print_flag="--no-server"
 else
+  print_flag=""
   impromptu_ensure_server
-  impromptu_set_prompt_command impromptu-client
 fi
+
+# Okay, I get it. This might look a little confusing.
+# But I promise it makes sense.
+#
+# Both bash and zsh count color escape codes in the length of the prompt.
+#
+# Fortunately, both bash and zsh have a way to escape color codes in a prompt,
+# so the length of the prompt can be calculated correctly. This allows you to
+# do fun things like hit the up arrow or hit tab and have a normal prompt.
+#
+# Unfortunately, those escape codes are different. Bash ignores characters
+# wrapped like "\[THIS\]", but zsh ignores stuff like "%{THIS%}". If you want
+# to learn more about escape codes (have fun?), check out `src/color.coffee`.
+#
+# Fortunately, both bash and zsh can set commands to run right before the
+# prompt is printed, which let us dynamically set the prompt.
+#
+# Unfortunately, there's no way for us to accurately determine which shell
+# you're using (as the current shell may not be the environment `$SHELL`).
+#
+# But fortunately (strangely), the shells use different pre-prompt commands.
+#
+# So we set both commands: `PROMPT_COMMAND` for bash and `precmd` for zsh,
+# and tell Impromptu to escape the color codes for that specific shell.
+export PROMPT_COMMAND='export IMPROMPTU_LAST_EXIT_CODE=$?;
+PS1="$(impromptu print '"$print_flag"' bash)"'
+
+precmd() {
+  export IMPROMPTU_LAST_EXIT_CODE=$?
+  export PS1="$(source impromptu print $print_flag zsh)"
+}
