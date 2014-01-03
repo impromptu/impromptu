@@ -3,53 +3,33 @@
 source $IMPROMPTU_BIN/impromptu-utils
 impromptu_ensure_constants
 
-# Check for version or help flags.
-if [[ -n "$1" ]]; then
-  if [[ "$1" == "-v" || "$1" == "--version" ]]; then
-    $IMPROMPTU_BIN/impromptu-node-cli $1
-  fi
+# Check for named subcommands (ignoring flags).
+if [[ -n "$1" && $1 != -* ]]; then
+  potential_subcommand="impromptu-$1"
+  potential_subcommand_path="$IMPROMPTU_DIR/node_modules/.bin/$potential_subcommand"
 
-  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-    $IMPROMPTU_BIN/impromptu-node-cli $1
-  fi
+  # Check for the subcommand in impromptu's installed node modules.
+  if [[ -x "$potential_subcommand_path" ]]; then
+    subcommand="$potential_subcommand_path"
+    shift
 
-  if [[ "$1" == "--no-server" ]]; then
-    impromptu_set_prompt_command impromptu-node-cli
+  # Check for the subcommand system-wide.
+  elif command -v "$potential_subcommand" >/dev/null 2>&1; then
+    subcommand="$potential_subcommand"
+    shift
   fi
-
-  if [[ "$1" == "prompt" ]]; then
-    if [[ -n "$2" && "$2" == "--no-server" ]]; then
-      $IMPROMPTU_BIN/impromptu-node-cli
-    else
-      source $IMPROMPTU_BIN/impromptu-client
-    fi
-  fi
-
-  if [[ "$1" == "server" ]]; then
-    if [[ -n "$2" ]]; then
-      if [[ "$2" == "start" ]]; then
-        impromptu_ping_server
-        if [[ "$?" -eq 0 ]]; then
-          echo "The Impromptu server is already running."
-        else
-          if [[ -n "$3" && "$3" == "--foreground" ]]; then
-            impromptu_ensure_server --foreground
-          else
-            impromptu_ensure_server
-          fi
-        fi
-      elif [[ "$2" == "shutdown" ]]; then
-        echo -n "shutdown" | impromptu_server_connection
-      fi
-    fi
-  fi
-
-  if [[ "$1" == "kill" ]]; then
-    pgrep -f impromptu | xargs kill
-  fi
-
-  exit
 fi
 
-impromptu_ensure_server
-impromptu_set_prompt_command impromptu-client
+# If we couldn't find a matching subcommand, fall back to the defaults.
+if [[ -z "$subcommand" ]]; then
+  # If we're in an interactive shell, set prompt commands.
+  if [[ $- == *i* ]]; then
+    subcommand="$IMPROMPTU_BIN/impromptu-set-prompt"
+
+  # Otherwise, just print the prompt.
+  else
+    subcommand="$IMPROMPTU_BIN/impromptu-print"
+  fi
+fi
+
+source $subcommand

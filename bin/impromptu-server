@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+if [[ -n "$1" ]]; then
+  if [[ "$1" == "start" ]]; then
+    impromptu_ping_server
+    if [[ "$?" -eq 0 ]]; then
+      echo "The Impromptu server is already running."
+    else
+      # TODO: Turn "foreground" into a separate command that restarts the server with the
+      # existing server config. This will involve adding a message to the server to return
+      # the proper flags (either formatted for shell, or maybe json).
+      if [[ -n "$2" && "$2" == "--foreground" ]]; then
+        impromptu_ensure_server --foreground
+      else
+        impromptu_ensure_server
+      fi
+    fi
+  elif [[ "$1" == "shutdown" ]]; then
+    echo -n "shutdown" | impromptu_server_connection
+  fi
+fi

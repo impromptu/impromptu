@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+source $IMPROMPTU_BIN/impromptu-utils
+
+if [[ -n "$1" && "$1" == "--no-server" ]]; then
+  impromptu_set_prompt_command impromptu-node-cli
+else
+  impromptu_ensure_server
+  impromptu_set_prompt_command impromptu-client
+fi

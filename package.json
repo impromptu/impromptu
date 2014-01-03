@@ -26,7 +26,11 @@
     "node": ">= 0.8.0"
   },
   "bin": {
-    "impromptu-cli": "./bin/impromptu-cli"
+    "impromptu-cli": "./bin/impromptu-cli",
+    "impromptu-kill": "./bin/impromptu-kill",
+    "impromptu-print": "./bin/impromptu-print",
+    "impromptu-server": "./bin/impromptu-server",
+    "impromptu-set-prompt": "./bin/impromptu-set-prompt"
   },
   "scripts": {
     "test": "grunt test",

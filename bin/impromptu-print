@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [[ -n "$1" && "$1" == "--no-server" ]]; then
+  shift
+  $IMPROMPTU_BIN/impromptu-node-cli "$@"
+else
+  source $IMPROMPTU_BIN/impromptu-client
+fi
