@@ -107,5 +107,13 @@ IMPROMPTU_SHELL=$1"
 impromptu_prompt_command () {
   # Record the last exit code before any methods are executed.
   export IMPROMPTU_LAST_EXIT_CODE=$?
+
+  # `update_terminal_cwd` is an OS X specific command that ensures Terminal.app
+  # maintains the correct directory when a new tab is opened (if that setting is
+  # enabled). This is usually bound to `$PROMPT_COMMAND`, but is overwritten when
+  # we rebind `$PROMPT_COMMAND`. We need to run `update_terminal_cwd` first, or
+  # else it will interfere with the cursoring in bash.
+  command -v update_terminal_cwd >/dev/null 2>&1 && update_terminal_cwd
+
   export PS1="$(impromptu print $@)"
 }

@@ -8,16 +8,6 @@ if [[ -n "$1" && "$1" == "--no-server" ]]; then
   return
 fi
 
-
-# `update_terminal_cwd` is an OS X specific command that ensures Terminal.app
-# maintains the correct directory when a new tab is opened (if that setting is
-# enabled). This is usually bound to `$PROMPT_COMMAND`, but is overwritten when
-# we rebind `$PROMPT_COMMAND`. We need to run `update_terminal_cwd` first, or
-# else it will interfere with the cursoring in bash.
-if [ "$(type -t update_terminal_cwd 2>/dev/null)" ]; then
-  update_terminal_cwd
-fi
-
 impromptu_ensure_constants
 
 # Set the current shell.
