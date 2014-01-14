@@ -6,7 +6,9 @@ class DB
       return unless message.type is 'cache:response'
 
       data = message.data
-      return unless @requests[data.method]
+      # The requests for this UID may not exist because there can be multiple
+      # instances of Impromptu.
+      return unless @requests[data.method] and @requests[data.method][data.uid]
 
       callbacks = @requests[data.method][data.uid]
       callback data.error, data.response for callback in callbacks
@@ -33,14 +35,14 @@ class DB
 
   exists: (key, done) ->
     @get key, (err, response) ->
-      done err, !!response
+      done err, !!response if done
 
   get: (key, done) ->
     @send 'get', {key}, done
 
   set: (key, value, expire, done) ->
     # If we only have three arguments, don't pass an expiry value
-    unless done
+    if typeof expire is 'function'
       done = expire
       expire = 0
 

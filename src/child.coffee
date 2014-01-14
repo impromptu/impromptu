@@ -74,6 +74,9 @@ runTests = ->
   require 'coffee-script'
   Mocha = require 'mocha'
 
+  # Allow unlimited listeners for tests.
+  process.setMaxListeners 0
+
   testDir = path.resolve(__dirname, '../test')
   files = fs.readdirSync(testDir).filter (f) ->
     f.match /\.coffee$/
