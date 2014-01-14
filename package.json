@@ -27,10 +27,12 @@
   },
   "bin": {
     "impromptu-cli": "./bin/impromptu-cli",
+    "impromptu-help": "./bin/impromptu-help",
     "impromptu-kill": "./bin/impromptu-kill",
     "impromptu-print": "./bin/impromptu-print",
     "impromptu-server": "./bin/impromptu-server",
-    "impromptu-set-prompt": "./bin/impromptu-set-prompt"
+    "impromptu-set-prompt": "./bin/impromptu-set-prompt",
+    "impromptu-version": "./bin/impromptu-version"
   },
   "scripts": {
     "test": "grunt test",

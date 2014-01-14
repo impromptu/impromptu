@@ -20,6 +20,15 @@ if [[ -n "$1" && $1 != -* ]]; then
   fi
 fi
 
+# Check if we're looking for the version or help.
+if [[ -z "$subcommand" && -n "$1" ]]; then
+  if [[ "$1" == "-v" || "$1" == "--version" ]]; then
+    subcommand="$IMPROMPTU_BIN/impromptu-version"
+  elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    subcommand="$IMPROMPTU_BIN/impromptu-help"
+  fi
+fi
+
 # If we couldn't find a matching subcommand, fall back to the defaults.
 if [[ -z "$subcommand" ]]; then
   # If we're in an interactive shell, set prompt commands.

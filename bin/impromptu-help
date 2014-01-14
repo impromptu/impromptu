@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Note that the version includes a newline.
+version="$(impromptu version)"
+echo "Impromptu version $version"
+echo
+echo "To generate your prompt using Impromptu, add 'source impromptu' to the end of your shell's configuration file."
+echo
+echo "You might want to run something like \`echo 'source impromptu' >> ~/.bash_profile\` on a default OS X install."

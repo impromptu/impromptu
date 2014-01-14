@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+var path = require('path')
+console.log(require(path.resolve(__dirname, '..')).VERSION)
