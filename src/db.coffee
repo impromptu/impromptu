@@ -2,7 +2,7 @@ class DB
   constructor: (@impromptu) ->
     @requests = {}
 
-    process.on 'message', (message) ->
+    process.on 'message', (message) =>
       return unless message.type is 'cache:response'
 
       data = message.data
@@ -10,6 +10,7 @@ class DB
 
       callbacks = @requests[data.method][data.uid]
       callback data.error, data.response for callback in callbacks
+      delete @requests[data.method][data.uid]
 
 
   send: (method, data, done) ->
@@ -20,12 +21,15 @@ class DB
     # Only send a request if there are no outstanding requests.
     unless @requests[method][uid]
       @requests[method][uid] = []
-      process.send
-        method: "cache:#{method}"
-        data: data
-        uid: uid
 
-    @requests[method][json].push done
+      data.uid = uid
+      data.method = method
+
+      process.send
+        type: "cache:request"
+        data: data
+
+    @requests[method][uid].push done
 
   exists: (key, done) ->
     @get key, (err, response) ->

@@ -44,15 +44,15 @@ cache =
 
   listen: (child) ->
     child.on 'message', (message) ->
-      switch message.type
-        when 'cache:get' then response = cache.get message.data
-        when 'cache:set' then response = cache.set message.data
-        when 'cache:del' then response = cache.del message.data
+      return unless message.type is 'cache:request'
 
+      data = message.data
+      response = cache[data.method] data
       child.send
         type: 'cache:response'
         data:
-          uid: message.data.uid
+          method: data.method
+          uid: data.uid
           response: response
 
 
@@ -70,25 +70,6 @@ childFactory =
 
   get: ->
     if @_queue.length then @_queue.shift() else @_spawn()
-
-
-# Tests
-# FYI: This is ridiculous.
-runTests = (child) ->
-  require 'coffee-script'
-  Mocha = require 'mocha'
-
-  testDir = path.resolve(__dirname, '../test')
-  files = fs.readdirSync(testDir).filter (f) ->
-    f.match /\.coffee$/
-
-  mocha = new Mocha
-    reporter: 'spec'
-
-  mocha.addFile path.resolve(testDir, file) for file in files
-
-  mocha.run (failures) =>
-    process.exit()
 
 
 # Safely shut down the server.
@@ -167,7 +148,12 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
 
 
     if body is 'test'
-      runTests(child)
+      child.send
+        type: 'test'
+
+      child.on 'message', (message) ->
+        if message.type is 'exit'
+          process.exit()
     else
       child.send
         type: 'env'

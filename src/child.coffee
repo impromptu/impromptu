@@ -28,35 +28,62 @@ parseEnv = (printenvOutput) ->
 
 process.on 'message', (message) ->
   if message.type is 'env'
-    env = parseEnv message.data
+    buildPrompt message.data
+  else if message.type is 'test'
+    runTests()
 
-    if env.IMPROMPTU_SHELL
-      impromptu.options.shell = env.IMPROMPTU_SHELL
+buildPrompt = (envString) ->
+  env = parseEnv envString
 
-    # Overload the environment.
-    process.env = env
+  if env.IMPROMPTU_SHELL
+    impromptu.options.shell = env.IMPROMPTU_SHELL
 
-    # Update the current working directory.
-    try
-      process.chdir env.PWD
-    catch err
+  # Overload the environment.
+  process.env = env
 
-    impromptu.load()
+  # Update the current working directory.
+  try
+    process.chdir env.PWD
+  catch err
+
+  impromptu.load()
+  impromptu.prompt.build (err, results) ->
+    # Send back the generated prompt.
+    # If no prompt is generated, we fall back to the environment's existing prompt.
+    # As a result, by registering no prompt sections, Impromptu can be used strictly
+    # for its background updating capabilities.
+    process.send
+      type: 'prompt'
+      data: results || env.PS1 || ''
+
+    # Run the background update.
+    # We synchronously perform the background update to optimize for speed of prompt
+    # generation. Reusing the process allows us to conserve memory while the socket
+    # server is idling.
+    impromptu.options.refresh = true
+
+    # Rebuild the prompt to refresh the cache.
     impromptu.prompt.build (err, results) ->
-      # Send back the generated prompt.
-      # If no prompt is generated, we fall back to the environment's existing prompt.
-      # As a result, by registering no prompt sections, Impromptu can be used strictly
-      # for its background updating capabilities.
-      process.send
-        type: 'prompt'
-        data: results || env.PS1 || ''
+      process.exit()
 
-      # Run the background update.
-      # We synchronously perform the background update to optimize for speed of prompt
-      # generation. Reusing the process allows us to conserve memory while the socket
-      # server is idling.
-      impromptu.options.refresh = true
+# Tests
+# FYI: This is ridiculous.
+runTests = ->
+  path = require 'path'
+  fs = require 'fs'
+  require 'coffee-script'
+  Mocha = require 'mocha'
 
-      # Rebuild the prompt to refresh the cache.
-      impromptu.prompt.build (err, results) ->
-        process.exit()
+  testDir = path.resolve(__dirname, '../test')
+  files = fs.readdirSync(testDir).filter (f) ->
+    f.match /\.coffee$/
+
+  mocha = new Mocha
+    reporter: 'spec'
+
+  mocha.addFile path.resolve(testDir, file) for file in files
+
+  mocha.run (failures) =>
+    process.send
+      type: 'exit'
+    process.exit()
