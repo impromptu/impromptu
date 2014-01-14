@@ -28,19 +28,25 @@ cache =
     result = cache._store[data.key]
     return unless result
 
-    if Date.now() < result.expireAt
-      data.value
+    if not result.expireAt or Date.now() < result.expireAt
+      result.value
     else
       cache.del data
       return # undefined
 
   set: (data) ->
-    cache._store[data.key] =
+    result =
       value: data.value
-      expireAt: Date.now() + data.expire * 1000
+
+    if data.expire
+      result.expireAt = Date.now() + data.expire * 1000
+
+    cache._store[data.key] = result
+
 
   del: (data) ->
-    delete cache._store[data.key] # returns true
+    delete cache._store[key] for key in data.keys
+    true
 
   listen: (child) ->
     child.on 'message', (message) ->

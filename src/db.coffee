@@ -29,7 +29,7 @@ class DB
         type: "cache:request"
         data: data
 
-    @requests[method][uid].push done
+    @requests[method][uid].push done if done
 
   exists: (key, done) ->
     @get key, (err, response) ->
@@ -46,8 +46,12 @@ class DB
 
     @send 'set', {key, value, expire}, done
 
-  del: (key, done) ->
-    @send 'del', {key}, done
+  del: (keys..., done) ->
+    if typeof done isnt 'function'
+      keys.push done
+      done = null
+
+    @send 'del', {keys}, done
 
 
 # Expose `DB`.
