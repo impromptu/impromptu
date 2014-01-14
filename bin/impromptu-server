@@ -16,9 +16,6 @@ if [[ -n "$1" ]]; then
   elif [[ "$1" == "foreground" ]]; then
     shift
 
-    # TODO: This should restart the server with the existing server config.
-    # This will involve adding a message to the server to return
-    # the proper flags (either formatted for shell, or maybe json).
     impromptu_ping_server
     if [[ "$?" -eq 0 ]]; then
       source impromptu server shutdown "$@"
