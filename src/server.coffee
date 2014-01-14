@@ -14,7 +14,6 @@ argv = minimist process.argv.slice(2),
     v: 'version'
 
 impromptu = new Impromptu
-  processType: 'server'
   verbosity: argv.verbosity
 
 impromptu.log.defaultDestinations.server = argv.foreground
@@ -138,20 +137,17 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
 
     child = childFactory.get()
 
+    # Bind message listeners that use the socket.
     child.on 'message', (message) ->
-      if message.type is 'prompt'
+      if message.type is 'write'
+        socket.write message.data
+
+      else if message.type is 'end'
         socket.end message.data
         # TODO: Call this when the child has exited (or disconnect from the
         # child at this point, and create a different system to handle any orphaned
         # or long-running background refreshes).
         childFactory.refresh()
-
-      else if message.type is 'log:stdout'
-        socket.write "#{message.data}\n"
-
-      else if message.type is 'log:server'
-        console.log message.data
-
 
     if body is 'test'
       child.send

@@ -97,20 +97,15 @@ class Log
     fs.appendFileSync @impromptu.path.log, message
 
   _writeToStdoutRaw: (message) ->
-    if @impromptu.options.processType is 'child'
+    if process.send
       process.send
-        type: 'log:stdout'
-        data: message
+        type: 'write'
+        data: "#{message}\n"
     else
       console.log message
 
   _writeToServerRaw: (message) ->
-    if @impromptu.options.processType is 'child'
-      process.send
-        type: 'log:server'
-        data: message
-    else if @impromptu.options.processType is 'server'
-      console.log message
+    console.log message
 
 # Expose `Log`.
 exports = module.exports = Log

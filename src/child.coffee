@@ -10,7 +10,6 @@ argv = minimist process.argv.slice(2),
     v: 'version'
 
 impromptu = new Impromptu
-  processType: 'child'
   verbosity: argv.verbosity
 
 impromptu.log.defaultDestinations.server = argv.foreground
@@ -53,7 +52,7 @@ buildPrompt = (envString) ->
     # As a result, by registering no prompt sections, Impromptu can be used strictly
     # for its background updating capabilities.
     process.send
-      type: 'prompt'
+      type: 'end'
       data: results || env.PS1 || ''
 
     # Run the background update.
