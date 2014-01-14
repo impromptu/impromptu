@@ -16,7 +16,15 @@ impromptu_ensure_constants() {
 
 # Pings the Impromptu socket server.
 impromptu_ping_server() {
-  pid_file="$IMPROMPTU_DIR/.compiled/impromptu-node-server.pid"
+  # The suffix of the PID file is either the basename of the socket (with extension)
+  # or the port of the Impromptu server.
+  if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
+    suffix="${IMPROMPTU_UNIX_DOMAIN_SOCKET##*/}"
+  else
+    suffix="$IMPROMPTU_PORT"
+  fi
+
+  pid_file="$IMPROMPTU_DIR/.compiled/impromptu-node-server-$suffix.pid"
   # Checks if the pid file exists and checks if the process is still running.
   [ -f $pid_file ] && kill -0 $(cat $pid_file) 2> /dev/null
 }

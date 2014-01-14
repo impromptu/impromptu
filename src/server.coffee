@@ -13,8 +13,13 @@ argv = minimist process.argv.slice(2),
     h: 'help'
     v: 'version'
 
+# If you use a Unix Domain Socket, its filename must be unique.
+pathOrPort = argv.path || argv.port
+serverId = if argv.path then path.basename path.resolve(argv.path) else argv.port
+
 impromptu = new Impromptu
   verbosity: argv.verbosity
+  serverId: serverId
 
 impromptu.log.defaultDestinations.server = argv.foreground
 impromptu.log.defaultDestinations.file = argv.logfile
@@ -162,4 +167,4 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
         type: 'env'
         data: body
 
-server.listen argv.path || argv.port
+server.listen pathOrPort
