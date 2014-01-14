@@ -86,9 +86,7 @@ class Global extends Impromptu.Cache
 
               # If the cached value should be stored for a certain amount of
               # time, set the lock and expiration timer.
-              client.set "lock:#{name}", true, (err) ->
-                fin err if err
-                client.expire "lock:#{name}", options.expire, fin
+              client.set "lock:#{name}", true, options.expire, fin
           ], (err) ->
             done err if err
 

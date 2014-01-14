@@ -13,8 +13,6 @@ argv = minimist process.argv.slice(2),
     h: 'help'
     v: 'version'
 
-console.log 'got args', argv
-
 impromptu = new Impromptu
   processType: 'server'
   verbosity: argv.verbosity
@@ -22,12 +20,49 @@ impromptu = new Impromptu
 impromptu.log.defaultDestinations.server = argv.foreground
 impromptu.log.defaultDestinations.file = argv.logfile
 
+
+cache =
+  _store: {}
+
+  get: (data) ->
+    result = cache._store[data.key]
+    return unless result
+
+    if Date.now() < result.expireAt
+      data.value
+    else
+      cache.del data
+      return # undefined
+
+  set: (data) ->
+    cache._store[data.key] =
+      value: data.value
+      expireAt: Date.now() + data.expire * 1000
+
+  del: (data) ->
+    delete cache._store[data.key] # returns true
+
+  listen: (child) ->
+    child.on 'message', (message) ->
+      switch message.type
+        when 'cache:get' then response = cache.get message.data
+        when 'cache:set' then response = cache.set message.data
+        when 'cache:del' then response = cache.del message.data
+
+      child.send
+        type: 'cache:response'
+        data:
+          uid: message.data.uid
+          response: response
+
+
 childFactory =
   MAX_LENGTH: 2
   _queue: []
 
   _spawn: ->
-    fork "#{__dirname}/../lib/child.js", process.argv.slice(2)
+    child = fork "#{__dirname}/../lib/child.js", process.argv.slice(2)
+    cache.listen(child)
 
   refresh: ->
     while @_queue.length < @MAX_LENGTH

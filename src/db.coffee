@@ -1,69 +1,50 @@
-redis = require 'redis'
-fs = require 'fs'
-path = require 'path'
-spawn = require('child_process').spawn
-
 class DB
-  @REDIS_CONF_FILE: '../etc/redis.conf'
-  @REDIS_PID_FILE: '/usr/local/var/run/redis-impromptu.pid'
-  @REDIS_PORT: 6420
-
   constructor: (@impromptu) ->
+    @requests = {}
 
-  # Returns the connection to the Redis server.
-  client: ->
-    # If the client object isn't cached, create a new connection.
-    unless @_client
-      @_client = redis.createClient DB.REDIS_PORT
+    process.on 'message', (message) ->
+      return unless message.type is 'cache:response'
 
-      # If the client throws an error, attempt to spawn the Redis server.
-      # The client will automatically attempt to reconnect, so if we
-      # successfully start the server, things will proceed normally.
-      @_client.once 'error', @_spawnServerFromError
+      data = message.data
+      return unless @requests[data.method]
 
-      # If the client connects error-free, ensure the error handler is removed.
-      @_client.on 'connect', =>
-        @_client.removeListener 'error', @_spawnServerFromError
+      callbacks = @requests[data.method][data.uid]
+      callback data.error, data.response for callback in callbacks
 
-    @_client
 
-  shutdown: ->
-    # We don't use `@client()` here because we don't want to spawn the server
-    # if it isn't already running.
-    #
-    # If we don't have a cached client, attempt to connect.
-    @_client = redis.createClient DB.REDIS_PORT unless @_client
+  send: (method, data, done) ->
+    uid = JSON.stringify data
 
-    # Remove the error handler that will spawn the server.
-    @_client.removeListener 'error', @_spawnServerFromError
+    @requests[method] ?= {}
 
-    # Silently absorb any errors.
-    @_client.on 'error', ->
+    # Only send a request if there are no outstanding requests.
+    unless @requests[method][uid]
+      @requests[method][uid] = []
+      process.send
+        method: "cache:#{method}"
+        data: data
+        uid: uid
 
-    # Shut down the server and gracefully disconnect.
-    @_client.shutdown()
-    @_client.quit()
+    @requests[method][json].push done
 
-  # Start the `redis-server` daemon if it doesn't already exist.
-  _spawnServerFromError: (error) ->
-    # If the server's PID file exists, check if it's accurate.
-    if fs.existsSync DB.REDIS_PID_FILE
-      # Fetch the process ID.
-      pid = parseInt fs.readFileSync(DB.REDIS_PID_FILE), 10
+  exists: (key, done) ->
+    @get key, (err, response) ->
+      done err, !!response
 
-      # Attempt to ping the process.
-      try
-        process.kill pid, 0
-        # If we can ping the server, then we don't know what error we received.
-        throw error
+  get: (key, done) ->
+    @send 'get', {key}, done
 
-      # If pinging the server throws an error (ESRCH), then we know the PID
-      # file is inaccurate; remove it.
-      catch ersch
-        fs.unlinkSync DB.REDIS_PID_FILE
+  set: (key, value, expire, done) ->
+    # If we only have three arguments, don't pass an expiry value
+    unless done
+      done = expire
+      expire = 0
 
-    # Spawn the server using the Impromptu server settings.
-    spawn 'redis-server', [path.resolve __dirname, DB.REDIS_CONF_FILE]
+    @send 'set', {key, value, expire}, done
+
+  del: (key, done) ->
+    @send 'del', {key}, done
+
 
 # Expose `DB`.
 exports = module.exports = DB
