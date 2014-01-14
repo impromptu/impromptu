@@ -29,14 +29,6 @@ describe 'Instance Cache', ->
 describe 'Global Cache', ->
   impromptu = new Impromptu()
 
-  before (done) ->
-    async.series [
-      (fn) ->
-        impromptu.db.client().on 'connect', fn
-      (fn) ->
-        impromptu.db.client().flushdb fn
-    ], done
-
   it 'should exist', ->
     should.exist Impromptu.Cache.Global
 

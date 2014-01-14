@@ -74,11 +74,18 @@ impromptu_ensure_server() {
 }
 
 # Opens a connection to the Impromptu socket server.
+# Defaults to a timeout of 1 second.
 impromptu_server_connection() {
-  if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
-    nc -w 1 -U "$IMPROMPTU_UNIX_DOMAIN_SOCKET"
+  if [[ -n "$1" ]]; then
+    timeout="$1"
   else
-    nc -w 1 localhost "$IMPROMPTU_PORT"
+    timeout="1"
+  fi
+
+  if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
+    nc -w "$timeout" -U "$IMPROMPTU_UNIX_DOMAIN_SOCKET"
+  else
+    nc -w "$timeout" localhost "$IMPROMPTU_PORT"
   fi
 }
 

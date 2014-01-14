@@ -71,16 +71,34 @@ childFactory =
   get: ->
     if @_queue.length then @_queue.shift() else @_spawn()
 
+
+# Tests
+# FYI: This is ridiculous.
+runTests = (child) ->
+  require 'coffee-script'
+  Mocha = require 'mocha'
+
+  testDir = path.resolve(__dirname, '../test')
+  files = fs.readdirSync(testDir).filter (f) ->
+    f.match /\.coffee$/
+
+  mocha = new Mocha
+    reporter: 'spec'
+
+  mocha.addFile path.resolve(testDir, file) for file in files
+
+  mocha.run (failures) =>
+    process.exit()
+
+
 # Safely shut down the server.
 shutdown = ->
   server.close ->
-    process.exit()
+    process.exit(failures)
+
 
 # Clean up after ourselves before the process exits.
 process.on 'exit', ->
-  # Shut down the Redis server.
-  impromptu.db.shutdown()
-
   # Remove the Impromptu server's pid file.
   fs.unlinkSync impromptu.path.serverPid
   # TODO: If the server is using a Unix domain socket, remove the socket file here.
@@ -94,9 +112,6 @@ process.on 'SIGINT', ->
 
 # Write the server's PID to a file.
 fs.writeFileSync impromptu.path.serverPid, process.pid
-
-# Ensure the Redis server is running.
-impromptu.db.client()
 
 # Build the queue of child processes.
 childFactory.refresh()
@@ -150,8 +165,12 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
       else if message.type is 'log:server'
         console.log message.data
 
-    child.send
-      type: 'env'
-      data: body
+
+    if body is 'test'
+      runTests(child)
+    else
+      child.send
+        type: 'env'
+        data: body
 
 server.listen argv.path || argv.port

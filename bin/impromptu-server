@@ -13,6 +13,8 @@ if [[ -n "$1" ]]; then
     fi
   elif [[ "$1" == "shutdown" ]]; then
     echo -n "shutdown" | impromptu_server_connection
+  elif [[ "$1" == "test" ]]; then
+    echo -n "test" | impromptu_server_connection 60
   elif [[ "$1" == "foreground" ]]; then
     shift
 

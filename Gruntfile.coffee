@@ -1,15 +1,15 @@
 fs = require 'fs'
 path = require 'path'
-Mocha = require 'mocha'
-exec = require('child_process').exec
+child_process = require('child_process')
+exec = child_process.exec
+spawn = child_process.spawn
+
 
 module.exports = (grunt) ->
 
   # Project configuration.
   grunt.initConfig
     mocha:
-      db:
-        src: ['test/db/*.coffee']
       default:
         src: ['test/*.coffee']
 
@@ -29,7 +29,7 @@ module.exports = (grunt) ->
         tasks: ['coffee', 'test']
 
       test:
-        files: ['test/**/*.coffee']
+        files: ['test/**/*.coffee', 'Gruntfile.coffee']
         tasks: ['test']
 
   # These plugins provide necessary tasks.
@@ -54,14 +54,16 @@ module.exports = (grunt) ->
   grunt.registerMultiTask 'mocha', 'Run mocha unit tests.', ->
     done = @async()
 
-    mocha = new Mocha
-      reporter: 'spec'
+    cmd = "IMPROMPTU_PORT=2934 impromptu server"
 
-    for files in @files
-      for file in files.src
-        mocha.addFile file
+    exec "#{cmd} shutdown", (err, stdout, stderr) ->
+      grunt.log.writeln 'Spawning server...'
+      server = exec "#{cmd} foreground", (err, stdout, stderr) ->
+        grunt.log.writeln '\n\n\n\nTests complete.'
 
-    mocha.run (failures) =>
-      if failures
-        grunt.log.error(failures).writeln()
-      done()
+      server.stdout.pipe process.stdout
+      server.stderr.pipe process.stderr
+
+      setTimeout ->
+        exec "#{cmd} test"
+      , 1000 # chill out for a bit

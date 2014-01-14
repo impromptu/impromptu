@@ -21,7 +21,7 @@ class Global extends Impromptu.Cache
 
 
   client: ->
-    @impromptu.db.client()
+    @impromptu.db
 
 
   run: (fn) ->
