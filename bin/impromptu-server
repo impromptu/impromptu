@@ -2,20 +2,31 @@
 
 if [[ -n "$1" ]]; then
   if [[ "$1" == "start" ]]; then
+    shift
+
     impromptu_ping_server
     if [[ "$?" -eq 0 ]]; then
       echo "The Impromptu server is already running."
     else
-      # TODO: Turn "foreground" into a separate command that restarts the server with the
-      # existing server config. This will involve adding a message to the server to return
-      # the proper flags (either formatted for shell, or maybe json).
-      if [[ -n "$2" && "$2" == "--foreground" ]]; then
-        impromptu_ensure_server --foreground
-      else
-        impromptu_ensure_server
-      fi
+
+      impromptu_ensure_server "$@"
     fi
   elif [[ "$1" == "shutdown" ]]; then
     echo -n "shutdown" | impromptu_server_connection
+  elif [[ "$1" == "foreground" ]]; then
+    shift
+
+    # TODO: This should restart the server with the existing server config.
+    # This will involve adding a message to the server to return
+    # the proper flags (either formatted for shell, or maybe json).
+    impromptu_ping_server
+    if [[ "$?" -eq 0 ]]; then
+      source impromptu server shutdown "$@"
+    fi
+
+    # NOTE: This constant should be temporary; most of the server logic will soon
+    # be handled in node.
+    _impromptu_start_in_foreground="true"
+    impromptu_ensure_server --foreground "$@"
   fi
 fi

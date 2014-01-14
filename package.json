@@ -40,7 +40,8 @@
     "coffee-script": "~1.6.2",
     "redis": "~0.8.2",
     "async": "~0.2.6",
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "minimist": "0.0.5"
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.3.1",

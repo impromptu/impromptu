@@ -1,6 +1,20 @@
 Impromptu = require '../lib/impromptu'
+minimist = require 'minimist'
+
+argv = minimist process.argv.slice(2),
+  defaults:
+    logfile: true
+    foreground: false
+  alias:
+    h: 'help'
+    v: 'version'
+
 impromptu = new Impromptu
   processType: 'child'
+  verbosity: argv.verbosity
+
+impromptu.log.defaultDestinations.server = argv.foreground
+impromptu.log.defaultDestinations.file = argv.logfile
 
 parseEnv = (printenvOutput) ->
   env = {}
@@ -18,9 +32,6 @@ process.on 'message', (message) ->
 
     if env.IMPROMPTU_SHELL
       impromptu.options.shell = env.IMPROMPTU_SHELL
-
-    if env.IMPROMPTU_LOG_LEVEL
-      impromptu.log.setVerbosity env.IMPROMPTU_LOG_LEVEL
 
     # Overload the environment.
     process.env = env

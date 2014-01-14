@@ -3,18 +3,31 @@ fork = require('child_process').fork
 Impromptu = require '../lib/impromptu'
 path = require 'path'
 fs = require 'fs'
+minimist = require 'minimist'
 
-pathOrPort = process.argv[2]
+argv = minimist process.argv.slice(2),
+  defaults:
+    logfile: true
+    foreground: false
+  alias:
+    h: 'help'
+    v: 'version'
+
+console.log 'got args', argv
+
 impromptu = new Impromptu
   processType: 'server'
-  verbosity: process.env.IMPROMPTU_LOG_LEVEL
+  verbosity: argv.verbosity
+
+impromptu.log.defaultDestinations.server = argv.foreground
+impromptu.log.defaultDestinations.file = argv.logfile
 
 childFactory =
   MAX_LENGTH: 2
   _queue: []
 
   _spawn: ->
-    fork "#{__dirname}/../lib/child.js"
+    fork "#{__dirname}/../lib/child.js", process.argv.slice(2)
 
   refresh: ->
     while @_queue.length < @MAX_LENGTH
@@ -106,4 +119,4 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
       type: 'env'
       data: body
 
-server.listen pathOrPort
+server.listen argv.path || argv.port

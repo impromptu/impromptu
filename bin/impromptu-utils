@@ -46,21 +46,17 @@ impromptu_ensure_server() {
       echo "Please specify a different path."
       return 1
     fi
-
-    server_path_or_port=$IMPROMPTU_UNIX_DOMAIN_SOCKET
-  else
-    server_path_or_port=$IMPROMPTU_PORT
   fi
 
   # Start the server process in the foreground.
-  if [[ -n "$1" && "$1" == "--foreground" ]]; then
-    "$IMPROMPTU_BIN/impromptu-node-server" $server_path_or_port
+  if [[ -n "$_impromptu_start_in_foreground" ]]; then
+    "$IMPROMPTU_BIN/impromptu-node-server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" "$@"
 
   # Start the server as a daemon in a subshell.
   else
     (
       # Ensure the server is detached from this process.
-      nohup "$IMPROMPTU_BIN/impromptu-node-server" $server_path_or_port >& /dev/null &
+      nohup "$IMPROMPTU_BIN/impromptu-node-server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" >& /dev/null "$@" &
     )
 
     echo "Starting Impromptu server..."
