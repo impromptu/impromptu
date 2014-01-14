@@ -131,7 +131,6 @@ class Impromptu.AbstractError extends Impromptu.Error
 exports = module.exports = Impromptu
 
 # Expose utilities.
-exports.cli = require './cli'
 exports.exec = require './exec'
 
 # Expose APIs.

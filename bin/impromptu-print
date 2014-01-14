@@ -2,12 +2,6 @@
 
 source $IMPROMPTU_BIN/impromptu-utils
 
-if [[ -n "$1" && "$1" == "--no-server" ]]; then
-  shift
-  $IMPROMPTU_BIN/impromptu-node-cli "$@"
-  return
-fi
-
 impromptu_ensure_constants
 
 # Set the current shell.
@@ -27,11 +21,7 @@ if [[ $? != 0 || -z $generated_prompt ]]; then
   echo "Attempting to start Impromptu server..."
   impromptu_ensure_server
 
-  if [[ "$?" -ne 0 ]]; then
-    echo "The Impromptu server failed to start. Falling back to the CLI..."
-    echo "Use the --no-server flag to use the CLI by default."
-    $IMPROMPTU_BIN/impromptu-node-cli
-  else
+  if [[ "$?" -eq 0 ]]; then
     generate_prompt
   fi
 elif [[ -n $generated_prompt ]]; then

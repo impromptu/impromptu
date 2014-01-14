@@ -2,12 +2,7 @@
 
 source $IMPROMPTU_BIN/impromptu-utils
 
-if [[ -n "$1" && "$1" == "--no-server" ]]; then
-  print_flag="--no-server"
-else
-  print_flag=""
-  impromptu_ensure_server
-fi
+impromptu_ensure_server
 
 # Okay, I get it. This might look a little confusing.
 # But I promise it makes sense.
@@ -33,8 +28,8 @@ fi
 # So we set both commands: `PROMPT_COMMAND` for bash and `precmd` for zsh,
 # and tell Impromptu to escape the color codes for that specific shell.
 export PROMPT_COMMAND='source $IMPROMPTU_BIN/impromptu-utils;
-impromptu_prompt_command "'$print_flag'" bash'
+impromptu_prompt_command bash'
 
 precmd() {
-  impromptu_prompt_command $print_flag zsh
+  impromptu_prompt_command zsh
 }
