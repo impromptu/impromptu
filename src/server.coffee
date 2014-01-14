@@ -81,7 +81,7 @@ childFactory =
 # Safely shut down the server.
 shutdown = ->
   server.close ->
-    process.exit(failures)
+    process.exit()
 
 
 # Clean up after ourselves before the process exits.
@@ -158,8 +158,9 @@ server = net.createServer {allowHalfOpen: true}, (socket) ->
         type: 'test'
 
       child.on 'message', (message) ->
-        if message.type is 'exit'
-          process.exit()
+        if message.type is 'shutdown'
+          shutdown()
+          socket.end()
     else
       child.send
         type: 'env'

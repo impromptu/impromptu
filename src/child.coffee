@@ -88,5 +88,5 @@ runTests = ->
 
   mocha.run (failures) =>
     process.send
-      type: 'exit'
+      type: 'shutdown'
     process.exit()

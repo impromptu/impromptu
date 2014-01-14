@@ -57,10 +57,7 @@ module.exports = (grunt) ->
     cmd = "IMPROMPTU_PORT=2934 impromptu server"
 
     exec "#{cmd} shutdown", (err, stdout, stderr) ->
-      grunt.log.writeln 'Spawning server...'
-      server = exec "#{cmd} foreground", (err, stdout, stderr) ->
-        grunt.log.writeln '\n\n\n\nTests complete.'
-
+      server = exec "#{cmd} foreground"
       server.stdout.pipe process.stdout
       server.stderr.pipe process.stderr
 
