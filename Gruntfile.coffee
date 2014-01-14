@@ -9,10 +9,6 @@ module.exports = (grunt) ->
 
   # Project configuration.
   grunt.initConfig
-    mocha:
-      default:
-        src: ['test/*.coffee']
-
     coffee:
       default:
         files: [
@@ -39,8 +35,6 @@ module.exports = (grunt) ->
   # Default task.
   grunt.registerTask 'default', ['coffee', 'test']
 
-  grunt.registerTask 'test', 'mocha:default'
-
   grunt.registerTask 'nuke', "Nuke stuff. Don't run this unless you know what you're doing.", ->
     steps = [
       'rm -rf ~/.impromptu'
@@ -50,8 +44,10 @@ module.exports = (grunt) ->
 
     exec steps.join ' && '
 
-  # Task for running Mocha tests with coffee.
-  grunt.registerMultiTask 'mocha', 'Run mocha unit tests.', ->
+  # Run the unit tests by spawning an Impromptu server and passing through the 'test' message.
+  # This allows us to run the tests in a real-world environment: the database requires an
+  # Impromptu server and worker process to work correctly.
+  grunt.registerTask 'test', 'Run unit tests.', ->
     done = @async()
 
     cmd = "IMPROMPTU_PORT=2934 impromptu server"
