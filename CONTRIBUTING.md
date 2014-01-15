@@ -14,4 +14,4 @@ In the `impromptu` directory, run `grunt` to build and test Impromptu.
 Run `grunt watch` to continually recompile the build and run tests.
 
 ### Testing
-Impromptu uses [Mocha](http://visionmedia.github.com/mocha/) for testing. To run the test suite alone, run `grunt mocha`.
+Impromptu uses [Mocha](http://visionmedia.github.com/mocha/) for testing. To run the test suite alone, run `grunt test`.
