@@ -1,5 +1,0 @@
-#!/usr/bin/env node
-var Impromptu = new require('../lib/impromptu.js');
-new Impromptu({refresh: true}).load().prompt.build(function(err, results) {
-  process.exit();
-});
