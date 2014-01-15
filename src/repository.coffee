@@ -65,7 +65,15 @@ class RepositoryFactory
 
   # Find and the primary repository.
   primary: (fn) ->
-    fn null, @_primary if @_primary
+    return fn null, @_primary if @_primary
+
+    # Prevent race conditions by tracking the queue of callbacks while we're
+    # looking for the primary repository.
+    if @_callbacks
+      @_callbacks.push fn
+      return
+
+    @_callbacks = [fn]
 
     # Track whether each repository exists.
     exists = {}
@@ -84,7 +92,9 @@ class RepositoryFactory
           # We've found the primary repository.
           if exists[repository.type]
             @_primary = repository
-            return fn null, @_primary
+            callback null, @_primary for callback in @_callbacks
+            delete @_callbacks
+            return
 
 
   # Finds the root of the primary repository.
