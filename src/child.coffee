@@ -50,10 +50,10 @@ buildPrompt = (envString) ->
     # Send back the generated prompt.
     # If no prompt is generated, we fall back to the environment's existing prompt.
     # As a result, by registering no prompt sections, Impromptu can be used strictly
-    # for its background updating capabilities.
+    # for its background updating capabilities. If PS1 exists, falls back to "`pwd` $".
     process.send
       type: 'end'
-      data: results || env.PS1 || ''
+      data: results || env.PS1 || "#{process.cwd()} $ "
 
     # Run the background update.
     # We synchronously perform the background update to optimize for speed of prompt
