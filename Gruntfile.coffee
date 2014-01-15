@@ -50,7 +50,7 @@ module.exports = (grunt) ->
   grunt.registerTask 'test', 'Run unit tests.', ->
     done = @async()
 
-    cmd = "IMPROMPTU_PORT=2934 impromptu server"
+    cmd = "IMPROMPTU_PORT=2934 IMPROMPTU_UNIX_DOMAIN_SOCKET='' impromptu server"
 
     exec "#{cmd} shutdown", (err, stdout, stderr) ->
       server = exec "#{cmd} foreground"
