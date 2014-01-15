@@ -7,7 +7,7 @@ A better prompt.
 
 Installation
 ------------
-Impromptu requires [Node.js](http://nodejs.org/) and [Redis](http://redis.io/). The install script currently requires [Git](http://git-scm.com/). Impromptu supports bash and zsh by default.
+Impromptu requires [Node.js](http://nodejs.org/). The install script currently requires [Git](http://git-scm.com/). Impromptu supports bash and zsh by default.
 
 1. `npm install -g use-impromptu`
 
