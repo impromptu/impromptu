@@ -35,7 +35,7 @@ cache =
     if not result.expireAt or Date.now() < result.expireAt
       result.value
     else
-      cache.del data
+      delete cache._store[data.key]
       return # undefined
 
   set: (data) ->
