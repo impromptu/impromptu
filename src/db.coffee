@@ -49,7 +49,7 @@ class DB
     @send 'set', {key, value, expire}, done
 
   del: (keys..., done) ->
-    if typeof done isnt 'function'
+    if done? and typeof done isnt 'function'
       keys.push done
       done = null
 
