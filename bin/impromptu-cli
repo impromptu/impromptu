@@ -4,9 +4,11 @@ source $IMPROMPTU_BIN/impromptu-utils
 impromptu_ensure_constants
 
 # Check for named subcommands (ignoring flags).
+# TODO: Update $IMPROMPTU_BIN to be $IMPROMPTU_DIR/node_modules/.bin, so that
+# node modules can expose their own subcommands.
 if [[ -n "$1" && $1 != -* ]]; then
   potential_subcommand="impromptu-$1"
-  potential_subcommand_path="$IMPROMPTU_DIR/node_modules/.bin/$potential_subcommand"
+  potential_subcommand_path="$IMPROMPTU_BIN/$potential_subcommand"
 
   # Check for the subcommand in impromptu's installed node modules.
   if [[ -x "$potential_subcommand_path" ]]; then
