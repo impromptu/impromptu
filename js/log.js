@@ -32,12 +32,12 @@ Log.prototype.setVerbosity = function(level) {
     this._verbosity = Log.Levels.NOTICE;
   }
   if (level === 'debug') {
-    return this._verbosity = Log.Levels.DEBUG;
+    this._verbosity = Log.Levels.DEBUG;
   }
 };
 
 Log.prototype.output = function(message) {
-  return this.write(message, {
+  this.write(message, {
     level: null,
     format: false,
     destinations: {
@@ -49,7 +49,7 @@ Log.prototype.output = function(message) {
 };
 
 Log.prototype.warning = function(message) {
-  return this.write(message, {
+  this.write(message, {
     level: Log.Levels.WARNING,
     format: true,
     destinations: this.defaultDestinations
@@ -57,7 +57,7 @@ Log.prototype.warning = function(message) {
 };
 
 Log.prototype.notice = function(message) {
-  return this.write(message, {
+  this.write(message, {
     level: Log.Levels.NOTICE,
     format: true,
     destinations: this.defaultDestinations
@@ -65,7 +65,7 @@ Log.prototype.notice = function(message) {
 };
 
 Log.prototype.debug = function(message) {
-  return this.write(message, {
+  this.write(message, {
     level: Log.Levels.DEBUG,
     format: true,
     destinations: this.defaultDestinations
@@ -89,7 +89,7 @@ Log.prototype.write = function(message, options) {
     this._writeToServerRaw(message);
   }
   if (destinations.file) {
-    return this._writeToFileRaw(message);
+    this._writeToFileRaw(message);
   }
 };
 
@@ -101,22 +101,22 @@ Log.prototype.format = function(message, level) {
 };
 
 Log.prototype._writeToFileRaw = function(message) {
-  return fs.appendFileSync(this.impromptu.path.log, message);
+  fs.appendFileSync(this.impromptu.path.log, message);
 };
 
 Log.prototype._writeToStdoutRaw = function(message) {
   if (process.send) {
-    return process.send({
+    process.send({
       type: 'write',
       data: "" + message + "\n"
     });
   } else {
-    return console.log(message);
+    console.log(message);
   }
 };
 
 Log.prototype._writeToServerRaw = function(message) {
-  return console.log(message);
+  console.log(message);
 };
 
 module.exports = Log;
