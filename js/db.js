@@ -1,36 +1,32 @@
 var slice = Array.prototype.slice;
 
 function DB(impromptu) {
-  var _this = this;
-
   this.impromptu = impromptu;
   this.requests = {};
   process.on('message', function(message) {
-    var callback, callbacks, data, _i, _len;
-
     if (message.type !== 'cache:response') {
       return;
     }
-    data = message.data;
-    if (!(_this.requests[data.method] && _this.requests[data.method][data.uid])) {
+
+    var data = message.data;
+    if (!(this.requests[data.method] && this.requests[data.method][data.uid])) {
       return;
     }
-    callbacks = _this.requests[data.method][data.uid];
-    for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
-      callback = callbacks[_i];
+
+    var callbacks = this.requests[data.method][data.uid];
+    for (var i = 0; i < callbacks.length; i++) {
+      var callback = callbacks[i];
       callback(data.error, data.response);
     }
-    return delete _this.requests[data.method][data.uid];
-  });
+
+    delete this.requests[data.method][data.uid];
+  }.bind(this));
 }
 
 DB.prototype.send = function(method, data, done) {
-  var uid, _base, _ref;
+  if (!this.requests[method]) this.requests[method] = {};
 
-  uid = JSON.stringify(data);
-  if ((_ref = (_base = this.requests)[method]) == null) {
-    _base[method] = {};
-  }
+  var uid = JSON.stringify(data);
   if (!this.requests[method][uid]) {
     this.requests[method][uid] = [];
     data.uid = uid;
@@ -40,21 +36,20 @@ DB.prototype.send = function(method, data, done) {
       data: data
     });
   }
+
   if (done) {
-    return this.requests[method][uid].push(done);
+    this.requests[method][uid].push(done);
   }
 };
 
 DB.prototype.exists = function(key, done) {
-  return this.get(key, function(err, response) {
-    if (done) {
-      return done(err, !!response);
-    }
+  this.get(key, function(err, response) {
+    if (done) done(err, !!response);
   });
 };
 
 DB.prototype.get = function(key, done) {
-  return this.send('get', {
+  this.send('get', {
     key: key
   }, done);
 };
@@ -64,22 +59,23 @@ DB.prototype.set = function(key, value, expire, done) {
     done = expire;
     expire = 0;
   }
-  return this.send('set', {
+  this.send('set', {
     key: key,
     value: value,
     expire: expire
   }, done);
 };
 
+/* del(keys..., done) */
 DB.prototype.del = function() {
-  var done, keys, _i;
+  var keys = Array.prototype.slice.call(arguments)
+  var done = keys.pop()
 
-  keys = 2 <= arguments.length ? slice.call(arguments, 0, _i = arguments.length - 1) : (_i = 0, []), done = arguments[_i++];
   if ((done != null) && typeof done !== 'function') {
     keys.push(done);
     done = null;
   }
-  return this.send('del', {
+  this.send('del', {
     keys: keys
   }, done);
 };
