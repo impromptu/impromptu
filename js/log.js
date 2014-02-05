@@ -12,6 +12,17 @@ function Log(impromptu, verbosity) {
   };
 }
 
+/**
+ * The log verbosity level.
+ *
+ * Do not refer to these numbers directly, use their corresponding key-names instead.
+ * Inspired by the Redis log levels.
+ *
+ * Log levels:
+ *   warning (only very important / critical messages are logged)
+ *   notice (moderately verbose, what you want in production probably)
+ *   debug (a lot of information, useful for development/testing)
+ */
 Log.Levels = {
   WARNING: 1,
   NOTICE: 2,
@@ -72,6 +83,20 @@ Log.prototype.debug = function(message) {
   });
 };
 
+
+/**
+ * Low-level method to write output and logs.
+ * Accepts a message and an options object.
+ *
+ * options.level - Integer. Specifies the log level of the message.
+ *                 Optional. Messages without a specified level will always be written.
+ *
+ * options.format - Boolean. Whether the message should be formatted.
+ *
+ * options.destinations - Whether the message should be written to various destiations.
+ *                        An object with three boolean keys: 'file', 'server', and 'stdout'.
+ *                        Optional, defaults to `this.defaultDestinations`.
+ */
 Log.prototype.write = function(message, options) {
   var destinations;
 
