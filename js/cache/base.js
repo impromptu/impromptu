@@ -1,3 +1,4 @@
+// TODO: Update for style, copy comments.
 var Cache, Impromptu, exports,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
