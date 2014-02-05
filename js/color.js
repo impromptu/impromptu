@@ -17,9 +17,7 @@ function Color(impromptu) {
 }
 
 Color.prototype.format = function(string, options) {
-  var original
-
-  original = string;
+  var original = string;
   if (options.foreground && _.has(COLORS, options.foreground)) {
     string = this.ansi(COLORS[options.foreground] + 30) + string;
   }
