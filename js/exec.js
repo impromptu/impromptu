@@ -1,46 +1,30 @@
-var Impromptu, exec, exports, _Command, _registry;
+var Impromptu = require('./impromptu');
+var exec = require('child_process').exec;
 
-Impromptu = require('./impromptu');
+var registry = {};
 
-exec = require('child_process').exec;
+function Command(command) {
+  this.command = command;
+  this.callbacks = [];
+  exec(this.command, function() {
+    this.results = arguments
 
-_registry = {};
+    for (var i = 0; i < this.callbacks.length; i++) {
+      var callback = this.callbacks[i]
+      callback.apply(Impromptu, arguments)
+    }
+  }.bind(this));
+}
 
-_Command = (function() {
-  function _Command(command) {
-    var _this = this;
-
-    this.command = command;
-    this.callbacks = [];
-    exec(this.command, function() {
-      var fn, _i, _len, _ref, _results;
-
-      _this.results = arguments;
-      _ref = _this.callbacks;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        fn = _ref[_i];
-        _results.push(fn.apply(Impromptu, arguments));
-      }
-      return _results;
-    });
+module.exports = function(command, fn) {
+  if (!registry[command]) {
+    registry[command] = new Command(command);
   }
 
-  return _Command;
-
-})();
-
-exports = module.exports = function(command, fn) {
-  var cached;
-
-  cached = _registry[command];
-  if (!cached) {
-    cached = _registry[command] = new _Command(command);
-  }
+  var cached = registry[command];
   if (cached.results) {
     fn.apply(Impromptu, cached.results);
   } else {
     cached.callbacks.push(fn);
   }
-  return null;
 };
