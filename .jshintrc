@@ -1,0 +1,16 @@
+{
+  // Configuration.
+  "indent": 2, // We use two-space indentation.
+  "trailing": true, // No trailing whitespace!
+  "node": true,
+
+  // Core
+  "asi": true, // Tolerate Automatic Semicolon Insertion (no semicolons). #haters
+  "eqnull": true, // Tolerate use of `== null`.
+  "newcap": true, // Require capitalization of all constructor functions e.g. `new F()`.
+  "noarg": true, // Prohibit use of `arguments.caller` and `arguments.callee`.
+  "nonew": true, // Constructors should not have side-effects.
+  "strict": false, // We don't include "use strict", please don't complain.
+  "sub": true, // Allow use of bracket notation to access properties.
+  "undef": true // Require all non-global variables be declared before they are used.
+}
