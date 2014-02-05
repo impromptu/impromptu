@@ -3,6 +3,7 @@ var path = require('path');
 var util = require('util');
 var _ = require('underscore');
 
+// Load our own package.json
 var npmConfig = require('../package.json');
 
 function Impromptu(options) {
@@ -31,6 +32,8 @@ function Impromptu(options) {
   this.db = new Impromptu.DB(this);
   this.module = new Impromptu.ModuleFactory(this);
   this.prompt = new Impromptu.Prompt(this);
+
+  // Attempt to compile the prompt in advance (if necessary).
   this._compilePrompt();
 }
 
@@ -38,20 +41,23 @@ Impromptu.VERSION = npmConfig.version;
 Impromptu.DEFAULT_CONFIG_DIR = process.env.IMPROMPTU_DIR || ("" + process.env.HOME + "/.impromptu");
 
 Impromptu.prototype.load = function() {
-  if (!this._compilePrompt()) {
-    return this;
-  }
+  // Ensure the prompt is compiled.
+  // Double-check that nothing has changed since Impromptu was instantiated.
+  if (!this._compilePrompt()) return this;
+
+  // Load the prompt file.
   var prompt = require(this.path.compiled);
   try {
-    if (typeof prompt.call === "function") {
-      prompt.call(this, Impromptu, this.prompt.section);
+    if (typeof prompt.call === 'function') {
+      prompt.call(this, Impromptu, this.prompt.section)
     }
   } catch (err) {
-    this._error('javascript', 'Your prompt file triggered a JavaScript error.', err);
+    this._error('javascript', 'Your prompt file triggered a JavaScript error.', err)
   }
   return this;
 };
 
+// Returns true if the compiled prompt file exists.
 Impromptu.prototype._compilePrompt = function() {
   var coffee, compiledDir, compiledJs, compiledMtime, err, sourceMtime, sourcePrompt;
 
@@ -76,6 +82,8 @@ Impromptu.prototype._compilePrompt = function() {
     return true;
   } else if (/\.coffee$/.test(sourcePrompt)) {
     this._clearError('coffeescript');
+
+    // Allow `.coffee` files in `require()`.
     coffee = require('coffee-script');
     try {
       compiledJs = coffee.compile(fs.readFileSync(sourcePrompt).toString());
