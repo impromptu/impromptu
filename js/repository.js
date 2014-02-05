@@ -35,22 +35,17 @@ function RepositoryFactory(impromptu) {
 }
 
 RepositoryFactory.prototype.register = function(type, options) {
-  var repository;
-
   if (options == null) {
     options = {};
   }
   options.type = type;
-  repository = new Repository(this.impromptu);
+  var repository = new Repository(this.impromptu);
   _.extend(repository, options);
   this._repositories.unshift(repository);
   return this[type] = repository;
 };
 
 RepositoryFactory.prototype.primary = function(fn) {
-  var exists,
-    _this = this;
-
   if (this._primary) {
     return fn(null, this._primary);
   }
@@ -59,33 +54,33 @@ RepositoryFactory.prototype.primary = function(fn) {
     return;
   }
   this._callbacks = [fn];
-  exists = {};
+  var exists = {};
   return async.each(this._repositories, function(repository, done) {
     return repository.exists(function(err, result) {
       var callback, _i, _j, _len, _len1, _ref, _ref1;
 
       exists[repository.type] = result;
-      if (_this._primary) {
+      if (this._primary) {
         return;
       }
-      _ref = _this._repositories;
+      _ref = this._repositories;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         repository = _ref[_i];
         if (typeof exists[repository.type] !== 'boolean') {
           break;
         }
         if (exists[repository.type]) {
-          _this._primary = repository;
-          _ref1 = _this._callbacks;
+          this._primary = repository;
+          _ref1 = this._callbacks;
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
             callback = _ref1[_j];
-            callback(null, _this._primary);
+            callback(null, this._primary);
           }
-          delete _this._callbacks;
+          delete this._callbacks;
           return;
         }
       }
-    });
+    }.bind(this));
   });
 };
 
