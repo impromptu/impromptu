@@ -9,6 +9,8 @@ function DB(impromptu) {
     }
 
     var data = message.data;
+    // The requests for this UID may not exist because there can be multiple
+    // instances of Impromptu.
     if (!(this.requests[data.method] && this.requests[data.method][data.uid])) {
       return;
     }
@@ -26,11 +28,14 @@ function DB(impromptu) {
 DB.prototype.send = function(method, data, done) {
   if (!this.requests[method]) this.requests[method] = {};
 
+  // Only send a request when there are no outstanding requests.
   var uid = JSON.stringify(data);
   if (!this.requests[method][uid]) {
     this.requests[method][uid] = [];
+
     data.uid = uid;
     data.method = method;
+
     process.send({
       type: "cache:request",
       data: data
@@ -55,10 +60,12 @@ DB.prototype.get = function(key, done) {
 };
 
 DB.prototype.set = function(key, value, expire, done) {
+  // If we only have three arguments, don't pass an expiry value.
   if (typeof expire === 'function') {
     done = expire;
     expire = 0;
   }
+
   this.send('set', {
     key: key,
     value: value,
