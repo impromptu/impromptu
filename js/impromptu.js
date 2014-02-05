@@ -1,11 +1,8 @@
-var Impromptu, exports, fs, npmConfig, path, _,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+var Impromptu, exports, fs, npmConfig, path, _;
 
+var util = require('util');
 path = require('path');
-
 fs = require('fs');
-
 _ = require('underscore');
 
 npmConfig = require('../package.json');
@@ -133,31 +130,20 @@ Impromptu = (function() {
 
 })();
 
-Impromptu.Error = (function(_super) {
-  __extends(Error, _super);
+Impromptu.Error = function Error(message) {
+  this.message = message
+  Error.apply(this, arguments)
+}
+util.inherits(Impromptu.Error, Error)
 
-  function Error(message) {
-    this.message = message;
-    Error.__super__.constructor.apply(this, arguments);
+Impromptu.AbstractError = function AbstractError(message) {
+  this.message = message;
+  if (!this.message) {
+    this.message = 'This method should be defined in a subclass.';
   }
-
-  return Error;
-
-})(Error);
-
-Impromptu.AbstractError = (function(_super) {
-  __extends(AbstractError, _super);
-
-  function AbstractError(message) {
-    this.message = message;
-    if (!this.message) {
-      this.message = 'This method should be defined in a subclass.';
-    }
-  }
-
-  return AbstractError;
-
-})(Impromptu.Error);
+  Impromptu.Error.apply(this, arguments)
+}
+util.inherits(Impromptu.AbstractError, Impromptu.Error)
 
 exports = module.exports = Impromptu;
 
