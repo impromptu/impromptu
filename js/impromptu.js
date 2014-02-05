@@ -59,40 +59,48 @@ Impromptu.prototype.load = function() {
 
 // Returns true if the compiled prompt file exists.
 Impromptu.prototype._compilePrompt = function() {
-  var coffee, compiledDir, compiledJs, compiledMtime, err, sourceMtime, sourcePrompt;
-
-  if (!(sourcePrompt = _.find(this.path.sources, function(path) {
+  var sourcePrompt = _.find(this.path.sources, function(path) {
     return fs.existsSync(path);
-  }))) {
-    return;
-  }
+  })
+
+  // Make sure we have a source prompt.
+  // If we don't find a prompt file, bail.
+  if (sourcePrompt) return false;
+
+  // Check whether the compiled prompt exists and is up to date.
   if (fs.existsSync(this.path.compiled)) {
-    sourceMtime = fs.statSync(sourcePrompt).mtime;
-    compiledMtime = fs.statSync(this.path.compiled).mtime;
-    if (sourceMtime < compiledMtime) {
-      return true;
-    }
+    var sourceMtime = fs.statSync(sourcePrompt).mtime;
+    var compiledMtime = fs.statSync(this.path.compiled).mtime;
+
+    if (sourceMtime < compiledMtime) return true;
   }
-  compiledDir = path.dirname(this.path.compiled);
-  if (!fs.existsSync(compiledDir)) {
-    fs.mkdir(compiledDir);
-  }
+
+  // Ensure the compiled prompt directory exists.
+  var compiledDir = path.dirname(this.path.compiled);
+  if (!fs.existsSync(compiledDir)) fs.mkdir(compiledDir)
+
+  // If your prompt is already JS, just copy it over.
   if (/\.js$/.test(sourcePrompt)) {
     fs.createReadStream(sourcePrompt).pipe(fs.createWriteStream(this.path.compiled));
     return true;
+
+  // If you're using CoffeeScript, load the CoffeeScript module to compile and cache it.
   } else if (/\.coffee$/.test(sourcePrompt)) {
+    // Clear any pre-existing CoffeeScript compiler errors.
+    // We only care about whether the most recent compilation succeeded.
     this._clearError('coffeescript');
 
     // Allow `.coffee` files in `require()`.
-    coffee = require('coffee-script');
+    var coffee = require('coffee-script');
     try {
-      compiledJs = coffee.compile(fs.readFileSync(sourcePrompt).toString());
+      var compiledJs = coffee.compile(fs.readFileSync(sourcePrompt).toString());
       fs.writeFileSync(this.path.compiled, compiledJs);
       return true;
-    } catch (_error) {
-      err = _error;
+    } catch (err) {
       this._error('coffeescript', 'Your prompt file is not valid CoffeeScript.', err);
     }
+
+    return false;
   }
 };
 
@@ -102,20 +110,23 @@ Impromptu.prototype._error = function(name, content, err) {
     background: 'red',
     foreground: 'white'
   });
+
   this.prompt.section("error:instructions:" + name, {
     content: "\nDetails can be found in " + this.path.log + "\n",
     options: {
       newlines: true
     }
   });
-  return this.log.warning("" + content + "\n\n" + err.stack + "\n----------------------------------------");
+
+  this.log.warning("" + content + "\n\n" + err.stack + "\n----------------------------------------");
 };
 
 Impromptu.prototype._clearError = function(name) {
   this.prompt.section("error:message:" + name, {
     content: ''
   });
-  return this.prompt.section("error:instructions:" + name, {
+
+  this.prompt.section("error:instructions:" + name, {
     content: ''
   });
 };
@@ -137,8 +148,10 @@ Impromptu.AbstractError = function AbstractError(message) {
 }
 util.inherits(Impromptu.AbstractError, Impromptu.Error)
 
-
+// Utilities.
 Impromptu.exec = require('./exec');
+
+// APIs.
 Impromptu.Color = require('./color');
 Impromptu.Cache = require('./cache/base');
 Impromptu.Cache.Shim = require('./cache/shim');
@@ -152,4 +165,5 @@ Impromptu.ModuleFactory = require('./module');
 Impromptu.Prompt = require('./prompt');
 Impromptu.RepositoryFactory = require('./repository');
 
+// Share with the world.
 module.exports = Impromptu;
