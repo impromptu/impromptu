@@ -6,32 +6,25 @@ var _ = require('underscore');
 var npmConfig = require('../package.json');
 
 function Impromptu(options) {
-  var config, ext, verbosity;
-
   this.options = options != null ? options : {};
-  config = this.options.config || Impromptu.DEFAULT_CONFIG_DIR;
+
+  var config = this.options.config || Impromptu.DEFAULT_CONFIG_DIR;
   delete this.options.config;
-  verbosity = this.options.verbosity;
+
+  var verbosity = this.options.verbosity;
   delete this.options.verbosity;
+
   this.path = {
     config: config,
-    sources: (function() {
-      var _i, _len, _ref, _results;
-
-      _ref = ['coffee', 'js'];
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        ext = _ref[_i];
-        _results.push("" + config + "/prompt." + ext);
-      }
-      return _results;
-    })(),
+    sources: [config + '/prompt.coffee', config + '/prompt.js'],
     compiled: "" + config + "/.compiled/prompt.js",
     log: "" + config + "/impromptu-debug.log"
   };
+
   if (this.options.serverId) {
     this.path.serverPid = "" + config + "/.compiled/impromptu-node-server-" + this.options.serverId + ".pid";
   }
+
   this.log = new Impromptu.Log(this, verbosity);
   this.color = new Impromptu.Color(this);
   this.repository = new Impromptu.RepositoryFactory(this);
@@ -45,18 +38,15 @@ Impromptu.VERSION = npmConfig.version;
 Impromptu.DEFAULT_CONFIG_DIR = process.env.IMPROMPTU_DIR || ("" + process.env.HOME + "/.impromptu");
 
 Impromptu.prototype.load = function() {
-  var err, prompt;
-
   if (!this._compilePrompt()) {
     return this;
   }
-  prompt = require(this.path.compiled);
+  var prompt = require(this.path.compiled);
   try {
     if (typeof prompt.call === "function") {
       prompt.call(this, Impromptu, this.prompt.section);
     }
-  } catch (_error) {
-    err = _error;
+  } catch (err) {
     this._error('javascript', 'Your prompt file triggered a JavaScript error.', err);
   }
   return this;
