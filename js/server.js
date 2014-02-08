@@ -1,19 +1,11 @@
-// TODO: Update for style, copy comments.
-var Impromptu, argv, cache, childFactory, fork, fs, impromptu, minimist, net, path, pathOrPort, server, serverId, shutdown;
+var net = require('net');
+var fork = require('child_process').fork;
+var Impromptu = require('../lib/impromptu');
+var path = require('path');
+var fs = require('fs');
+var minimist = require('minimist');
 
-net = require('net');
-
-fork = require('child_process').fork;
-
-Impromptu = require('../lib/impromptu');
-
-path = require('path');
-
-fs = require('fs');
-
-minimist = require('minimist');
-
-argv = minimist(process.argv.slice(2), {
+var argv = minimist(process.argv.slice(2), {
   defaults: {
     logfile: true,
     foreground: false
@@ -24,11 +16,11 @@ argv = minimist(process.argv.slice(2), {
   }
 });
 
-pathOrPort = argv.path || argv.port;
+// If you use a Unix Domain Socket, its filename must be unique.
+var pathOrPort = argv.path || argv.port;
+var serverId = argv.path ? path.basename(path.resolve(argv.path)) : argv.port;
 
-serverId = argv.path ? path.basename(path.resolve(argv.path)) : argv.port;
-
-impromptu = new Impromptu({
+var impromptu = new Impromptu({
   verbosity: argv.verbosity,
   serverId: serverId
 });
@@ -37,12 +29,10 @@ impromptu.log.defaultDestinations.server = argv.foreground;
 
 impromptu.log.defaultDestinations.file = argv.logfile;
 
-cache = {
+var cache = {
   _store: {},
   get: function(data) {
-    var result;
-
-    result = cache._store[data.key];
+    var result = cache._store[data.key];
     if (!result) {
       return;
     }
@@ -53,36 +43,30 @@ cache = {
     }
   },
   set: function(data) {
-    var result;
+    var result = {value: data.value};
 
-    result = {
-      value: data.value
-    };
     if (data.expire) {
       result.expireAt = Date.now() + data.expire * 1000;
     }
-    return cache._store[data.key] = result;
+    cache._store[data.key] = result;
   },
   del: function(data) {
-    var key, _i, _len, _ref;
-
-    _ref = data.keys;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      key = _ref[_i];
+    for (var i = 0; i < data.keys.length; i++) {
+      var key = data.keys[i];
       delete cache._store[key];
     }
+
+    // TODO: Is this necessary?
     return true;
   },
   listen: function(child) {
     return child.on('message', function(message) {
-      var data, response;
-
       if (message.type !== 'cache:request') {
         return;
       }
-      data = message.data;
-      response = cache[data.method](data);
-      return child.send({
+      var data = message.data;
+      var response = cache[data.method](data);
+      child.send({
         type: 'cache:response',
         data: {
           method: data.method,
@@ -94,23 +78,17 @@ cache = {
   }
 };
 
-childFactory = {
+var childFactory = {
   MAX_LENGTH: 2,
   _queue: [],
   _spawn: function() {
-    var child;
-
-    child = fork("" + __dirname + "/../lib/child.js", process.argv.slice(2));
-    return cache.listen(child);
+    var child = fork("" + __dirname + "/../lib/child.js", process.argv.slice(2));
+    cache.listen(child);
   },
   refresh: function() {
-    var _results;
-
-    _results = [];
     while (this._queue.length < this.MAX_LENGTH) {
-      _results.push(this._queue.push(this._spawn()));
+      this._queue.push(this._spawn());
     }
-    return _results;
   },
   get: function() {
     if (this._queue.length) {
@@ -121,46 +99,66 @@ childFactory = {
   }
 };
 
-shutdown = function() {
+// Safely shut down the server.
+var shutdown = function() {
   return server.close(function() {
     return process.exit();
   });
 };
 
+// Clean up after ourselves before the process exits.
 process.on('exit', function() {
-  return fs.unlinkSync(impromptu.path.serverPid);
+  // Remove the Impromptu server's pid file.
+  fs.unlinkSync(impromptu.path.serverPid);
+  // TODO: If the server is using a Unix domain socket, remove the socket file here.
 });
 
+// Gracefully shut down on Ctrl+C.
 process.on('SIGINT', function() {
-  return shutdown();
+  shutdown();
 });
 
+// Prepare to create the server.
+// -----------------------------
+
+// Write the server's PID to a file.
 fs.writeFileSync(impromptu.path.serverPid, process.pid);
 
+// Build the queue of child processes.
 childFactory.refresh();
 
-server = net.createServer({
+// Create the server.
+var server = net.createServer({
   allowHalfOpen: true
 }, function(socket) {
-  var body, npmConfig, npmConfigPath;
+  // Verify that the client is running on the same version as the server.
+  var npmConfigPath = path.resolve("" + __dirname + "/../package.json");
+  var npmConfig = JSON.parse(fs.readFileSync(npmConfigPath));
 
-  npmConfigPath = path.resolve("" + __dirname + "/../package.json");
-  npmConfig = JSON.parse(fs.readFileSync(npmConfigPath));
+  // If there's a version mismatch, stop running the server.
   if (Impromptu.VERSION !== npmConfig.version) {
     socket.end();
     shutdown();
     return;
   }
-  body = '';
+
+  // Build the body.
+  // The body can be:
+  // * A newline delimited representation of the shell environment (as formatted
+  //   by printenv: each line is equal to "KEY=value").
+  // * The string 'shutdown'.
+  var body = '';
   socket.on('data', function(data) {
     body += data;
+
+    // Make sure the server isn't being flooded.
     if (body.length > 1e6) {
       body = '';
       socket.end();
-      return socket.destroy();
+      socket.destroy();
     }
   });
-  return socket.on('end', function() {
+  socket.on('end', function() {
     var child;
 
     if (body === 'shutdown') {
@@ -169,26 +167,34 @@ server = net.createServer({
       return;
     }
     child = childFactory.get();
+
+    // Bind message listeners that use the socket.
     child.on('message', function(message) {
       if (message.type === 'write') {
         return socket.write(message.data);
       } else if (message.type === 'end') {
         socket.end(message.data);
-        return childFactory.refresh();
+        // TODO: Call this when the child has exited (or disconnect from the
+        // child at this point, and create a different system to handle any orphaned
+        // or long-running background refreshes).
+        childFactory.refresh();
       }
     });
+
     if (body === 'test') {
       child.send({
         type: 'test'
       });
-      return child.on('message', function(message) {
+
+      child.on('message', function(message) {
         if (message.type === 'shutdown') {
           shutdown();
-          return socket.end();
+          socket.end();
         }
       });
+
     } else {
-      return child.send({
+      child.send({
         type: 'env',
         data: body
       });
