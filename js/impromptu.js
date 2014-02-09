@@ -65,7 +65,7 @@ Impromptu.prototype._compilePrompt = function() {
 
   // Make sure we have a source prompt.
   // If we don't find a prompt file, bail.
-  if (sourcePrompt) return false;
+  if (!sourcePrompt) return false;
 
   // Check whether the compiled prompt exists and is up to date.
   if (fs.existsSync(this.path.compiled)) {
@@ -132,14 +132,14 @@ Impromptu.prototype._clearError = function(name) {
 };
 
 
-Impromptu.Error = function Error(message) {
+Impromptu.Error = function (message) {
   this.message = message
   Error.apply(this, arguments)
 }
 util.inherits(Impromptu.Error, Error)
 
 
-Impromptu.AbstractError = function AbstractError(message) {
+Impromptu.AbstractError = function (message) {
   this.message = message;
   if (!this.message) {
     this.message = 'This method should be defined in a subclass.';
@@ -147,6 +147,9 @@ Impromptu.AbstractError = function AbstractError(message) {
   Impromptu.Error.apply(this, arguments)
 }
 util.inherits(Impromptu.AbstractError, Impromptu.Error)
+
+// Share with the world.
+module.exports = Impromptu;
 
 // Utilities.
 Impromptu.exec = require('./exec');
@@ -165,5 +168,3 @@ Impromptu.ModuleFactory = require('./module');
 Impromptu.Prompt = require('./prompt');
 Impromptu.RepositoryFactory = require('./repository');
 
-// Share with the world.
-module.exports = Impromptu;

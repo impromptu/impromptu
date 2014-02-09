@@ -83,7 +83,8 @@ var childFactory = {
   _queue: [],
   _spawn: function() {
     var child = fork("" + __dirname + "/../lib/child.js", process.argv.slice(2));
-    cache.listen(child);
+    cache.listen(child)
+    return child
   },
   refresh: function() {
     while (this._queue.length < this.MAX_LENGTH) {

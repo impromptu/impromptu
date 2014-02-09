@@ -123,7 +123,7 @@ RepositoryFactory.prototype.primary = function(fn) {
         }
       }
     }.bind(this));
-  });
+  }.bind(this));
 };
 
 /**
