@@ -1,165 +1,181 @@
-// TODO: Update for style, copy comments.
-var Impromptu, Prompt, WhenError, async, exports, makeAsync, _, _ref,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var Impromptu = require('./impromptu');
+var util = require('util');
+var async = require('async');
+var _ = require('underscore');
 
-Impromptu = require('./impromptu');
+// Create a custom error for when the `when` requirements fail.
+Impromptu.WhenError = function (message) {
+  Impromptu.Error.apply(this, arguments)
+}
+util.inherits(Impromptu.WhenError, Impromptu.Error)
 
-async = require('async');
-
-_ = require('underscore');
-
-WhenError = (function(_super) {
-  __extends(WhenError, _super);
-
-  function WhenError() {
-    _ref = WhenError.__super__.constructor.apply(this, arguments);
-    return _ref;
-  }
-
-  return WhenError;
-
-})(Impromptu.Error);
-
-makeAsync = function(input, callback) {
-  var err, results;
-
+// Allows any input to be treated asynchronously.
+var makeAsync = function(input, callback) {
+  // Handle non-function `input`.
   if (!_.isFunction(input)) {
-    return callback(null, input);
+    callback(null, input);
+    return
   }
+
+  // Handle asynchronous `input` function.
   if (input.length) {
-    return input(callback);
+    input(callback);
+    return
   }
+
+  // Handle synchronous `input` function.
+  var results = null
+  var err = null
   try {
-    return results = input();
-  } catch (_error) {
-    err = _error;
-  } finally {
-    callback(err, results);
+    results = input();
+  } catch (e) {
+    err = e
   }
+
+  callback(err, results);
 };
 
-Prompt = (function() {
-  function Prompt(impromptu) {
-    this.impromptu = impromptu;
-    this.section = __bind(this.section, this);
-    this._sections = Object.create(null);
-    this._orderedSections = [];
+function Prompt(impromptu) {
+  this.impromptu = impromptu;
+  this.section = this.section.bind(this);
+  // Create a completely empty object.
+  this._sections = Object.create(null);
+  this._orderedSections = [];
+}
+
+Prompt.prototype.section = function(key, properties) {
+  // Create the section if it doesn't already exist.
+  if (!this._sections[key]) {
+    this._sections[key] = {
+      background: 'default',
+      foreground: 'default',
+      options: {
+        newlines: false,
+        prePadding: true,
+        postPadding: true
+      }
+    };
+    this._orderedSections.push(this._sections[key]);
   }
 
-  Prompt.prototype.section = function(key, properties) {
-    var section;
+  var section = this._sections[key];
 
-    if (!this._sections[key]) {
-      this._sections[key] = {
-        background: 'default',
-        foreground: 'default',
-        options: {
-          newlines: false,
-          prePadding: true,
-          postPadding: true
-        }
-      };
-      this._orderedSections.push(this._sections[key]);
-    }
-    section = this._sections[key];
-    if ((properties.when != null) && !_.isArray(properties.when)) {
-      properties.when = [properties.when];
-    }
-    _.extend(section.options, properties.options);
-    delete properties.options;
-    return _.extend(section, properties);
-  };
+  // Ensure `when` is an array.
+  if ((properties.when != null) && !_.isArray(properties.when)) {
+    properties.when = [properties.when];
+  }
 
-  Prompt.prototype.build = function(fn) {
-    var _this = this;
+  // Apply changes to the `options` object to prevent
+  // it from being overwritten below.
+  _.extend(section.options, properties.options);
+  delete properties.options;
 
-    return async.waterfall([
-      function(done) {
-        return async.each(_this._orderedSections, function(section, complete) {
-          return _this._content(section, function(err, content) {
-            if (!err) {
-              section._formattedContent = content;
-            }
-            return complete();
-          });
-        }, done);
-      }, function(done) {
-        var lastBackground, result;
+  // Apply changes to the section properties.
+  _.extend(section, properties);
+};
 
-        lastBackground = null;
-        result = _this._orderedSections.reduce(function(value, section) {
-          var content, options;
-
-          content = section._formattedContent;
-          if (!content) {
-            return value;
+// Build the prompt.
+Prompt.prototype.build = function(fn) {
+  async.waterfall([
+    function(done) {
+      async.each(this._orderedSections, function(section, complete) {
+        this._content(section, function(err, content) {
+          if (!err) {
+            section._formattedContent = content;
           }
-          options = section.options;
-          if (options.postPadding && /\S$/.test(content)) {
-            content = "" + content + " ";
-          }
-          if (section.background !== lastBackground && options.prePadding && /^\S/.test(content)) {
-            content = " " + content;
-          }
-          content = _this.impromptu.color.format(content, {
-            foreground: section.foreground,
-            background: section.background
-          });
-          lastBackground = options.postPadding ? section.background : null;
-          return value + content;
-        }, '');
-        return done(null, result);
-      }
-    ], fn);
-  };
-
-  Prompt.prototype._content = function(section, fn) {
-    return async.waterfall([
-      function(done) {
-        if (!section.when) {
-          return done(null);
-        }
-        return async.every(section.when, function(item, callback) {
-          return makeAsync(item, function(err, results) {
-            return callback(!!results);
-          });
-        }, function(success) {
-          if (success) {
-            return done(null);
-          } else {
-            return done(new WhenError());
-          }
+          complete();
         });
-      }, function(done) {
-        var content;
+      }.bind(this), done);
+    }.bind(this),
 
-        content = [].concat(section.content);
-        return async.map(content, makeAsync, done);
-      }, function(results, done) {
-        if (section.format) {
-          results = section.format.apply(section, results);
+    function(done) {
+      var lastBackground = null;
+      var result = this._orderedSections.reduce(function(value, section) {
+        var content = section._formattedContent;
+        if (!content) {
+          return value;
+        }
+
+        var options = section.options;
+
+        // Pad both sides of the content with spaces.
+        // If two sections have the same background color, link them with a single space.
+        // If the content begins or ends in whitespace, do not pad that side.
+        if (options.postPadding && /\S$/.test(content)) {
+          content += ' '
+        }
+        if (section.background !== lastBackground && options.prePadding && /^\S/.test(content)) {
+          content = ' ' + content;
+        }
+
+        content = this.impromptu.color.format(content, {
+          foreground: section.foreground,
+          background: section.background
+        });
+
+        lastBackground = options.postPadding ? section.background : null;
+
+        return value + content;
+      }.bind(this), '');
+
+      done(null, result);
+    }.bind(this)
+  ], fn);
+};
+
+Prompt.prototype._content = function(section, fn) {
+  async.waterfall([
+    function(done) {
+      if (!section.when) {
+        done(null)
+        return
+      }
+
+      // `section.when` is an array of mixed values
+      async.every(section.when, function(item, callback) {
+        makeAsync(item, function(err, results) {
+          callback(!!results);
+        });
+      }, function(success) {
+        if (success) {
+          done(null);
         } else {
-          results = results.join('');
+          done(new Impromptu.WhenError());
         }
-        results = results ? results.toString() : '';
-        if (!section.options.newlines) {
-          results = results.replace(/\n/g, '');
-        }
-        return done(null, results);
-      }
-    ], function(err, results) {
-      if (err instanceof WhenError) {
-        return fn(null, '');
+      });
+    },
+
+    function(done) {
+      // Ensure `content` is an array.
+      var content = [].concat(section.content);
+      async.map(content, makeAsync, done);
+    },
+
+    function(results, done) {
+      if (section.format) {
+        results = section.format.apply(section, results);
       } else {
-        return fn(err, results);
+        results = results.join('');
       }
-    });
-  };
 
-  return Prompt;
+      // Ensure the content is a string.
+      results = results ? results.toString() : '';
 
-})();
+      // Strip newlines unless they're explicitly requested.
+      if (!section.options.newlines) {
+        results = results.replace(/\n/g, '');
+      }
 
-exports = module.exports = Prompt;
+      done(null, results);
+    }
+  ], function(err, results) {
+    // If `section.when` fails, just pass along blank content.
+    if (err instanceof Impromptu.WhenError) {
+      return fn(null, '');
+    } else {
+      return fn(err, results);
+    }
+  });
+};
+
+module.exports = Prompt;
