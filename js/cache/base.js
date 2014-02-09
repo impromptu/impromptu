@@ -1,77 +1,110 @@
-// TODO: Update for style, copy comments.
-var Cache, Impromptu, exports,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var Impromptu = require('../impromptu');
 
-Impromptu = require('../impromptu');
+/**
+ * An abstract class that manages how a method is cached.
+ */
+function Cache(impromptu, name, options) {
+  this.impromptu = impromptu;
+  this.name = name;
+  this.options = options;
+  this._setThenGet = this._setThenGet.bind(this);
+  this._update = this._update.bind(this);
 
-Cache = (function() {
-  function Cache(impromptu, name, options) {
-    var protoRun,
-      _this = this;
 
-    this.impromptu = impromptu;
-    this.name = name;
-    this.options = options;
-    this._setThenGet = __bind(this._setThenGet, this);
-    this._update = __bind(this._update, this);
-    protoRun = this.run;
-    this.run = function(done) {
-      if (_this.options.run) {
-        return _this.options.run.apply(_this, arguments);
-      } else {
-        return protoRun.apply(_this, arguments);
-      }
-    };
+  // Build our own `run` instance-method to accurately reflect the fact that
+  // `run` is always asynchronous and requires an argument to declare itself
+  // as such to our API.
+  var protoRun = this.run;
+  this.run = function(done) {
+    if (this.options.run) {
+      return this.options.run.apply(this, arguments);
+    } else {
+      return protoRun.apply(this, arguments);
+    }
+  }.bind(this);
+}
+
+/**
+ * The main method: `run` acts as a deterministic way to fetch and potentially
+ * update the cache.
+ *
+ * Accepts a `fn` with a signature of `err, results`, where `results` is the
+ * cached value.
+ *
+ * This method is bound to the instance so the method can be passed around
+ * without the instance. Can be overloaded using `options.run`.
+ */
+Cache.prototype.run = function(fn) {
+  throw Impromptu.AbstractError;
+};
+
+/**
+ * Gets the cached value.
+ *
+ * Accepts a `fn` with a signature of `err, results`, where `results` is the
+ * cached value. Does not update the cache.
+ */
+Cache.prototype.get = function(fn) {
+  throw Impromptu.AbstractError;
+};
+
+/**
+ * Updates the cached value.
+ *
+ * Accepts a `fn` with a signature of `err, success`, where `success` is a
+ * boolean indicating whether the cached value was updated.
+ */
+Cache.prototype.set = function(fn) {
+  throw Impromptu.AbstractError;
+};
+
+/**
+ * Clears the cached value.
+ *
+ * Accepts a `fn` with a signature of `err, success`, where `success` is a
+ * boolean indicating whether the value was removed from the cache.
+ */
+Cache.prototype.unset = function(fn) {
+  throw Impromptu.AbstractError;
+};
+
+/**
+ * Private. A low-level method to properly call the cache's update method.
+ */
+Cache.prototype._update = function(done) {
+  done = done || (function(err, results) {});
+
+  // If the method accepts an argument, it is asynchronous.
+  if (this.options.update.length) {
+    this.options.update.call(this.options.context, done)
+    return
   }
 
-  Cache.prototype.run = function(fn) {
-    throw Impromptu.AbstractError;
-  };
+  var results = null
+  var err = null
+  try {
+    results = this.options.update.call(this.options.context);
+  } catch (e) {
+    err = e;
+  } finally {
+    // Process the results if method is synchronous.
+    done(err, results);
+  }
+};
 
-  Cache.prototype.get = function(fn) {
-    throw Impromptu.AbstractError;
-  };
-
-  Cache.prototype.set = function(fn) {
-    throw Impromptu.AbstractError;
-  };
-
-  Cache.prototype.unset = function(fn) {
-    throw Impromptu.AbstractError;
-  };
-
-  Cache.prototype._update = function(done) {
-    var err, results;
-
-    done || (done = function(err, results) {});
-    if (this.options.update.length) {
-      return this.options.update.call(this.options.context, done);
-    }
-    try {
-      return results = this.options.update.call(this.options.context);
-    } catch (_error) {
-      err = _error;
-    } finally {
-      done(err, results);
-    }
-  };
-
-  Cache.prototype._setThenGet = function(done) {
-    var _this = this;
-
-    return this.set(function(err, results) {
-      if (err) {
-        if (done) {
-          return done(err);
-        }
-      } else {
-        return _this.get(done);
+/**
+ * Private. A helper method to update the cached value, then fetch the cached value.
+ */
+Cache.prototype._setThenGet = function(done) {
+  this.set(function(err, results) {
+    if (err) {
+      if (done) {
+        done(err);
       }
-    });
-  };
+    } else {
+      this.get(done);
+    }
+  }.bind(this));
+};
 
-  return Cache;
-
-})();
-
-exports = module.exports = Cache;
+module.exports = Cache;
