@@ -82,7 +82,8 @@ RepositoryFactory.prototype.register = function(type, options) {
 
 RepositoryFactory.prototype.primary = function(fn) {
   if (this._primary) {
-    return fn(null, this._primary);
+    fn(null, this._primary);
+    return
   }
 
   // Prevent race conditions by tracking the queue of callbacks while we're
@@ -96,8 +97,8 @@ RepositoryFactory.prototype.primary = function(fn) {
   // Track whether each repository exists.
   var exists = {};
 
-  return async.each(this._repositories, function(repository, done) {
-    return repository.exists(function(err, result) {
+  async.each(this._repositories, function(repository, done) {
+    repository.exists(function(err, result) {
       exists[repository.type] = result;
       if (this._primary) {
         return;
@@ -119,7 +120,9 @@ RepositoryFactory.prototype.primary = function(fn) {
           for (var j = 0; j < this._callbacks.length; j++) {
             this._callbacks[j](null, this._primary)
           }
-          delete this._callbacks
+
+          // Clear all of the callbacks.
+          this._callbacks.length = 0
         }
       }
     }.bind(this));
