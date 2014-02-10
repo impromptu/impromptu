@@ -95,8 +95,8 @@ test.base = (CacheClass, options = {}) ->
 
 test.global = (CacheClass, options = {}) ->
   impromptu = new Impromptu()
-  refreshable = new Impromptu
-    refresh: true
+  refreshable = new Impromptu()
+  refreshable.config.set('refresh', true)
 
   it 'should update when refresh is set', (done) ->
     cached = new CacheClass refreshable, test.name(),

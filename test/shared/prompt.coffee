@@ -10,7 +10,7 @@ class PromptTests
 
   shouldInitializeImpromptu: ->
     @impromptu = new Impromptu
-      config: "#{environment.TEST_PROMPT_ROOT}/#{@name}"
+    @impromptu.config.set 'root', "#{environment.TEST_PROMPT_ROOT}/#{@name}"
 
     should.exist @impromptu
 
@@ -27,22 +27,23 @@ class PromptTests
 
   shouldCreateDebugLog: (fn) ->
     @shouldBuildPrompt (err, prompt) =>
-      exists = fs.existsSync @impromptu.path.log
+      exists = fs.existsSync @impromptu.path('log')
       exists.should.be.ok
-      log = if exists then fs.readFileSync(@impromptu.path.log).toString() else ''
+      log = if exists then fs.readFileSync(@impromptu.path('log')).toString() else ''
       fn err, log
 
   shouldNotCreateDebugLog: (fn) ->
     @shouldBuildPrompt (err, prompt) =>
-      exists = fs.existsSync(@impromptu.path.log)
+      exists = fs.existsSync(@impromptu.path('log'))
       exists.should.not.be.ok
       fn err
 
   clean: (fn) ->
     @shouldInitializeImpromptu() unless @impromptu
     # Remove the `.compiled` directory and the debug log.
-    compiledDir = path.dirname @impromptu.path.compiled
-    exec "rm -rf #{compiledDir} #{@impromptu.path.log}", fn
+    compiledDir = path.dirname @impromptu.path('compiled')
+    logFilePath = @impromptu.path('log')
+    exec "rm -rf #{compiledDir} #{logFilePath}", fn
     delete @impromptu
 
 module.exports = (name, options = {}) ->

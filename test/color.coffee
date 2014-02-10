@@ -43,8 +43,8 @@ describe 'Color', ->
 
 
   describe 'For Bash Prompt', ->
-    impromptuBash = new Impromptu
-      shell: 'bash'
+    impromptuBash = new Impromptu()
+    impromptuBash.config.set('shell', 'bash')
 
     it 'should format the foreground', ->
       result = impromptuBash.color.format 'test',
@@ -68,8 +68,8 @@ describe 'Color', ->
 
 
   describe 'For Zsh Prompt', ->
-    impromptuZsh = new Impromptu
-      shell: 'zsh'
+    impromptuZsh = new Impromptu()
+    impromptuZsh.config.set('shell', 'zsh')
 
     it 'should format the foreground', ->
       result = impromptuZsh.color.format 'test',
