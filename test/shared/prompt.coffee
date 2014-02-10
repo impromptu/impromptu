@@ -21,7 +21,7 @@ class PromptTests
 
   shouldBuildPrompt: (fn) ->
     @shouldLoadThePromptFile()
-    @impromptu.prompt.build (err, prompt) =>
+    @impromptu.build (err, prompt) =>
       should.exist prompt
       fn err, prompt
 
