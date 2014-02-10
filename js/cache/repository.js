@@ -10,6 +10,7 @@ util.inherits(Repository, Impromptu.Cache.Global)
 Repository.prototype.prepare = function(method, fn) {
   if (this._prepared) {
     Impromptu.Cache.Global.prototype[method].call(this, fn)
+    return
   }
 
   var parts = ['root', 'branch']
