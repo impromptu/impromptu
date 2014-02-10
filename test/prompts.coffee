@@ -1,6 +1,6 @@
 should = require 'should'
 environment = require './shared/environment'
-Impromptu = require '../lib/impromptu'
+Impromptu = require('../lib/impromptu').constructor
 promptTests = require './shared/prompt'
 
 describe 'Prompt Files', ->

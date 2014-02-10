@@ -1,6 +1,6 @@
 should = require 'should'
 environment = require './environment'
-Impromptu = require '../../lib/impromptu'
+Impromptu = require('../../lib/impromptu').constructor
 exec = require('child_process').exec
 path = require 'path'
 fs = require 'fs'

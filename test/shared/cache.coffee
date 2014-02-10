@@ -1,5 +1,5 @@
 should = require 'should'
-Impromptu = require '../../lib/impromptu'
+Impromptu = require('../../lib/impromptu').constructor
 async = require 'async'
 _ = require 'underscore'
 
@@ -41,7 +41,7 @@ test =
     "impromptu-cache-test-#{test.counter++}"
 
 test.base = (CacheClass, options = {}) ->
-  impromptu = new Impromptu
+  impromptu = new Impromptu()
   cache = null
 
   beforeEach ->

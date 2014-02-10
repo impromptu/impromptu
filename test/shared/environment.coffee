@@ -1,4 +1,4 @@
-Impromptu = require '../../lib/impromptu'
+Impromptu = require('../../lib/impromptu').constructor
 path = require 'path'
 
 TEST_PROMPT_ROOT = path.resolve './test/prompts'
