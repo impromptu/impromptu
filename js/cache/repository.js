@@ -1,55 +1,48 @@
-// TODO: Update for style, copy comments.
-var Impromptu, Repository, async, exports, _ref,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+var Impromptu = require('../impromptu')
+var util = require('util')
+var async = require('async')
 
-Impromptu = require('../impromptu');
+function Repository() {
+  Impromptu.Cache.Global.apply(this, arguments)
+}
+util.inherits(Repository, Impromptu.Cache.Global)
 
-async = require('async');
-
-Repository = (function(_super) {
-  __extends(Repository, _super);
-
-  function Repository() {
-    _ref = Repository.__super__.constructor.apply(this, arguments);
-    return _ref;
+Repository.prototype.prepare = function(method, fn) {
+  if (this._prepared) {
+    Impromptu.Cache.Global.prototype[method].call(this, fn)
   }
 
-  Repository.prototype.prepare = function(method, fn) {
-    var parts,
-      _this = this;
+  var parts = ['root', 'branch']
+  if (this.options.commit) {
+    parts.push('commit')
+  }
 
-    if (this._prepared) {
-      return Impromptu.Cache.Global.prototype[method].call(this, fn);
+  // Fetch all the parts for the repository to generate the repository's key name.
+  async.map(parts, function(part, done) {
+    return this.impromptu.repository[part](done)
+  }.bind(this), function(err, results) {
+    if (err) {
+      return fn(err)
     }
-    parts = ['root', 'branch'];
-    if (this.options.commit) {
-      parts.push('commit');
+
+    // Remove any trailing empty parts.
+    while (results.length && !results[results.length - 1]) {
+      results.pop()
     }
-    return async.map(parts, function(part, done) {
-      return _this.impromptu.repository[part](done);
-    }, function(err, results) {
-      if (err) {
-        return fn(err);
-      }
-      while (results.length && !results[results.length - 1]) {
-        results.pop();
-      }
-      results.unshift(_this.name);
-      _this.name = results.join(':');
-      _this._prepared = true;
-      return Impromptu.Cache.Global.prototype[method].call(_this, fn);
-    });
-  };
 
-  return Repository;
+    // Update the name.
+    results.unshift(this.name)
+    this.name = results.join(':')
 
-})(Impromptu.Cache.Global);
+    this._prepared = true
+    Impromptu.Cache.Global.prototype[method].call(this, fn)
+  }.bind(this))
+}
 
-['run', 'get', 'set', 'unset'].forEach(function(method) {
-  return Repository.prototype[method] = function(fn) {
-    return this.prepare(method, fn);
-  };
-});
+;['run', 'get', 'set', 'unset'].forEach(function(method) {
+  Repository.prototype[method] = function(fn) {
+    this.prepare(method, fn)
+  }
+})
 
-exports = module.exports = Repository;
+module.exports = Repository

@@ -1,56 +1,37 @@
-// TODO: Update for style, copy comments.
-var Impromptu, Instance, exports, _ref,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+var Impromptu = require('../impromptu')
+var util = require('util')
 
-Impromptu = require('../impromptu');
+function Instance() {
+  Impromptu.Cache.apply(this, arguments)
+}
+util.inherits(Instance, Impromptu.Cache)
 
-Instance = (function(_super) {
-  __extends(Instance, _super);
-
-  function Instance() {
-    _ref = Instance.__super__.constructor.apply(this, arguments);
-    return _ref;
+Instance.prototype.run = function(fn) {
+  // Return the cached value if possible.
+  if (this._cached) {
+    this.get(fn);
+  } else {
+    this._setThenGet(fn);
   }
+};
 
-  Instance.prototype.run = function(fn) {
-    if (this._cached) {
-      return this.get(fn);
-    } else {
-      return this._setThenGet(fn);
-    }
-  };
+Instance.prototype.get = function(fn) {
+  if (!fn) return
 
-  Instance.prototype.get = function(fn) {
-    var _ref1;
+  var value = this._cached != null ? this._cached : this.options.fallback
+  fn(null, value)
+};
 
-    if (fn) {
-      return fn(null, (_ref1 = this._cached) != null ? _ref1 : this.options.fallback);
-    }
-  };
+Instance.prototype.set = function(fn) {
+  this._update(function(err, value) {
+    if (!err) this._cached = value
+    if (fn) fn(err, !err)
+  }.bind(this));
+};
 
-  Instance.prototype.set = function(fn) {
-    var _this = this;
+Instance.prototype.unset = function(fn) {
+  this._cached = null
+  if (fn) fn(null, true)
+};
 
-    return this._update(function(err, value) {
-      if (!err) {
-        _this._cached = value;
-      }
-      if (fn) {
-        return fn(err, !err);
-      }
-    });
-  };
-
-  Instance.prototype.unset = function(fn) {
-    this._cached = null;
-    if (fn) {
-      return fn(null, true);
-    }
-  };
-
-  return Instance;
-
-})(Impromptu.Cache);
-
-exports = module.exports = Instance;
+module.exports = Instance
