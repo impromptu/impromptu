@@ -25,14 +25,14 @@ class CacheTests
 
 
   setShouldPass: (fn) =>
-    @instance.set (err, result) ->
-      result.should.equal true
+    @instance.set (err, success) ->
+      success.should.equal true
       fn err
 
 
   unsetShouldPass: (fn) =>
-    @instance.unset (err, result) ->
-      result.should.equal true
+    @instance.unset (err, success) ->
+      success.should.equal true
       fn err
 
 test =
@@ -92,19 +92,52 @@ test.base = (CacheClass, options = {}) ->
   it 'should call run without a callback', ->
     cache.instance.run()
 
+  it 'should handle multiple cache sets with a single request', (done) ->
+    called = false
+    raceSafeCache = new CacheClass impromptu, test.name(),
+      update: (fn) ->
+        called.should.equal false
+        called = true
+        setTimeout ->
+          fn null, 'value'
+        , 20
+
+    async.series [
+      (fn) ->
+        impromptu.refresh()
+        async.parallel [
+          (complete) ->
+            raceSafeCache.run (err, updated) ->
+              updated.should.equal 'value'
+              complete err
+
+          (complete) ->
+            raceSafeCache.run (err, updated) ->
+              updated.should.equal 'value'
+              complete err
+        ], fn
+    ], done
+
+
+  it 'should update when needs refresh is set', (done) ->
+    called = false
+    refreshableCache = new CacheClass impromptu, test.name(),
+      update: (fn) ->
+        called.should.equal false
+        called = true
+        fn null, 'value'
+
+    refreshableCache.run ->
+      called = false
+      impromptu.refresh()
+      refreshableCache.run done
+
+
+
 
 test.global = (CacheClass, options = {}) ->
   impromptu = new Impromptu()
   refreshable = new Impromptu()
-
-  it 'should update when refresh is set', (done) ->
-    cached = new CacheClass refreshable, test.name(),
-      update: (fn) ->
-        done()
-        fn null, 'value'
-
-    refreshable.refresh()
-    cached.run ->
 
   it 'should fetch cached values', (done) ->
     name = test.name()
@@ -134,50 +167,6 @@ test.global = (CacheClass, options = {}) ->
           fetched.should.equal 'value'
           fn err
     ], done
-
-  it 'should handle multiple cache sets with a single request', (done) ->
-    name = test.name()
-
-    called = false
-    updater = new CacheClass refreshable, name,
-      update: (fn) ->
-        called.should.equal false
-        called = true
-        setTimeout ->
-          fn null, 'value'
-        , 20
-
-    fetcher = new CacheClass impromptu, name,
-      update: (fn) ->
-        should.fail 'Update should not run.'
-        fn null, 'value'
-
-    async.series [
-      (fn) ->
-        fetcher.run (err, fetched) ->
-          should.not.exist fetched
-          fn err
-
-      (fn) ->
-        refreshable.refresh()
-        async.parallel [
-          (complete) ->
-            updater.run (err, updated) ->
-              updated.should.equal 'value'
-              complete err
-
-          (complete) ->
-            updater.run (err, updated) ->
-              updated.should.equal 'value'
-              complete err
-        ], fn
-
-      (fn) ->
-        fetcher.run (err, fetched) ->
-          fetched.should.equal 'value'
-          fn err
-    ], done
-
 
 
 exports = module.exports = test
