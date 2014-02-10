@@ -1,5 +1,5 @@
-var Impromptu = require('../lib/impromptu');
-var minimist = require('minimist');
+var Impromptu = require('../lib/impromptu')
+var minimist = require('minimist')
 
 var argv = minimist(process.argv.slice(2), {
   defaults: {
@@ -10,56 +10,56 @@ var argv = minimist(process.argv.slice(2), {
     h: 'help',
     v: 'version'
   }
-});
+})
 
 var impromptu = new Impromptu({
   verbosity: argv.verbosity
-});
+})
 
-impromptu.log.defaultDestinations.server = argv.foreground;
+impromptu.log.defaultDestinations.server = argv.foreground
 
-impromptu.log.defaultDestinations.file = argv.logfile;
+impromptu.log.defaultDestinations.file = argv.logfile
 
 var parseEnv = function(printenvOutput) {
-  var env = {};
+  var env = {}
   if (printenvOutput) {
-    var pairs = printenvOutput.split(/(?:^|\n)([a-z0-9_]+)=/i);
+    var pairs = printenvOutput.split(/(?:^|\n)([a-z0-9_]+)=/i)
 
     // Remove the first blank match.
-    pairs.shift();
+    pairs.shift()
 
     for (var index = 0; index < pairs.length; index += 2) {
-      var key = pairs[index];
-      env[key] = pairs[index + 1];
+      var key = pairs[index]
+      env[key] = pairs[index + 1]
     }
   }
-  return env;
-};
+  return env
+}
 
 process.on('message', function(message) {
   if (message.type === 'env') {
-    buildPrompt(message.data);
+    buildPrompt(message.data)
   } else if (message.type === 'test') {
-    runTests();
+    runTests()
   }
-});
+})
 
 var buildPrompt = function(envString) {
-  var env = parseEnv(envString);
+  var env = parseEnv(envString)
 
   if (env.IMPROMPTU_SHELL) {
-    impromptu.options.shell = env.IMPROMPTU_SHELL;
+    impromptu.options.shell = env.IMPROMPTU_SHELL
   }
 
   // Overload the environment.
-  process.env = env;
+  process.env = env
 
   // Update the current working directory.
   try {
-    process.chdir(env.PWD);
+    process.chdir(env.PWD)
   } catch (e) {}
 
-  impromptu.load();
+  impromptu.load()
   impromptu.prompt.build(function(err, results) {
     // Send back the generated prompt.
     // If no prompt is generated, we fall back to the environment's existing prompt.
@@ -68,51 +68,51 @@ var buildPrompt = function(envString) {
     process.send({
       type: 'end',
       data: results || env.PS1 || ("" + (process.cwd()) + " $ ")
-    });
+    })
 
     // Run the background update.
     // We synchronously perform the background update to optimize for speed of prompt
     // generation. Reusing the process allows us to conserve memory while the socket
     // server is idling.
-    impromptu.options.refresh = true;
+    impromptu.options.refresh = true
 
     // Rebuild the prompt to refresh the cache.
     impromptu.prompt.build(function(err, results) {
-      process.exit();
-    });
-  });
-};
+      process.exit()
+    })
+  })
+}
 
 // Tests
 // FYI: This is ridiculous.
 var runTests = function() {
-  require('coffee-script');
+  require('coffee-script')
 
-  var path = require('path');
-  var fs = require('fs');
-  var Mocha = require('mocha');
+  var path = require('path')
+  var fs = require('fs')
+  var Mocha = require('mocha')
 
   // Allow unlimited listeners for tests.
-  process.setMaxListeners(0);
+  process.setMaxListeners(0)
 
-  var testDir = path.resolve(__dirname, '../test');
+  var testDir = path.resolve(__dirname, '../test')
   var files = fs.readdirSync(testDir).filter(function(f) {
-    return f.match(/\.coffee$/);
-  });
+    return f.match(/\.coffee$/)
+  })
 
   var mocha = new Mocha({
     reporter: 'spec'
-  });
+  })
 
   for (var i = 0; i < files.length; i++) {
-    var file = files[i];
-    mocha.addFile(path.resolve(testDir, file));
+    var file = files[i]
+    mocha.addFile(path.resolve(testDir, file))
   }
 
   mocha.run(function(failures) {
     process.send({
       type: 'shutdown'
-    });
-    process.exit();
-  });
-};
+    })
+    process.exit()
+  })
+}

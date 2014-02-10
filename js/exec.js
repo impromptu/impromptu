@@ -1,11 +1,11 @@
-var Impromptu = require('./impromptu');
-var exec = require('child_process').exec;
+var Impromptu = require('./impromptu')
+var exec = require('child_process').exec
 
-var registry = {};
+var registry = {}
 
 function Command(command) {
-  this.command = command;
-  this.callbacks = [];
+  this.command = command
+  this.callbacks = []
   exec(this.command, function() {
     this.results = arguments
 
@@ -13,18 +13,18 @@ function Command(command) {
       var callback = this.callbacks[i]
       callback.apply(Impromptu, arguments)
     }
-  }.bind(this));
+  }.bind(this))
 }
 
 module.exports = function(command, fn) {
   if (!registry[command]) {
-    registry[command] = new Command(command);
+    registry[command] = new Command(command)
   }
 
-  var cached = registry[command];
+  var cached = registry[command]
   if (cached.results) {
-    fn.apply(Impromptu, cached.results);
+    fn.apply(Impromptu, cached.results)
   } else {
-    cached.callbacks.push(fn);
+    cached.callbacks.push(fn)
   }
-};
+}

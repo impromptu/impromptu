@@ -1,7 +1,7 @@
-var Impromptu = require('./impromptu');
-var util = require('util');
-var async = require('async');
-var _ = require('underscore');
+var Impromptu = require('./impromptu')
+var util = require('util')
+var async = require('async')
+var _ = require('underscore')
 
 // Create a custom error for when the `when` requirements fail.
 var WhenError = function (message) {
@@ -13,13 +13,13 @@ util.inherits(WhenError, Impromptu.Error)
 var makeAsync = function(input, callback) {
   // Handle non-function `input`.
   if (!_.isFunction(input)) {
-    callback(null, input);
+    callback(null, input)
     return
   }
 
   // Handle asynchronous `input` function.
   if (input.length) {
-    input(callback);
+    input(callback)
     return
   }
 
@@ -27,20 +27,20 @@ var makeAsync = function(input, callback) {
   var results = null
   var err = null
   try {
-    results = input();
+    results = input()
   } catch (e) {
     err = e
   }
 
-  callback(err, results);
-};
+  callback(err, results)
+}
 
 function Prompt(impromptu) {
-  this.impromptu = impromptu;
-  this.section = this.section.bind(this);
+  this.impromptu = impromptu
+  this.section = this.section.bind(this)
   // Create a completely empty object.
-  this._sections = Object.create(null);
-  this._orderedSections = [];
+  this._sections = Object.create(null)
+  this._orderedSections = []
 }
 
 Prompt.prototype.section = function(key, properties) {
@@ -54,25 +54,25 @@ Prompt.prototype.section = function(key, properties) {
         prePadding: true,
         postPadding: true
       }
-    };
-    this._orderedSections.push(this._sections[key]);
+    }
+    this._orderedSections.push(this._sections[key])
   }
 
-  var section = this._sections[key];
+  var section = this._sections[key]
 
   // Ensure `when` is an array.
   if ((properties.when != null) && !_.isArray(properties.when)) {
-    properties.when = [properties.when];
+    properties.when = [properties.when]
   }
 
   // Apply changes to the `options` object to prevent
   // it from being overwritten below.
-  _.extend(section.options, properties.options);
-  delete properties.options;
+  _.extend(section.options, properties.options)
+  delete properties.options
 
   // Apply changes to the section properties.
-  _.extend(section, properties);
-};
+  _.extend(section, properties)
+}
 
 // Build the prompt.
 Prompt.prototype.build = function(fn) {
@@ -81,22 +81,22 @@ Prompt.prototype.build = function(fn) {
       async.each(this._orderedSections, function(section, complete) {
         this._content(section, function(err, content) {
           if (!err) {
-            section._formattedContent = content;
+            section._formattedContent = content
           }
-          complete();
-        });
-      }.bind(this), done);
+          complete()
+        })
+      }.bind(this), done)
     }.bind(this),
 
     function(done) {
-      var lastBackground = null;
+      var lastBackground = null
       var result = this._orderedSections.reduce(function(value, section) {
-        var content = section._formattedContent;
+        var content = section._formattedContent
         if (!content) {
-          return value;
+          return value
         }
 
-        var options = section.options;
+        var options = section.options
 
         // Pad both sides of the content with spaces.
         // If two sections have the same background color, link them with a single space.
@@ -105,23 +105,23 @@ Prompt.prototype.build = function(fn) {
           content += ' '
         }
         if (section.background !== lastBackground && options.prePadding && /^\S/.test(content)) {
-          content = ' ' + content;
+          content = ' ' + content
         }
 
         content = this.impromptu.color.format(content, {
           foreground: section.foreground,
           background: section.background
-        });
+        })
 
-        lastBackground = options.postPadding ? section.background : null;
+        lastBackground = options.postPadding ? section.background : null
 
-        return value + content;
-      }.bind(this), '');
+        return value + content
+      }.bind(this), '')
 
-      done(null, result);
+      done(null, result)
     }.bind(this)
-  ], fn);
-};
+  ], fn)
+}
 
 Prompt.prototype._content = function(section, fn) {
   async.waterfall([
@@ -134,48 +134,48 @@ Prompt.prototype._content = function(section, fn) {
       // `section.when` is an array of mixed values
       async.every(section.when, function(item, callback) {
         makeAsync(item, function(err, results) {
-          callback(!!results);
-        });
+          callback(!!results)
+        })
       }, function(success) {
         if (success) {
-          done(null);
+          done(null)
         } else {
-          done(new WhenError());
+          done(new WhenError())
         }
-      });
+      })
     },
 
     function(done) {
       // Ensure `content` is an array.
-      var content = [].concat(section.content);
-      async.map(content, makeAsync, done);
+      var content = [].concat(section.content)
+      async.map(content, makeAsync, done)
     },
 
     function(results, done) {
       if (section.format) {
-        results = section.format.apply(section, results);
+        results = section.format.apply(section, results)
       } else {
-        results = results.join('');
+        results = results.join('')
       }
 
       // Ensure the content is a string.
-      results = results ? results.toString() : '';
+      results = results ? results.toString() : ''
 
       // Strip newlines unless they're explicitly requested.
       if (!section.options.newlines) {
-        results = results.replace(/\n/g, '');
+        results = results.replace(/\n/g, '')
       }
 
-      done(null, results);
+      done(null, results)
     }
   ], function(err, results) {
     // If `section.when` fails, just pass along blank content.
     if (err instanceof WhenError) {
-      return fn(null, '');
+      return fn(null, '')
     } else {
-      return fn(err, results);
+      return fn(err, results)
     }
-  });
-};
+  })
+}
 
-module.exports = Prompt;
+module.exports = Prompt

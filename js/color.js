@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = require('underscore')
 
 var COLORS = {
   black: 0,
@@ -10,35 +10,35 @@ var COLORS = {
   cyan: 6,
   white: 7,
   "default": 9
-};
+}
 
 function Color(impromptu) {
-  this.impromptu = impromptu;
+  this.impromptu = impromptu
 }
 
 Color.prototype.format = function(string, options) {
-  var original = string;
+  var original = string
   if (options.foreground && _.has(COLORS, options.foreground)) {
-    string = this.ansi(COLORS[options.foreground] + 30) + string;
+    string = this.ansi(COLORS[options.foreground] + 30) + string
   }
   if (options.background && _.has(COLORS, options.background)) {
-    string = this.ansi(COLORS[options.background] + 40) + string;
+    string = this.ansi(COLORS[options.background] + 40) + string
   }
   if (string !== original) {
-    string = string + this.ansi(0);
+    string = string + this.ansi(0)
   }
-  return string;
-};
+  return string
+}
 
 Color.prototype.ansi = function(code) {
   switch (this.impromptu.options.shell) {
     case 'bash':
-      return "\\[\\033[" + code + "m\\]";
+      return "\\[\\033[" + code + "m\\]"
     case 'zsh':
-      return "%{\x1B[" + code + "m%}";
+      return "%{\x1B[" + code + "m%}"
     default:
-      return "\x1B[" + code + "m";
+      return "\x1B[" + code + "m"
   }
-};
+}
 
-module.exports = Color;
+module.exports = Color
