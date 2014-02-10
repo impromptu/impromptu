@@ -134,4 +134,48 @@ test.global = (CacheClass, options = {}) ->
           fn err
     ], done
 
+  it 'should handle multiple cache sets with a single request', (done) ->
+    name = test.name()
+
+    called = false
+    updater = new CacheClass refreshable, name,
+      update: (fn) ->
+        called.should.equal false
+        called = true
+        setTimeout ->
+          fn null, 'value'
+        , 20
+
+    fetcher = new CacheClass impromptu, name,
+      update: (fn) ->
+        should.fail 'Update should not run.'
+        fn null, 'value'
+
+    async.series [
+      (fn) ->
+        fetcher.run (err, fetched) ->
+          should.not.exist fetched
+          fn err
+
+      (fn) ->
+        async.parallel [
+          (complete) ->
+            updater.run (err, updated) ->
+              updated.should.equal 'value'
+              complete err
+
+          (complete) ->
+            updater.run (err, updated) ->
+              updated.should.equal 'value'
+              complete err
+        ], fn
+
+      (fn) ->
+        fetcher.run (err, fetched) ->
+          fetched.should.equal 'value'
+          fn err
+    ], done
+
+
+
 exports = module.exports = test
