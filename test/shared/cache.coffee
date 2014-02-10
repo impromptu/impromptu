@@ -96,7 +96,6 @@ test.base = (CacheClass, options = {}) ->
 test.global = (CacheClass, options = {}) ->
   impromptu = new Impromptu()
   refreshable = new Impromptu()
-  refreshable.config.set('refresh', true)
 
   it 'should update when refresh is set', (done) ->
     cached = new CacheClass refreshable, test.name(),
@@ -104,6 +103,7 @@ test.global = (CacheClass, options = {}) ->
         done()
         fn null, 'value'
 
+    refreshable.refresh()
     cached.run ->
 
   it 'should fetch cached values', (done) ->
@@ -124,6 +124,7 @@ test.global = (CacheClass, options = {}) ->
           fn err
 
       (fn) ->
+        refreshable.refresh()
         updater.run (err, updated) ->
           updated.should.equal 'value'
           fn err
@@ -158,6 +159,7 @@ test.global = (CacheClass, options = {}) ->
           fn err
 
       (fn) ->
+        refreshable.refresh()
         async.parallel [
           (complete) ->
             updater.run (err, updated) ->
