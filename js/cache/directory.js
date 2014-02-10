@@ -1,26 +1,13 @@
-// TODO: Update for style, copy comments.
-var Directory, Impromptu, exports,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+var Impromptu = require('../impromptu')
+var util = require('util')
 
-Impromptu = require('../impromptu');
+function Directory(impromptu, name, options) {
+  options = options || {}
 
-Directory = (function(_super) {
-  __extends(Directory, _super);
+  var directory = options.directory || process.env.PWD
+  name = name + ':' + directory
+  Impromptu.Cache.Global.call(this, impromptu, name, options)
+}
+util.inherits(Directory, Impromptu.Cache.Global)
 
-  function Directory(impromptu, name, options) {
-    var directory;
-
-    if (options == null) {
-      options = {};
-    }
-    directory = options.directory || process.env.PWD;
-    name = "" + name + ":" + directory;
-    Directory.__super__.constructor.call(this, impromptu, name, options);
-  }
-
-  return Directory;
-
-})(Impromptu.Cache.Global);
-
-exports = module.exports = Directory;
+module.exports = Directory

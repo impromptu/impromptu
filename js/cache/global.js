@@ -1,133 +1,141 @@
-// TODO: Update for style, copy comments.
-var CacheError, Global, Impromptu, async, exec, exports, processIsRunning, _ref, _ref1,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+var Impromptu = require('../impromptu')
+var util = require('util')
+var async = require('async')
+var exec = require('child_process').exec
 
-Impromptu = require('../impromptu');
+var CacheError = function (message) {
+  Impromptu.Error.apply(this, arguments)
+}
+util.inherits(CacheError, Impromptu.Error)
 
-async = require('async');
-
-exec = require('child_process').exec;
-
-CacheError = (function(_super) {
-  __extends(CacheError, _super);
-
-  function CacheError() {
-    _ref = CacheError.__super__.constructor.apply(this, arguments);
-    return _ref;
-  }
-
-  return CacheError;
-
-})(Impromptu.Error);
-
-processIsRunning = function(pid) {
-  var ersch;
-
+var processIsRunning = function(pid) {
   try {
-    process.kill(pid, 0);
-  } catch (_error) {
-    ersch = _error;
-    return false;
-  }
-  return true;
-};
-
-Global = (function(_super) {
-  __extends(Global, _super);
-
-  function Global() {
-    _ref1 = Global.__super__.constructor.apply(this, arguments);
-    return _ref1;
+    // Attempt to ping the process.
+    process.kill(pid, 0)
+  } catch (ersch) {
+    // If pinging the server throws an error (ESRCH), then the process isn't running.
+    return false
   }
 
-  Global.Error = CacheError;
+  return true
+}
 
-  Global.prototype.client = function() {
-    return this.impromptu.db;
-  };
 
-  Global.prototype.run = function(fn) {
-    if (this.impromptu.options.refresh) {
-      return this._setThenGet(fn);
-    } else {
-      return this.get(fn);
+function Global() {
+  Impromptu.Cache.apply(this, arguments)
+}
+util.inherits(Global, Impromptu.Cache)
+
+Global.Error = CacheError
+
+Global.prototype.client = function() {
+  return this.impromptu.db
+}
+
+Global.prototype.run = function(fn) {
+  if (this.impromptu.options.refresh) {
+    this._setThenGet(fn)
+  } else {
+    this.get(fn)
+  }
+}
+
+Global.prototype.unset = function(fn) {
+  this.client().del(this.name, "lock:" + this.name, "lock-process:" + this.name, function(err, results) {
+    if (fn) {
+      return fn(err, !!results)
     }
-  };
+  })
+}
 
-  Global.prototype.unset = function(fn) {
-    return this.client().del(this.name, "lock:" + this.name, "lock-process:" + this.name, function(err, results) {
-      if (fn) {
-        return fn(err, !!results);
+Global.prototype.get = function(fn) {
+  var fallback = this.options.fallback
+  return this.client().get(this.name, function(err, results) {
+    if (results == null) {
+      results = fallback
+    }
+
+    if (fn) {
+      fn(err, results)
+    }
+  })
+}
+
+Global.prototype.set = function(fn) {
+  var client = this.client()
+  var name = this.name
+  var options = this.options
+  var update = this._update
+
+  // Try to update the cached value.
+  async.waterfall([
+    // Check if the cached value is locked (and therefore still valid).
+    function(done) {
+      client.exists("lock:" + name, done)
+    },
+
+    // Check if there's a process already running to update the cache.
+    function(exists, done) {
+      if (exists) {
+        done(new CacheError('The cache is currently locked.'))
+      } else {
+        client.get("lock-process:" + name, done)
       }
-    });
-  };
+    },
 
-  Global.prototype.get = function(fn) {
-    var fallback;
+    function(pid, done) {
+      if (pid && processIsRunning(pid)) {
+        // There's already an update process running.
+        done(new CacheError('A process is currently updating the cache.'))
 
-    fallback = this.options.fallback;
-    return this.client().get(this.name, function(err, results) {
-      if (results == null) {
-        results = fallback;
+      } else {
+        // Time to update the cache.
+        // Set the process lock.
+        client.set("lock-process:" + name, process.pid, done)
       }
-      if (fn) {
-        return fn(err, results);
-      }
-    });
-  };
+    },
 
-  Global.prototype.set = function(fn) {
-    var client, name, options, update;
-
-    client = this.client();
-    name = this.name;
-    options = this.options;
-    update = this._update;
-    return async.waterfall([
-      function(done) {
-        return client.exists("lock:" + name, done);
-      }, function(exists, done) {
-        if (exists) {
-          return done(new CacheError('The cache is currently locked.'));
+    function(locked, done) {
+      // Run the provided method to generate the new value to cache.
+      update(function(err, value) {
+        if (err) {
+          done(err)
+          return
         }
-        return client.get("lock-process:" + name, done);
-      }, function(pid, done) {
-        if (pid && processIsRunning(pid)) {
-          return done(new CacheError('A process is currently updating the cache.'));
-        }
-        return client.set("lock-process:" + name, process.pid, done);
-      }, function(locked, done) {
-        return update(function(err, value) {
-          if (err) {
-            return done(err);
+
+        // Update the cache with the new value and locks.
+        async.parallel([
+          function(fin) {
+            // Update the cached value.
+            client.set(name, value.toString(), fin)
+          },
+
+          function(fin) {
+            // If the cached value should be stored for a certain amount of
+            // time, set the lock and expiration timer.
+            if (options.expire) {
+              client.set("lock:" + name, true, options.expire, fin)
+            } else {
+              fin()
+            }
           }
-          return async.parallel([
-            function(fin) {
-              return client.set(name, value.toString(), fin);
-            }, function(fin) {
-              if (!options.expire) {
-                return fin();
-              }
-              return client.set("lock:" + name, true, options.expire, fin);
-            }
-          ], function(err) {
-            if (err) {
-              done(err);
-            }
-            return client.del("lock-process:" + name, done);
-          });
-        });
-      }
-    ], function(err, results) {
-      if (fn) {
-        return fn(err, results && !err);
-      }
-    });
-  };
+        ], function(err) {
+          if (err) {
+            done(err)
+            return
+          }
 
-  return Global;
+          // Unset the lock process. The value has been updated.
+          client.del("lock-process:" + name, done)
+        })
+      })
+    }
+  ], function(err, results) {
+    // The update was successful if there was no error.
+    if (fn) {
+      fn(err, results && !err)
+    }
+  })
+}
 
-})(Impromptu.Cache);
-
-exports = module.exports = Global;
+exports = module.exports = Global

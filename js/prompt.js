@@ -4,10 +4,10 @@ var async = require('async');
 var _ = require('underscore');
 
 // Create a custom error for when the `when` requirements fail.
-Impromptu.WhenError = function (message) {
+var WhenError = function (message) {
   Impromptu.Error.apply(this, arguments)
 }
-util.inherits(Impromptu.WhenError, Impromptu.Error)
+util.inherits(WhenError, Impromptu.Error)
 
 // Allows any input to be treated asynchronously.
 var makeAsync = function(input, callback) {
@@ -140,7 +140,7 @@ Prompt.prototype._content = function(section, fn) {
         if (success) {
           done(null);
         } else {
-          done(new Impromptu.WhenError());
+          done(new WhenError());
         }
       });
     },
@@ -170,7 +170,7 @@ Prompt.prototype._content = function(section, fn) {
     }
   ], function(err, results) {
     // If `section.when` fails, just pass along blank content.
-    if (err instanceof Impromptu.WhenError) {
+    if (err instanceof WhenError) {
       return fn(null, '');
     } else {
       return fn(err, results);
