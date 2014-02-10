@@ -9,16 +9,26 @@ module.exports = (grunt) ->
 
   # Project configuration.
   grunt.initConfig
+    jshint:
+      options:
+        jshintrc: true
+      lib: ['lib/**/*.js']
+
     watch:
+      lib:
+        files: ['lib/**/*.js']
+        tasks: ['jshint', 'test']
+
       test:
-        files: ['lib/**/*.js', 'test/**/*.coffee', 'Gruntfile.coffee']
+        files: ['test/**/*.coffee', 'Gruntfile.coffee']
         tasks: ['test']
 
   # These plugins provide necessary tasks.
   grunt.loadNpmTasks 'grunt-contrib-watch'
+  grunt.loadNpmTasks 'grunt-contrib-jshint'
 
   # Default task.
-  grunt.registerTask 'default', ['test']
+  grunt.registerTask 'default', ['jshint', 'test']
 
   grunt.registerTask 'nuke', "Nuke stuff. Don't run this unless you know what you're doing.", ->
     steps = [

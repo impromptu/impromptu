@@ -48,7 +48,8 @@
     "grunt-contrib-watch": "~0.3.1",
     "grunt": "~0.4.1",
     "mocha": "~1.8.2",
-    "should": "~1.2.2"
+    "should": "~1.2.2",
+    "grunt-contrib-jshint": "~0.8.0"
   },
   "keywords": []
 }
