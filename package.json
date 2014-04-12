@@ -42,7 +42,8 @@
     "coffee-script": "~1.6.2",
     "async": "~0.2.6",
     "underscore": "~1.4.4",
-    "minimist": "0.0.5"
+    "minimist": "0.0.5",
+    "dtrace-provider": "~0.2.8"
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.3.1",
