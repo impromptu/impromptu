@@ -18,4 +18,4 @@ describe 'Prompt Files', ->
     tests = promptTests 'load-error',
       expectedError:
         name: 'runtime error'
-        text: 'Your prompt file triggered a JavaScript error.'
+        text: 'Your prompt method triggered a JavaScript error.'
