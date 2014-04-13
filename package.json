@@ -35,8 +35,7 @@
     "impromptu-version": "./bin/impromptu-version"
   },
   "scripts": {
-    "test": "grunt test",
-    "prepublish": "./scripts/bootstrap"
+    "test": "grunt test"
   },
   "dependencies": {
     "coffee-script": "~1.6.2",
