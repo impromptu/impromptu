@@ -14,5 +14,5 @@ impromptu="$IMPROMPTU_INTERNAL_BIN/impromptu-cli"
 if [ -f "$impromptu" ]; then
   source $impromptu
 else
-  printf "Unable to find Impromptu.\n$ "
+  printf "[cannot find local impromptu] $(pwd) $ "
 fi
