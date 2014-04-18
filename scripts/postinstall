@@ -1,0 +1,111 @@
+#!/usr/bin/env node
+
+// Don't try to set up a prompt on the CI server
+if (process.env.TRAVIS === 'true')
+  process.exit(0);
+
+var fs       = require('fs');
+var exec     = require('child_process').exec;
+var spawn    = require('child_process').spawn;
+var readline = require('readline');
+
+var userInput = readline.createInterface({
+  input  : process.stdin,
+  output : process.stdout
+});
+
+var PROMPT_DIR;
+var usingSudo = process.env.SUDO_GID && process.env.SUDO_UID;
+
+function printCommandOutput(data) {
+  process.stdout.write(data.toString());
+}
+
+function npmInstallMyImpromptu() {
+  console.log('NPM installing My Impromptu.');
+
+  // Clone the process.env object and rip out the global install setting
+  // Without this, NPM will run any npm install processes forked from this
+  // process as global installs.
+  //
+  // Uses JSON.stringify/parse to "clone" process.env. This is relatively
+  // safe because all of the values come from the shell, so they're all strings.
+  var localInstallEnv = JSON.parse(JSON.stringify(process.env));
+  delete localInstallEnv.npm_config_global;
+
+  var install = spawn('npm', 'install . --production'.split(' '), {cwd: PROMPT_DIR, env: localInstallEnv});
+  install.stdin.setEncoding = 'utf-8';
+  install.stdout.pipe(process.stdout, {end: false});
+
+  process.stdin.resume();
+  process.stdin.pipe(install.stdin, {end: false});
+
+  install.on('close', function(code) {
+    if (code === 0) {
+      console.log("You're all set!");
+    }
+
+    process.exit(code);
+  });
+}
+
+function cloneMyImpromptu() {
+
+  console.log('Cloning...');
+  var commandArg = 'clone git://github.com/Impromptu/my-impromptu.git ' + PROMPT_DIR;
+
+  var options = {};
+  if (usingSudo) {
+    options.gid = parseInt(process.env.SUDO_GID, 10);
+    options.uid = parseInt(process.env.SUDO_UID, 10);
+  }
+
+  var clone = spawn('git', commandArg.split(' '), options);
+  clone.stdout.on('data', printCommandOutput);
+  clone.stderr.on('data', printCommandOutput);
+
+  clone.on('error', function() {
+    if (process.env.npm_config_unsafe_perm != 'true') {
+      console.log('You need to use the --unsafe flag to install Impromptu with sudo.');
+      process.exit(1);
+    }
+  });
+
+  clone.on('close', function(code) {
+    if(code !== 0) {
+      console.log('There was a problem with the clone. Exiting.');
+      process.exit(code);
+    }
+
+    npmInstallMyImpromptu();
+  });
+}
+
+function handleQuestionResponse(response) {
+  if (/^n/i.test(response)) {
+    console.log('Okay, please consult the Impromptu documentation if you need any help getting setup.');
+    console.log('https://github.com/Impromptu/impromptu/tree/master/docs');
+    process.exit(0);
+  }
+
+  cloneMyImpromptu();
+}
+
+function main() {
+  if (fs.existsSync(PROMPT_DIR))
+    process.exit(0);
+
+  console.log("You don't have a ~/.impromptu directory.");
+  userInput.question("Would you like help setting one up? (Y/n) ", handleQuestionResponse);
+}
+
+// Override home directory when using sudo
+if (usingSudo) {
+  exec('eval echo ~${SUDO_USER}', function(err, stdout) {
+    PROMPT_DIR = stdout.trim() + '/.impromptu';
+    main();
+  });
+} else {
+  PROMPT_DIR = process.env.HOME + '/.impromptu';
+  main();
+}

@@ -9,7 +9,7 @@ Installation
 ------------
 Impromptu requires [Node.js](http://nodejs.org/). The install script currently requires [Git](http://git-scm.com/). Impromptu supports bash and zsh by default.
 
-1. `npm install -g use-impromptu`
+1. `npm install -g impromptu`
 
 2. Run `which impromptu`. If there's no output, npm's global scripts are not available in your `$PATH`. You'll need to add something like `export PATH=$PATH:/usr/local/share/npm/bin` to your shell’s configuration file.
 

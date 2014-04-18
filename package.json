@@ -26,17 +26,12 @@
     "node": ">= 0.8.0"
   },
   "bin": {
-    "impromptu-cli": "./bin/impromptu-cli",
-    "impromptu-help": "./bin/impromptu-help",
-    "impromptu-kill": "./bin/impromptu-kill",
-    "impromptu-print": "./bin/impromptu-print",
-    "impromptu-server": "./bin/impromptu-server",
-    "impromptu-set-prompt": "./bin/impromptu-set-prompt",
-    "impromptu-version": "./bin/impromptu-version"
+    "impromptu": "./bin/impromptu"
   },
   "scripts": {
     "test": "grunt test",
-    "prepublish": "./scripts/bootstrap"
+    "prepublish": "./scripts/bootstrap",
+    "postinstall": "./scripts/postinstall"
   },
   "dependencies": {
     "coffee-script": "~1.6.2",
