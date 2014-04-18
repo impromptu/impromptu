@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source $IMPROMPTU_BIN/impromptu-utils
+source $IMPROMPTU_INTERNAL_BIN/impromptu-utils
 
 impromptu_ensure_server
 
@@ -27,7 +27,7 @@ impromptu_ensure_server
 #
 # So we set both commands: `PROMPT_COMMAND` for bash and `precmd` for zsh,
 # and tell Impromptu to escape the color codes for that specific shell.
-export PROMPT_COMMAND='source $IMPROMPTU_BIN/impromptu-utils;
+export PROMPT_COMMAND='source $IMPROMPTU_INTERNAL_BIN/impromptu-utils;
 impromptu_prompt_command bash'
 
 precmd() {

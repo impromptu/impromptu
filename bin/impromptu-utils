@@ -5,10 +5,6 @@
 IMPROMPTU_UTILS_LOADED="true"
 
 impromptu_ensure_constants() {
-  if [[ -z "$IMPROMPTU_DIR" || ! -d "$IMPROMPTU_DIR" ]]; then
-    export IMPROMPTU_DIR="$HOME/.impromptu"
-  fi
-
   if [[ -z "$IMPROMPTU_PORT" ]]; then
     IMPROMPTU_PORT="1624"
   fi
@@ -58,13 +54,13 @@ impromptu_ensure_server() {
 
   # Start the server process in the foreground.
   if [[ -n "$_impromptu_start_in_foreground" ]]; then
-    "$IMPROMPTU_BIN/impromptu-node-server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" "$@"
+    "$IMPROMPTU_INTERNAL_BIN/impromptu-node-server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" "$@"
 
   # Start the server as a daemon in a subshell.
   else
     (
       # Ensure the server is detached from this process.
-      nohup "$IMPROMPTU_BIN/impromptu-node-server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" >& /dev/null "$@" &
+      nohup "$IMPROMPTU_INTERNAL_BIN/impromptu-node-server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" >& /dev/null "$@" &
     )
 
     echo "Starting Impromptu server..."

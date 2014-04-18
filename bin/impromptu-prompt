@@ -2,4 +2,4 @@
 
 # For backwards compatibility with old versions of `use-impromptu`,
 # this calls the default `impromptu-cli` script.
-source $IMPROMPTU_BIN/impromptu-cli
+source $IMPROMPTU_INTERNAL_BIN/impromptu-cli

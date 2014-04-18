@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 
-# Ensure an impromptu bin directory is specified.
-# Defaults to the impromptu module installed in the ~/.impromptu directory.
-if [[ -z "$IMPROMPTU_BIN" || ! -d "$IMPROMPTU_BIN" ]]; then
-  export IMPROMPTU_BIN="$HOME/.impromptu/node_modules/impromptu/bin"
+# Ensure an impromptu directory is specified.
+# Defaults to the ~/.impromptu directory.
+if [[ -z "$IMPROMPTU_DIR" || ! -d "$IMPROMPTU_DIR" ]]; then
+  export IMPROMPTU_DIR="$HOME/.impromptu"
 fi
 
+export IMPROMPTU_BIN="$IMPROMPTU_DIR/node_modules/.bin"
+export IMPROMPTU_INTERNAL_BIN="$IMPROMPTU_DIR/node_modules/impromptu/bin"
+
 # Attempt to find the installed version of impromptu.
-impromptu="$IMPROMPTU_BIN/impromptu-cli"
+impromptu="$IMPROMPTU_INTERNAL_BIN/impromptu-cli"
 if [ -f "$impromptu" ]; then
   source $impromptu
 else

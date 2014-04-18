@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 
-source $IMPROMPTU_BIN/impromptu-utils
+source $IMPROMPTU_INTERNAL_BIN/impromptu-utils
 impromptu_ensure_constants
 
 # Check for named subcommands (ignoring flags).
-# TODO: Update $IMPROMPTU_BIN to be $IMPROMPTU_DIR/node_modules/.bin, so that
-# node modules can expose their own subcommands.
 if [[ -n "$1" && $1 != -* ]]; then
   potential_subcommand="impromptu-$1"
-  potential_subcommand_path="$IMPROMPTU_BIN/$potential_subcommand"
+  potential_bin_subcommand_path="$IMPROMPTU_BIN/$potential_subcommand"
+  potential_internal_subcommand_path="$IMPROMPTU_INTERNAL_BIN/$potential_subcommand"
 
   # Check for the subcommand in impromptu's installed node modules.
   if [[ -x "$potential_subcommand_path" ]]; then
     subcommand="$potential_subcommand_path"
+    shift
+
+  elif [[ -x "$potential_internal_subcommand_path" ]]; then
+    subcommand="$potential_internal_subcommand_path"
     shift
 
   # Check for the subcommand system-wide.
@@ -25,9 +28,9 @@ fi
 # Check if we're looking for the version or help.
 if [[ -z "$subcommand" && -n "$1" ]]; then
   if [[ "$1" == "-v" || "$1" == "--version" ]]; then
-    subcommand="$IMPROMPTU_BIN/impromptu-version"
+    subcommand="$IMPROMPTU_INTERNAL_BIN/impromptu-version"
   elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
-    subcommand="$IMPROMPTU_BIN/impromptu-help"
+    subcommand="$IMPROMPTU_INTERNAL_BIN/impromptu-help"
   fi
 fi
 
@@ -35,11 +38,11 @@ fi
 if [[ -z "$subcommand" ]]; then
   # If we're in an interactive shell, set prompt commands.
   if [[ $- == *i* ]]; then
-    subcommand="$IMPROMPTU_BIN/impromptu-set-prompt"
+    subcommand="$IMPROMPTU_INTERNAL_BIN/impromptu-set-prompt"
 
   # Otherwise, just print the prompt.
   else
-    subcommand="$IMPROMPTU_BIN/impromptu-print"
+    subcommand="$IMPROMPTU_INTERNAL_BIN/impromptu-print"
   fi
 fi
 
