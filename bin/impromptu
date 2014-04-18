@@ -10,7 +10,7 @@ export IMPROMPTU_BIN="$IMPROMPTU_DIR/node_modules/.bin"
 export IMPROMPTU_INTERNAL_BIN="$IMPROMPTU_DIR/node_modules/impromptu/bin"
 
 # Attempt to find the installed version of impromptu.
-impromptu="$IMPROMPTU_INTERNAL_BIN/impromptu-cli"
+impromptu="$IMPROMPTU_INTERNAL_BIN/cli"
 if [ -f "$impromptu" ]; then
   source $impromptu
 else

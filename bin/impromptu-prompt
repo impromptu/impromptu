@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 # For backwards compatibility with old versions of `use-impromptu`,
-# this calls the default `impromptu-cli` script.
-source $IMPROMPTU_INTERNAL_BIN/impromptu-cli
+# this calls the default `cli` script.
+source $IMPROMPTU_INTERNAL_BIN/cli

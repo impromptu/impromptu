@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-$IMPROMPTU_INTERNAL_BIN/impromptu-node-version
+$IMPROMPTU_INTERNAL_BIN/version

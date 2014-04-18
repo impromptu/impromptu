@@ -20,7 +20,7 @@ impromptu_ping_server() {
     suffix="$IMPROMPTU_PORT"
   fi
 
-  pid_file="$IMPROMPTU_DIR/.compiled/impromptu-node-server-$suffix.pid"
+  pid_file="$IMPROMPTU_DIR/.compiled/server-$suffix.pid"
   # Checks if the pid file exists and checks if the process is still running.
   [ -f $pid_file ] && kill -0 $(cat $pid_file) 2> /dev/null
 }
@@ -54,13 +54,13 @@ impromptu_ensure_server() {
 
   # Start the server process in the foreground.
   if [[ -n "$_impromptu_start_in_foreground" ]]; then
-    "$IMPROMPTU_INTERNAL_BIN/impromptu-node-server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" "$@"
+    "$IMPROMPTU_INTERNAL_BIN/server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" "$@"
 
   # Start the server as a daemon in a subshell.
   else
     (
       # Ensure the server is detached from this process.
-      nohup "$IMPROMPTU_INTERNAL_BIN/impromptu-node-server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" >& /dev/null "$@" &
+      nohup "$IMPROMPTU_INTERNAL_BIN/server" --port "$IMPROMPTU_PORT" --path "$IMPROMPTU_UNIX_DOMAIN_SOCKET" >& /dev/null "$@" &
     )
 
     echo "Starting Impromptu server..."
