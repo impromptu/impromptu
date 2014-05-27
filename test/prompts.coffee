@@ -8,13 +8,13 @@ describe 'Prompt Files', ->
     tests = promptTests 'sample',
       expectedPrompt: "\x1b[42m\x1b[37m user@host \x1b[0m\x1b[44m\x1b[37m ~/path/to/impromptu \x1b[0m"
 
-  describe 'Compiler Error', ->
+  describe 'CoffeeScript Compilation Error', ->
     tests = promptTests 'compiler-error',
       expectedError:
         name: 'compiler error'
         text: 'Your prompt file is not valid CoffeeScript.'
 
-  describe 'JavaScript Loading Error', ->
+  describe 'JavaScript Prompt Method Error', ->
     tests = promptTests 'load-error',
       expectedError:
         name: 'runtime error'
