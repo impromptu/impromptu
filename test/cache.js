@@ -4,6 +4,8 @@ var Impromptu = require('../lib/impromptu').constructor
 var async = require('async')
 var cacheTest = require('./shared/cache')
 
+// Skip the database tests on Travis CI
+// TODO: Make these work
 if (environment.isTravis()) {
   return
 }

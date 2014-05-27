@@ -8,6 +8,7 @@ describe('Impromptu', function() {
     should.exist(Impromptu)
   })
   it('should use semantic versions', function() {
+    // https://github.com/coolaj86/semver-utils/blob/v1.0.1/semver-utils.js
     var regex = /^((\d+)\.(\d+)\.(\d+))(?:-([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?(?:\+([\dA-Za-z\-]+(?:\.[\dA-Za-z\-]+)*))?$/
     regex.test(Impromptu.VERSION).should.be["true"]
   })
