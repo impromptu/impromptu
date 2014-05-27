@@ -20,7 +20,7 @@ module.exports = (grunt) ->
         tasks: ['jshint', 'test']
 
       test:
-        files: ['test/**/*.coffee', 'Gruntfile.coffee']
+        files: ['test/**/*.js', 'Gruntfile.coffee']
         tasks: ['test']
 
   # These plugins provide necessary tasks.
