@@ -2,7 +2,6 @@ should = require 'should'
 environment = require './environment'
 Impromptu = require('../../lib/impromptu').constructor
 exec = require('child_process').exec
-path = require 'path'
 fs = require 'fs'
 
 class PromptTests
@@ -40,10 +39,10 @@ class PromptTests
 
   clean: (fn) ->
     @shouldInitializeImpromptu() unless @impromptu
-    # Remove the `.compiled` directory and the debug log.
-    compiledDir = path.dirname @impromptu.path('compiled')
+    # Remove the `tmp` directory and the debug log.
+    tmpDir = @impromptu.path('tmp')
     logFilePath = @impromptu.path('log')
-    exec "rm -rf #{compiledDir} #{logFilePath}", fn
+    exec "rm -rf #{tmpDir} #{logFilePath}", fn
     delete @impromptu
 
 module.exports = (name, options = {}) ->

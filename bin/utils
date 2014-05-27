@@ -20,7 +20,7 @@ impromptu_ping_server() {
     suffix="$IMPROMPTU_PORT"
   fi
 
-  pid_file="$IMPROMPTU_DIR/.compiled/server-$suffix.pid"
+  pid_file="$IMPROMPTU_DIR/tmp/server-$suffix.pid"
   # Checks if the pid file exists and checks if the process is still running.
   [ -f $pid_file ] && kill -0 $(cat $pid_file) 2> /dev/null
 }
@@ -33,9 +33,9 @@ impromptu_ensure_server() {
   fi
 
   # A server isn't running; try to start one.
-  # Ensure the `.compiled` directory exists.
-  compiled_dir="$IMPROMPTU_DIR/.compiled"
-  [ -d $compiled_dir ] || mkdir $compiled_dir
+  # Ensure the `tmp` directory exists.
+  tmp_dir="$IMPROMPTU_DIR/tmp"
+  [ -d $tmp_dir ] || mkdir $tmp_dir
 
   # Check if we're using a Unix domain socket or a port.
   if [[ -n "$IMPROMPTU_UNIX_DOMAIN_SOCKET" ]]; then
