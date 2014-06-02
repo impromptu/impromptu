@@ -51,7 +51,6 @@
   "externDependencies": {
     "async": "./externs/async.js",
     "coffee-script": "./externs/coffee-script.js",
-    "package.json": "./externs/package.json.js",
     "underscore": "./externs/underscore.js"
   },
   "keywords": []
