@@ -50,7 +50,6 @@
   },
   "externDependencies": {
     "async": "./externs/async.js",
-    "closure-compat": "./externs/closure-compat.js",
     "coffee-script": "./externs/coffee-script.js",
     "package.json": "./externs/package.json.js",
     "underscore": "./externs/underscore.js"
