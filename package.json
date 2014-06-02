@@ -48,6 +48,7 @@
     "grunt-contrib-jshint": "~0.8.0",
     "closure-npc": "~0.1.4"
   },
+  "externs": ["./externs/process.js"],
   "externDependencies": {
     "async": "./externs/async.js",
     "coffee-script": "./externs/coffee-script.js",
