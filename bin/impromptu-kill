@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
 pgrep -f impromptu | xargs kill
+rm -rf $IMPROMPTU_DIR/tmp
