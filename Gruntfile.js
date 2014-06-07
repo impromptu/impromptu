@@ -27,7 +27,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch')
   grunt.loadNpmTasks('grunt-contrib-jshint')
 
-  grunt.registerTask('test', ['jshint', 'unit'])
+  grunt.registerTask('test', ['jshint', 'unit', 'check-types'])
   grunt.registerTask('default', ['test'])
 
   grunt.registerTask('nuke', "Nuke stuff. Don't run this unless you know what you're doing.", function() {
@@ -57,5 +57,18 @@ module.exports = function(grunt) {
         exec(cmd + ' test')
       }, 1000)
     })
+  })
+
+  grunt.registerTask('check-types', 'Checks the types of Impromptu using Closure Compiler.', function() {
+    var done = this.async()
+    var checkTypes = exec('./node_modules/.bin/closure-npc', function(err, stdout, stderr) {
+      var results = stderr.trim().split('\n').pop()
+      var errorMatch = /(\d+) error\(s\)/.exec(results)
+      var succeeded = errorMatch && parseInt(errorMatch[1], 10) === 0
+      done(succeeded)
+    })
+
+    checkTypes.stdout.pipe(process.stdout)
+    checkTypes.stderr.pipe(process.stderr)
   })
 }
