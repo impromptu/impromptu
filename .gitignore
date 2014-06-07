@@ -13,12 +13,12 @@ pids
 logs
 results
 
-npm-debug.log
 node_modules
+*.log
 
 # Ignore our output directories
+tmp
 test/prompts/*/tmp
-test/prompts/*/impromptu-debug.log
 
 # Ignore socket files
 *.sock
