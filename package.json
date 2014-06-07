@@ -30,7 +30,6 @@
   },
   "scripts": {
     "test": "grunt test",
-    "prepublish": "./scripts/bootstrap",
     "postinstall": "./scripts/postinstall"
   },
   "dependencies": {
