@@ -52,7 +52,7 @@ function npmInstallMyImpromptu() {
 function cloneMyImpromptu() {
 
   console.log('Cloning...');
-  var commandArg = 'clone git://github.com/Impromptu/my-impromptu.git ' + PROMPT_DIR;
+  var commandArg = 'clone git://github.com/impromptu/my-impromptu.git ' + PROMPT_DIR;
 
   var options = {};
   if (usingSudo) {
@@ -84,7 +84,7 @@ function cloneMyImpromptu() {
 function handleQuestionResponse(response) {
   if (/^n/i.test(response)) {
     console.log('Okay, please consult the Impromptu documentation if you need any help getting setup.');
-    console.log('https://github.com/Impromptu/impromptu/tree/master/docs');
+    console.log('https://github.com/impromptu/impromptu/tree/master/docs');
     process.exit(0);
   }
 

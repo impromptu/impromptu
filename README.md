@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Impromptu/impromptu.png)](https://travis-ci.org/Impromptu/impromptu)
+[![Build Status](https://travis-ci.org/impromptu/impromptu.png)](https://travis-ci.org/impromptu/impromptu)
 
 Impromptu
 =========
