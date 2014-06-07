@@ -40,7 +40,7 @@ module.exports = function(grunt) {
   // Impromptu server and worker process to work correctly.
   grunt.registerTask('unit', 'Run unit tests.', function() {
     var done = this.async()
-    var cmd = "IMPROMPTU_PORT=2934 IMPROMPTU_UNIX_DOMAIN_SOCKET='' impromptu server"
+    var cmd = "IMPROMPTU_PORT=2934 IMPROMPTU_UNIX_DOMAIN_SOCKET='' ./bin/impromptu server"
 
     exec(cmd + ' shutdown', function(err, stdout, stderr) {
       var server = exec(cmd + ' foreground')
