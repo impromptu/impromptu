@@ -10,7 +10,7 @@ function PromptTests(name) {
 
 PromptTests.prototype.shouldInitializeImpromptu = function() {
   this.impromptu = new Impromptu
-  this.impromptu.config.set('root', environment.TEST_PROMPT_ROOT + '/' + this.name)
+  this.impromptu._setRootPath(environment.TEST_PROMPT_ROOT + '/' + this.name)
   should.exist(this.impromptu)
 }
 
@@ -31,9 +31,9 @@ PromptTests.prototype.shouldBuildPrompt = function(fn) {
 PromptTests.prototype.shouldCreateDebugLog = function(fn) {
   this.shouldBuildPrompt(function(err, prompt) {
     var exists, log
-    exists = fs.existsSync(this.impromptu.path('log'))
+    exists = fs.existsSync(this.impromptu.config.get('path.log'))
     exists.should.be.ok
-    log = exists ? fs.readFileSync(this.impromptu.path('log')).toString() : ''
+    log = exists ? fs.readFileSync(this.impromptu.config.get('path.log')).toString() : ''
     fn(err, log)
   }.bind(this))
 }
@@ -41,7 +41,7 @@ PromptTests.prototype.shouldCreateDebugLog = function(fn) {
 PromptTests.prototype.shouldNotCreateDebugLog = function(fn) {
   this.shouldBuildPrompt(function(err, prompt) {
     var exists
-    exists = fs.existsSync(this.impromptu.path('log'))
+    exists = fs.existsSync(this.impromptu.config.get('path.log'))
     exists.should.not.be.ok
     fn(err)
   }.bind(this))
@@ -51,8 +51,8 @@ PromptTests.prototype.clean = function(fn) {
   if (!this.impromptu) {
     this.shouldInitializeImpromptu()
   }
-  var tmpDir = this.impromptu.path('tmp')
-  var logFilePath = this.impromptu.path('log')
+  var tmpDir = this.impromptu.config.get('path.tmp')
+  var logFilePath = this.impromptu.config.get('path.log')
   exec('rm -rf ' + tmpDir + ' ' + logFilePath, fn)
   delete this.impromptu
 }
