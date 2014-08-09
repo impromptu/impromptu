@@ -38,7 +38,7 @@ describe('Color', function() {
   })
   describe('For Bash Prompt', function() {
     var impromptuBash = new Impromptu()
-    impromptuBash.config.set('shell', 'bash')
+    impromptuBash.state.set('shell', 'bash')
     it('should format the foreground', function() {
       var result = impromptuBash.color.format('test', {
         foreground: 'red'
@@ -61,7 +61,7 @@ describe('Color', function() {
   })
   describe('For Zsh Prompt', function() {
     var impromptuZsh = new Impromptu()
-    impromptuZsh.config.set('shell', 'zsh')
+    impromptuZsh.state.set('shell', 'zsh')
     it('should format the foreground', function() {
       var result
       result = impromptuZsh.color.format('test', {
