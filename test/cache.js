@@ -50,7 +50,7 @@ describe('Directory Cache', function() {
   })
   it('should have the directory in the name', function() {
     var name = cacheTest.name()
-    var cache = new Impromptu.Cache.Directory(impromptu, name, {
+    var cache = new Impromptu.Cache.Directory(impromptu.state, impromptu.db, impromptu.repository, name, {
       update: function(fn) {
         return fn(null, 'value')
       }
@@ -72,7 +72,7 @@ describe('Repository Cache', function() {
   })
   it('should have the repository root in the name', function(done) {
     var name = cacheTest.name()
-    var cache = new Impromptu.Cache.Repository(impromptu, name, {
+    var cache = new Impromptu.Cache.Repository(impromptu.state, impromptu.db, impromptu.repository, name, {
       update: function(fn) {
         return fn(null, 'value')
       }

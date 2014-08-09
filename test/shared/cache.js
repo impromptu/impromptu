@@ -17,7 +17,7 @@ function CacheTests(CacheClass, options, impromptu, name) {
     return fn(null, 'value')
   }
 
-  this.instance = new CacheClass(this.impromptu, this.name, this.options)
+  this.instance = new CacheClass(this.impromptu.state, this.impromptu.db, this.impromptu.repository, this.name, this.options)
 }
 
 CacheTests.prototype.getShouldEqualFallback = function(fn) {
@@ -124,7 +124,7 @@ test.base = function(CacheClass, options) {
   })
   it('should handle multiple cache sets with a single request', function(done) {
     var called = false
-    var raceSafeCache = new CacheClass(impromptu, test.name(), {
+    var raceSafeCache = new CacheClass(impromptu.state, impromptu.db, impromptu.repository, test.name(), {
       update: function(fn) {
         called.should.equal(false)
         called = true
@@ -154,7 +154,7 @@ test.base = function(CacheClass, options) {
   })
   it('should update when needs refresh is set', function(done) {
     var called = false
-    var refreshableCache = new CacheClass(impromptu, test.name(), {
+    var refreshableCache = new CacheClass(impromptu.state, impromptu.db, impromptu.repository, test.name(), {
       update: function(fn) {
         called.should.equal(false)
         called = true
@@ -175,12 +175,12 @@ test.global = function(CacheClass, options) {
   var refreshable = new Impromptu()
   it('should fetch cached values', function(done) {
     var name = test.name()
-    var updater = new CacheClass(refreshable, name, {
+    var updater = new CacheClass(refreshable.state, refreshable.db, refreshable.repository, name, {
       update: function(fn) {
         return fn(null, 'value')
       }
     })
-    var fetcher = new CacheClass(impromptu, name, {
+    var fetcher = new CacheClass(impromptu.state, impromptu.db, impromptu.repository, name, {
       update: function(fn) {
         should.fail('Update should not run.')
         return fn(null, 'value')
