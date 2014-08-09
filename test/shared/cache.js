@@ -135,7 +135,7 @@ test.base = function(CacheClass, options) {
     })
     async.series([
       function(fn) {
-        impromptu.refresh()
+        impromptu.config.set('refreshCache', true)
         async.parallel([
           function(complete) {
             raceSafeCache.run(function(err, updated) {
@@ -163,7 +163,7 @@ test.base = function(CacheClass, options) {
     })
     refreshableCache.run(function() {
       called = false
-      impromptu.refresh()
+      impromptu.config.set('refreshCache', true)
       refreshableCache.run(done)
     })
   })
@@ -193,7 +193,7 @@ test.global = function(CacheClass, options) {
           fn(err)
         })
       }, function(fn) {
-        refreshable.refresh()
+        refreshable.config.set('refreshCache', true)
         updater.run(function(err, updated) {
           updated.should.equal('value')
           fn(err)
