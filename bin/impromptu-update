@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+{
+  # A note on updating bash scripts:
+  #
+  # Shells interpret a file as it executes. As a result, if you overwrite a script while it is
+  # executing, the script will then continue execution within the new file. This quickly leads to
+  # unpredictable behavior which could cause a painful update process (to say the least).
+  #
+  # However, we can instruct the shell to read the entirety of a file by placing its contents inside
+  # of a code block and terminating the block with an exit keyword (in case the new file has any
+  # additional lines).
+  #
+  # For more information, see:
+  #   http://stackoverflow.com/a/2358491
+  #   http://www.tldp.org/LDP/abs/html/special-chars.html#CODEBLOCKREF
+  if impromptu_in_interactive_shell; then
+    echo "Cannot update Impromptu within an interactive shell."
+    echo "Please run \"impromptu update\"."
+    return
+  fi
+
+  echo "Updating Impromptu..."
+  echo "Impromptu directory: \"$IMPROMPTU_DIR\""
+
+  # Check for git.
+  if ! command -v "git" >/dev/null 2>&1; then
+    echo "Error: Could not locate 'git' command."
+    exit
+  fi
+
+  cd "$IMPROMPTU_DIR"
+
+  # Find the git branch and check if we're in a repo.
+  branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+  if [[ -z "$branch" ]]; then
+    echo "Error: Could not locate a git branch for \"$IMPROMPTU_DIR\"."
+    exit
+  fi
+
+  echo "Branch: \"$branch\""
+
+  # Check if we're on the master branch.
+  # Copy IMPROMPTU_DIR into a tmp directory (for updating).
+  # Update the tmp directory:
+  #   run 'git pull'
+  #   run 'npm update'
+  # Stop the server.
+  # Generate a test prompt in the tmp directory.
+  # Copy IMPROMPTU_DIR into another tmp directory (for backup).
+  # Overwrite IMPROMPTU_DIR with updated tmp directory.
+  # Globally install the same version of Impromptu.
+  exit
+}
