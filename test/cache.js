@@ -12,10 +12,10 @@ if (environment.isTravis()) {
 
 describe('Shim Cache', function() {
   it('should exist', function() {
-    should.exist(Impromptu.Cache.Shim)
+    should.exist(Impromptu.Cache.ShimCache)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.Shim, {
+    cacheTest.base(Impromptu.Cache.ShimCache, {
       fallback: 'value'
     })
   })
@@ -23,34 +23,34 @@ describe('Shim Cache', function() {
 
 describe('Instance Cache', function() {
   it('should exist', function() {
-    should.exist(Impromptu.Cache.Instance)
+    should.exist(Impromptu.Cache.InstanceCache)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.Instance)
+    cacheTest.base(Impromptu.Cache.InstanceCache)
   })
 })
 
 describe('Global Cache', function() {
   var impromptu = new Impromptu()
   it('should exist', function() {
-    should.exist(Impromptu.Cache.Global)
+    should.exist(Impromptu.Cache.GlobalCache)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.Global)
+    cacheTest.base(Impromptu.Cache.GlobalCache)
   })
   describe('Run Behavior', function() {
-    cacheTest.global(Impromptu.Cache.Global)
+    cacheTest.global(Impromptu.Cache.GlobalCache)
   })
 })
 
 describe('Directory Cache', function() {
   var impromptu = new Impromptu()
   it('should exist', function() {
-    should.exist(Impromptu.Cache.Directory)
+    should.exist(Impromptu.Cache.DirectoryCache)
   })
   it('should have the directory in the name', function() {
     var name = cacheTest.name()
-    var cache = new Impromptu.Cache.Directory(impromptu, name, {
+    var cache = new Impromptu.Cache.DirectoryCache(impromptu, name, {
       update: function(fn) {
         return fn(null, 'value')
       }
@@ -58,35 +58,35 @@ describe('Directory Cache', function() {
     cache.name.should.equal("" + name + ":" + process.env.PWD)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.Directory)
+    cacheTest.base(Impromptu.Cache.DirectoryCache)
   })
   describe('Run Behavior', function() {
-    cacheTest.global(Impromptu.Cache.Directory)
+    cacheTest.global(Impromptu.Cache.DirectoryCache)
   })
 })
 
 describe('Repository Cache', function() {
   var impromptu = new Impromptu()
   it('should exist', function() {
-    should.exist(Impromptu.Cache.Repository)
+    should.exist(Impromptu.Cache.RepositoryCache)
   })
   it('should have the repository root in the name', function(done) {
     var name = cacheTest.name()
-    var cache = new Impromptu.Cache.Repository(impromptu, name, {
+    var cache = new Impromptu.Cache.RepositoryCache(impromptu, name, {
       update: function(fn) {
         return fn(null, 'value')
       }
     })
-    Impromptu.Cache.Global.prototype.prepared = function(done) {
+    Impromptu.Cache.GlobalCache.prototype.prepared = function(done) {
       cache.name.should.equal("" + name + ":" + process.env.PWD)
       done()
     }
     cache.prepare('prepared', done)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.Repository)
+    cacheTest.base(Impromptu.Cache.RepositoryCache)
   })
   describe('Run Behavior', function() {
-    cacheTest.global(Impromptu.Cache.Repository)
+    cacheTest.global(Impromptu.Cache.RepositoryCache)
   })
 })
