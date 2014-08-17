@@ -15,7 +15,7 @@ describe('Shim Cache', function() {
     should.exist(Impromptu.Cache.ShimCache)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.ShimCache, {
+    cacheTest.base('shim', {
       fallback: 'value'
     })
   })
@@ -26,7 +26,7 @@ describe('Instance Cache', function() {
     should.exist(Impromptu.Cache.InstanceCache)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.InstanceCache)
+    cacheTest.base('instance')
   })
 })
 
@@ -36,10 +36,10 @@ describe('Global Cache', function() {
     should.exist(Impromptu.Cache.GlobalCache)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.GlobalCache)
+    cacheTest.base('global')
   })
   describe('Run Behavior', function() {
-    cacheTest.global(Impromptu.Cache.GlobalCache)
+    cacheTest.global('global')
   })
 })
 
@@ -50,7 +50,7 @@ describe('Directory Cache', function() {
   })
   it('should have the directory in the name', function() {
     var name = cacheTest.name()
-    var cache = new Impromptu.Cache.DirectoryCache(impromptu, name, {
+    var cache = impromptu.cache.create('directory', name, {
       update: function(fn) {
         return fn(null, 'value')
       }
@@ -58,10 +58,10 @@ describe('Directory Cache', function() {
     cache.name.should.equal("" + name + ":" + process.env.PWD)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.DirectoryCache)
+    cacheTest.base('directory')
   })
   describe('Run Behavior', function() {
-    cacheTest.global(Impromptu.Cache.DirectoryCache)
+    cacheTest.global('directory')
   })
 })
 
@@ -72,7 +72,7 @@ describe('Repository Cache', function() {
   })
   it('should have the repository root in the name', function(done) {
     var name = cacheTest.name()
-    var cache = new Impromptu.Cache.RepositoryCache(impromptu, name, {
+    var cache = impromptu.cache.create('repository', name, {
       update: function(fn) {
         return fn(null, 'value')
       }
@@ -84,9 +84,9 @@ describe('Repository Cache', function() {
     cache.prepare('prepared', done)
   })
   describe('Cache API', function() {
-    cacheTest.base(Impromptu.Cache.RepositoryCache)
+    cacheTest.base('repository')
   })
   describe('Run Behavior', function() {
-    cacheTest.global(Impromptu.Cache.RepositoryCache)
+    cacheTest.global('repository')
   })
 })
