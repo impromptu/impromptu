@@ -80,7 +80,7 @@ describe('Prompt', function() {
   }
 
   var makePrompt = function(keys) {
-    var prompt = new Impromptu.Prompt(impromptu)
+    var prompt = new Impromptu.Prompt(impromptu.color)
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i]
       prompt.section(key, sections[key])
