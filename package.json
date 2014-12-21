@@ -37,7 +37,7 @@
     "async": "~0.2.6",
     "underscore": "~1.4.4",
     "minimist": "0.0.5",
-    "dtrace-provider": "~0.2.8"
+    "dtrace-provider": "~0.3.1"
   },
   "devDependencies": {
     "grunt-contrib-watch": "~0.3.1",
