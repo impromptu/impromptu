@@ -10,6 +10,11 @@ impromptu_ensure_constants() {
   fi
 }
 
+# Checks if Impromptu was sourced into an interactive shell.
+impromptu_in_interactive_shell() {
+  [[ $- == *i* ]]
+}
+
 # Pings the Impromptu socket server.
 impromptu_ping_server() {
   # The suffix of the PID file is either the basename of the socket (with extension)

@@ -37,7 +37,7 @@ fi
 # If we couldn't find a matching subcommand, fall back to the defaults.
 if [[ -z "$subcommand" ]]; then
   # If we're in an interactive shell, set prompt commands.
-  if [[ $- == *i* ]]; then
+  if impromptu_in_interactive_shell; then
     subcommand="$IMPROMPTU_INTERNAL_BIN/impromptu-set-prompt"
 
   # Otherwise, just print the prompt.
