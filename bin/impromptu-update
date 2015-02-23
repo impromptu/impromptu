@@ -19,6 +19,9 @@
     return
   fi
 
+  # Store original working directory.
+  original_directory="$(pwd)"
+
   echo "Updating Impromptu..."
   echo "Impromptu directory: \"$IMPROMPTU_DIR\""
 
@@ -39,34 +42,114 @@
 
   # Check if we're on the master branch.
   if [[ "$branch" != "master" ]]; then
-    echo "Your Impromptu directory is running branch \"$branch\", would you like to continue the update? (Y/n)"
-    read branch_answer
-    if [[ "$branch_answer" == n* ]]; then
+    printf "\nYour Impromptu directory is running branch \"$branch\", would you like to continue the update? (Y/n) "
+    read answer
+    if [[ "$answer" == n* ]]; then
       exit
     fi
   fi
 
-  # Clear out tmp directories.
+  # Declare update variables and helper methods.
   update_tmp_directory="/tmp/impromptu-update"
   backup_tmp_directory="/tmp/impromptu-backup"
-  rm -rf "$update_tmp_directory"
-  rm -rf "$backup_tmp_directory"
+  updated_impromptu_version=
+
+  clear_update_directory() {
+    rm -rf "$update_tmp_directory"
+  }
+
+  catch_error() {
+    if [[ "$?" -ne 0 ]]; then
+      echo "$1"
+      clear_update_directory
+      exit
+    fi
+  }
+
+  stop_server() {
+    # Shut down the current impromptu server.
+    source impromptu server shutdown
+
+    # Give the server a second to shut down. If it's still running, kill it.
+    # TODO: Wait for the server process to shut down instead of sleeping.
+    sleep 1
+    impromptu_ping_server
+    if [[ "$?" -eq 0 ]]; then
+      source impromptu kill
+    fi
+  }
+
+  # Clear out tmp directories and stop the Impromptu server.
+  clear_update_directory
+  stop_server
 
   # Copy IMPROMPTU_DIR into a tmp directory (for updating).
   echo "Copying Impromptu into a temporary directory..."
-  cp -r "$IMPROMPTU_DIR" "$update_tmp_directory"
+  cp -RP "$IMPROMPTU_DIR" "$update_tmp_directory"
 
-  # Update the tmp directory:
+  # Update the tmp directory within a subshell.
   (
-    cd "$update_tmp_directory"
+    # Reset the directory variables for the update.
+    export IMPROMPTU_DIR="$update_tmp_directory"
+    export IMPROMPTU_BIN=
+    export IMPROMPTU_INTERNAL_BIN=
+
+    cd "$IMPROMPTU_DIR"
+
     git pull
+    catch_error "Error: Impromptu failed to pull the git repository. Please try again."
+
     npm update
+    catch_error "Error: Impromptu failed to update npm. Please try again."
+
+    # Test the prompt using the update directory.
+    printf "\n\n\nPrinting test prompt...\n\n\n"
+    cd "$original_directory"
+    source impromptu print
+    updated_impromptu_version=$(source impromptu version)
+
+    # Shut down the update directory prompt server.
+    stop_server
+
+    printf "\n\nTake a look at your test prompt. Does everything look okay? (Y/n) "
+    read answer
+    if [[ "$answer" == n* ]]; then
+      clear_update_directory
+      echo "Update aborted."
+      exit
+    fi
   )
 
-  # Stop the server.
-  # Generate a test prompt in the tmp directory.
   # Copy IMPROMPTU_DIR into another tmp directory (for backup).
+  echo "Creating a temporary backup..."
+  rm -rf "$backup_tmp_directory"
+  cp -RP "$IMPROMPTU_DIR" "$backup_tmp_directory"
+
   # Overwrite IMPROMPTU_DIR with updated tmp directory.
+  echo "Updating local Impromptu directory..."
+  rm -rf "$IMPROMPTU_DIR"
+  cp -RP "$update_tmp_directory" "$IMPROMPTU_DIR"
+  cd "$IMPROMPTU_DIR"
+
   # Globally install the same version of Impromptu.
+  echo "Updating global Impromptu version..."
+  update_global_impromptu="0"
+
+  npm list -g impromptu | grep -q " \-> "
+  if [[ "$?" -eq 0 ]]; then
+    printf "\nThe global version of Impromptu is linked using npm."
+    printf "\nWould you like to overwrite it? (Y/n) "
+    read answer
+    [[ "$answer" != n* ]]
+    update_global_impromptu="$?";
+  fi
+
+  if [[ "$update_global_impromptu" -eq 0 ]]; then
+    npm install -g "impromptu@$updated_impromptu_version"
+  fi
+
+  # Clean up!
+  clear_update_directory
+  printf "\nImpromptu was successfully updated!\n\n\n"
   exit
 }
