@@ -37,13 +37,32 @@
     exit
   fi
 
-  echo "Branch: \"$branch\""
-
   # Check if we're on the master branch.
+  if [[ "$branch" != "master" ]]; then
+    echo "Your Impromptu directory is running branch \"$branch\", would you like to continue the update? (Y/n)"
+    read branch_answer
+    if [[ "$branch_answer" == n* ]]; then
+      exit
+    fi
+  fi
+
+  # Clear out tmp directories.
+  update_tmp_directory="/tmp/impromptu-update"
+  backup_tmp_directory="/tmp/impromptu-backup"
+  rm -rf "$update_tmp_directory"
+  rm -rf "$backup_tmp_directory"
+
   # Copy IMPROMPTU_DIR into a tmp directory (for updating).
+  echo "Copying Impromptu into a temporary directory..."
+  cp -r "$IMPROMPTU_DIR" "$update_tmp_directory"
+
   # Update the tmp directory:
-  #   run 'git pull'
-  #   run 'npm update'
+  (
+    cd "$update_tmp_directory"
+    git pull
+    npm update
+  )
+
   # Stop the server.
   # Generate a test prompt in the tmp directory.
   # Copy IMPROMPTU_DIR into another tmp directory (for backup).
