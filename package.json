@@ -1,7 +1,7 @@
 {
   "name": "impromptu",
   "description": "A better prompt.",
-  "version": "0.2.6",
+  "version": "0.3.0-beta.0",
   "homepage": "http://impromptu.sh/",
   "author": "Impromptu Team (http://impromptu.sh/)",
   "contributors": [
