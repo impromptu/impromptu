@@ -110,6 +110,8 @@ IMPROMPTU_JOBS_COUNT=$(jobs|wc -l|sed 's/ //g')"
     request_env+="
 IMPROMPTU_SHELL=$1"
   fi
+  request_env+="
+IMPROMPTU_ENV_COMPLETE=0"
 
   echo -n "$request_env"
 }
