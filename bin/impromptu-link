@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+link_impromptu() {
+  ln -s "$impromptu_desired_linked_path" "$IMPROMPTU_GLOBAL_BIN"
+}
+
+# Ensure a global impromptu path is specified.
+if [[ -z "$IMPROMPTU_GLOBAL_BIN" ]]; then
+  export IMPROMPTU_GLOBAL_BIN="/usr/local/bin/impromptu"
+fi
+
+impromptu_desired_linked_path="$IMPROMPTU_INTERNAL_BIN/impromptu"
+
+if [[ ! -e $IMPROMPTU_GLOBAL_BIN ]]; then
+  # We don't have the desired impromptu global. Create the link.
+  link_impromptu
+fi
+
+impromptu_current_global_bin=$(command -v impromptu)
+if [[ -z "$impromptu_current_global_bin" ]]; then
+  echo "The desired path to the global impromptu, \"$IMPROMPTU_GLOBAL_BIN\", is not accessible from your shell's PATH."
+  exit
+fi
+
+impromptu_linked_path=$(readlink "$impromptu_current_global_bin")
+
+# Check if we're using the intended path for the global `impromptu` executable.
+if [[ "$impromptu_current_global_bin" == "$IMPROMPTU_GLOBAL_BIN" ]]; then
+  if [[ "$impromptu_linked_path" == "$impromptu_desired_linked_path" ]]; then
+    # We're already linked to the file we want. Yay.
+    exit
+  fi
+
+
+  echo "Impromptu is currently linked to \"$impromptu_linked_path\"."
+  echo "Linking impromptu to \"$impromptu_desired_linked_path\"."
+  link_impromptu
+  exit
+fi
+
+# Another `impromptu` executable overridding our desired global path. Let's see what we can do.
+echo "We found another instance of impromptu in your path: \"$impromptu_current_global_bin\". Please remove it and try again."

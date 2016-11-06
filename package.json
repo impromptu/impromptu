@@ -25,9 +25,6 @@
   "engines": {
     "node": ">= 0.10.0"
   },
-  "bin": {
-    "impromptu": "./bin/impromptu"
-  },
   "scripts": {
     "test": "grunt test",
     "postinstall": "./scripts/postinstall"
