@@ -1,16 +1,18 @@
+impromptu = require('impromptu')
+
 module.exports = (Impromptu, section) ->
   methods = @module.register 'sample-configfile', (Impromptu, register) ->
     register 'cwd',
       update: (done) ->
-        Impromptu.exec 'printf "~/path/to/impromptu"', done
+        impromptu.exec 'printf "~/path/to/impromptu"', done
 
     register 'user',
       update: (done) ->
-        Impromptu.exec 'printf "user"', done
+        impromptu.exec 'printf "user"', done
 
     register 'host',
       update: (done) ->
-        Impromptu.exec 'printf "host"', done
+        impromptu.exec 'printf "host"', done
 
 
   section 'user',

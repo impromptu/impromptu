@@ -1,9 +1,8 @@
 var should = require('should')
 var environment = require('./shared/environment')
-var Impromptu = require('../lib/impromptu').constructor
+var impromptu = require('../lib/impromptu')
 
 describe('Module', function() {
-  var impromptu = new Impromptu
   var methods = null
   var counter = 0
   it('should register a module', function() {
@@ -20,7 +19,7 @@ describe('Module', function() {
       })
       register('echo', {
         update: function(done) {
-          return Impromptu.exec('echo test', done)
+          return impromptu.exec('echo test', done)
         }
       })
     })

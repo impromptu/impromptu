@@ -1,9 +1,9 @@
 var should = require('should')
 var environment = require('./shared/environment')
-var Impromptu = require('../lib/impromptu').constructor
+var impromptu = require('../lib/impromptu')
+var Impromptu = impromptu.constructor
 
 describe('Prompt', function() {
-  var impromptu = new Impromptu
   var helloSync = function() {
     return 'Hello, world!'
   }
@@ -14,7 +14,7 @@ describe('Prompt', function() {
     })
     register('echo', {
       update: function(done) {
-        return Impromptu.exec("printf test", done)
+        return impromptu.exec("printf test", done)
       }
     })
   })
