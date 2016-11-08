@@ -7,6 +7,7 @@ if [[ -z "$IMPROMPTU_DIR" || ! -d "$IMPROMPTU_DIR" ]]; then
 fi
 
 export IMPROMPTU_BIN="$IMPROMPTU_DIR/node_modules/.bin"
+export IMPROMPTU_TMP="$IMPROMPTU_DIR/tmp"
 
 if [[ -n "$IMPROMPTU_TESTING" ]]; then
   export IMPROMPTU_INTERNAL_BIN="$IMPROMPTU_DIR/bin"
