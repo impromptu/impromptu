@@ -1,0 +1,15 @@
+{
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "rules": {
+    "new-cap": [2, { "newIsCap": true, "capIsNew": false }],
+    "no-caller": 2,
+    "no-extra-semi": 2,
+    "no-new": 2,
+    "no-undef": 2,
+    "indent": [2, 2],
+    "semi": [2, "never"]
+  }
+}

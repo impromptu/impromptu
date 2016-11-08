@@ -37,14 +37,17 @@
     "dtrace-provider": "~0.3.1"
   },
   "devDependencies": {
-    "grunt-contrib-watch": "~0.3.1",
+    "closure-npc": "~0.1.5",
+    "eslint": "^3.9.1",
     "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.3.1",
+    "gruntify-eslint": "^3.1.0",
     "mocha": "~1.8.2",
-    "should": "~1.2.2",
-    "grunt-contrib-jshint": "~0.8.0",
-    "closure-npc": "~0.1.5"
+    "should": "~1.2.2"
   },
-  "externs": ["./externs/process.js"],
+  "externs": [
+    "./externs/process.js"
+  ],
   "externDependencies": {
     "async": "./externs/async.js",
     "coffee-script": "./externs/coffee-script.js",

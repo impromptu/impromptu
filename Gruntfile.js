@@ -6,16 +6,13 @@ var spawn = child_process.spawn
 
 module.exports = function(grunt) {
   grunt.initConfig({
-    jshint: {
-      options: {
-        jshintrc: true
-      },
-      lib: ['lib/**/*.js']
+    eslint: {
+      src: ['lib/**/*.js']
     },
     watch: {
       lib: {
         files: ['lib/**/*.js'],
-        tasks: ['jshint', 'test']
+        tasks: ['eslint', 'test']
       },
       test: {
         files: ['test/**/*.js', 'Gruntfile.js'],
@@ -25,9 +22,9 @@ module.exports = function(grunt) {
   })
 
   grunt.loadNpmTasks('grunt-contrib-watch')
-  grunt.loadNpmTasks('grunt-contrib-jshint')
+  grunt.loadNpmTasks("gruntify-eslint")
 
-  grunt.registerTask('test', ['jshint', 'unit', 'check-types'])
+  grunt.registerTask('test', ['eslint', 'unit', 'check-types'])
   grunt.registerTask('default', ['test'])
 
   grunt.registerTask('nuke', "Nuke stuff. Don't run this unless you know what you're doing.", function() {
