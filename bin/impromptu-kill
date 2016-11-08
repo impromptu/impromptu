@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 pgrep -f impromptu | xargs kill
-rm -rf $IMPROMPTU_DIR/tmp
+rm -rf $IMPROMPTU_TMP/prompt.js
+rm -rf $IMPROMPTU_TMP/*.pid
