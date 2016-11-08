@@ -17,7 +17,11 @@ PromptTests.prototype.shouldInitializeImpromptu = function() {
 PromptTests.prototype.shouldLoadThePromptFile = function() {
   this.shouldInitializeImpromptu()
   this.impromptu.load()
-  this.impromptu.prompt._orderedSections.length.should.be.ok
+
+  // If we have sections, there was a loading error. Otherwise we should have a prompt.
+  if (!this.impromptu.prompt._orderedSections.length) {
+    should.exist(this.impromptu._prompt)
+  }
 }
 
 PromptTests.prototype.shouldBuildPrompt = function(fn) {
