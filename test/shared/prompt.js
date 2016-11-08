@@ -11,6 +11,7 @@ function PromptTests(name) {
 PromptTests.prototype.shouldInitializeImpromptu = function() {
   this.impromptu = new Impromptu
   this.impromptu._setRootPath(environment.TEST_PROMPT_ROOT + '/' + this.name)
+  fs.mkdirSync(this.impromptu.state.get('path.tmp'))
   should.exist(this.impromptu)
 }
 
